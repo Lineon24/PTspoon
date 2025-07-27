@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import HeaderWithBack from '@/components/HeaderWithBack';
@@ -11,6 +11,17 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    const checkLogin = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.replace('/') // 로그인된 경우 홈으로 리디렉션
+      }
+    }
+
+    checkLogin()
+  }, [])
+  
   const handleKakaoLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
