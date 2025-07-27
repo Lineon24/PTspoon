@@ -15,7 +15,6 @@ const iconList = [UtensilsCrossed];
 
 export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | null; }) {
   const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null;
-  const IconColor = icon
   const router = useRouter();
   const pathname = usePathname();
 
