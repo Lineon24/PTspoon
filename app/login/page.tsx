@@ -11,6 +11,35 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  const handleKakaoLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: `${location.origin}/`,
+      },
+    });
+
+  if (error) {
+    setError('카카오 로그인 중 오류가 발생했습니다.');
+  }
+ }; 
+    const kakaoButtonStyle = {
+  width: '100%',
+  padding: 13,
+  background: '#FEE500',
+  color: '#3C1E1E',
+  border: 'none',
+  borderRadius: 8,
+  fontWeight: 600,
+  fontSize: 16,
+  marginTop: 13,
+  cursor: 'pointer' as 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+  };
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -57,6 +86,16 @@ export default function LoginPage() {
         />
         <button type="submit" style={buttonStyle}>로그인</button>
         {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          style={kakaoButtonStyle}
+          >
+        <img src="https://developers.kakao.com/assets/img/about/logos/kakaologin/logo_kakao.png"
+          style={{ height: 18, marginRight: 8 }}
+        />
+          카카오톡으로 가입 / 로그인
+        </button>
       </form>
       <button
         style={{ marginTop: 20, background: 'none', border: 'none', color: '#3478ff', cursor: 'pointer' }}

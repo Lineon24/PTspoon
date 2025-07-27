@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TabBar from '@/components/TabBar'; 
+import AuthListener from "@/components/AuthListener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
           padding: 0, // 기본 패딩 제거
         }}
       >
+        <AuthListener />
         {/* 실제 페이지 콘텐츠를 담을 컨테이너 */}
         <div style={{
           flexGrow: 1, // 남은 수직 공간을 모두 차지하도록 설정
