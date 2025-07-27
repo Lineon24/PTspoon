@@ -13,7 +13,7 @@ interface Profile {
 const iconList = [UtensilsCrossed];
 
 
-export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | null; }) {
+export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | 'black'; }) {
   const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null;
   const router = useRouter();
   const pathname = usePathname();
