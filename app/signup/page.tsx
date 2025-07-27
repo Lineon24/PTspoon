@@ -110,8 +110,8 @@ export default function SignupPage() {
           onClick={handleKakaoLogin}
           style={kakaoButtonStyle}
           >
-        <img src="https://developers.kakao.com/assets/img/about/logos/kakaologin/logo_kakao.png"
-          style={{ height: 18, marginRight: 8 }}
+        <img src="/image/kakaotalk_sharing_btn_medium.png"
+          style={{ height: 30, marginRight: 8 }}
         />
           카카오톡으로 가입 / 로그인
         </button>

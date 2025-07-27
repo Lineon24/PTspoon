@@ -15,7 +15,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
-        redirectTo: `${location.origin}/`,
+        redirectTo: process.env.NEXT_PUBLIC_REDIRECT_URL,
       },
     });
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
   justifyContent: 'center',
   gap: 8,
   };
-  
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -91,8 +91,9 @@ export default function LoginPage() {
           onClick={handleKakaoLogin}
           style={kakaoButtonStyle}
           >
-        <img src="https://developers.kakao.com/assets/img/about/logos/kakaologin/logo_kakao.png"
-          style={{ height: 18, marginRight: 8 }}
+        <img src="/image/kakaotalk_sharing_btn_medium.png"
+          style={{ height: 30, marginRight: 8 }}
+          alt="카카오 로그인"
         />
           카카오톡으로 가입 / 로그인
         </button>
