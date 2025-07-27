@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import HeaderWithBack from '@/components/HeaderWithBack';
 import PostList from '@/components/PostList'; // PostList 컴포넌트 임포트 경로 수정
 
 // Post, Comment, Profile 인터페이스는 동일하게 유지
@@ -134,33 +135,7 @@ export default function WritePostPage() {
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
-      {/* 상단바 */}
-      <div style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0, width: '100%', height: 'auto',
-        padding: '10px 20px', background: '#fff', borderBottom: '1px solid #e6eaf2',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        zIndex: 3, boxSizing: 'border-box', maxWidth: 540, margin: '0 auto',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <button
-            onClick={() => router.push('/posts')}
-            style={{
-              background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer',
-              marginRight: '10px', color: '#333', lineHeight: '1', padding: '0'
-            }}
-          >
-            ←
-          </button>
-          <span style={{ fontWeight: 'bold', color: '#1d1d1f', fontSize: 18 }}>내 게시글</span>
-        </div>
-        <div style={{ color: '#3670ff', fontWeight: '500', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ marginRight: 5 }}>{profile.nickname}</span>
-          <button onClick={handleLogout} style={{ background: '#ecf2ff', border: 'none', borderRadius: 7, color: '#3770f8', fontWeight: 600, fontSize: 12, padding: '6px 14px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-            로그아웃
-          </button>
-        </div>
-      </div>
+      <HeaderWithBack title="내 게시글" backTF= {true} /> {/* 상단 고정 헤더 */}
       <div style={{ height: '60px' }}></div>
 
       {/* 게시글 작성 폼 */}
