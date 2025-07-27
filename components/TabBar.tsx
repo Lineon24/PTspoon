@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
-import { Home, Newspaper, MessageSquare } from "lucide-react";
+import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
 
 const showTabBarPaths = ['/', '/login', '/signup', '/posts','/posts/write'];
 
 const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},
   {href: "/posts", label: "게시판", icon: <Newspaper size={20} />},
+  {href: "/posts/write", label: "게시글 작성", icon: <SquarePen size={20} />},
   {href: "/chat", label: "채팅방", icon: <MessageSquare size={20} />},
 ];
 

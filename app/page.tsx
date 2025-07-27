@@ -22,8 +22,7 @@ export default function MainPage() {
       <div style={{ color: '#787b88', fontSize: 15, marginBottom: 16 }}>
         마음이 맞는 사람과 맛집을 찾아보세요!
       </div>
-
-      {/* 채팅방 입장 버튼 (누구나 노출, 클릭 시 로그인 필요하면 /login 이동) 과 게시글 보기 버튼*/}
+            {/* 채팅방 입장 버튼 (누구나 노출, 클릭 시 로그인 필요하면 /login 이동) 과 게시글 보기 버튼*/}
       <button
         style={{
           width: '100%',
