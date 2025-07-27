@@ -15,7 +15,7 @@ export default function LoginPage() {
     const checkLogin = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        router.replace('/') // 로그인된 경우 홈으로 리디렉션
+        router.replace('/') // 로그인된 경우 홈으로 이동
       }
     }
 

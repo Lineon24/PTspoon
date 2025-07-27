@@ -16,7 +16,7 @@ export default function SignupPage() {
     const checkLogin = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        router.replace('/') // 로그인된 경우 홈으로 리디렉션
+        router.replace('/') // 로그인된 경우 홈으로 이동
       }
     }
 
@@ -36,30 +36,51 @@ export default function SignupPage() {
   }
  }; 
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
 
-    // 1. 회원 생성
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+  // 1. profiles 테이블에서 이메일 중복 체크
+  const { data: existingProfiles, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email);
 
-    if (error) {
-      setError(error.message);
-      return;
-    }
+  if (profileError) {
+    setError('서버 오류로 회원가입을 진행할 수 없습니다.');
+    return;
+  }
 
-    // 2. 닉네임 저장 (회원 생성 성공 시)
-    if (data.user) {
-      await supabase
-        .from('profiles')
-        .insert({ id: data.user.id, nickname });
-      alert('회원가입 성공! 로그인해 주세요.');
-      router.replace('/login');
-    }
-  };
+  if (existingProfiles && existingProfiles.length > 0) {
+    setError('이미 사용 중인 이메일입니다.');
+    return;
+  }
+
+  // 2. 회원 생성
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    setError(error.message);
+    return;
+  }
+
+  // 3. 닉네임 저장
+  if (data.user) {
+    await supabase
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        email,
+        nickname,
+      });
+
+    alert('회원가입 성공! 로그인해 주세요.');
+    router.replace('/login');
+  }
+};
   
   const kakaoButtonStyle = {
   width: '100%',
