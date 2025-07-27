@@ -16,7 +16,7 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
-        redirectTo: `https://prufoodfind.vercel.app/`,
+        redirectTo: process.env.NEXT_PUBLIC_REDIRECT_URL,
       },
     });
 
