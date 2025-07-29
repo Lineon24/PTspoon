@@ -14,6 +14,7 @@ interface Post {
   username: string;
   title: string;
   content: string;
+  image_urls: string[];
 }
 
 interface Profile {
@@ -24,6 +25,9 @@ interface Profile {
 export default function WritePostPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
@@ -60,7 +64,7 @@ export default function WritePostPage() {
     getUserProfile();
   }, [router]);
 
-  // 2. 내 게시글 목록 불러오기 및 실시간 구독
+  // 내 게시글 목록 불러오기 및 실시간 구독
   useEffect(() => {
     if (!profile) return;
 
@@ -68,7 +72,7 @@ export default function WritePostPage() {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('user_id', profile.id) // ★ 내 게시글만 필터링
+        .eq('user_id', profile.id) // 내 게시글만 필터링
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -98,36 +102,87 @@ export default function WritePostPage() {
     };
   }, [profile]); // profile이 변경될 때마다 이 useEffect가 다시 실행
 
-  // 3. 게시글 작성 핸들러
-  const handleSubmitPost = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 게시글 작성 
+  const handleSubmitPost = async (e: React.FormEvent) => { e.preventDefault();
     if (!profile || !newPostTitle.trim() || !newPostContent.trim()) {
       alert('제목과 내용을 모두 입력해주세요.');
-      return;
+    return;
     }
 
-    const { error } = await supabase.from('posts').insert([
-      { 
-        user_id: profile.id, 
-        username: profile.nickname, 
-        title: newPostTitle, 
-        content: newPostContent 
+  // 1. 이미지 업로드
+    let uploadedUrls: string[] = [];
+      if (selectedFiles.length > 0) {
+        try {
+        const uploadPromises = selectedFiles.map((file) => handleImageUpload(file));
+        uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
+        } catch (err) {
+          console.error('이미지 업로드 중 오류:', err);
+          alert('이미지 업로드에 실패했습니다.');
+          return;
+        }
       }
-    ]);
 
-    if (error) {
-      console.error('게시글 작성 오류:', error);
-      alert('게시글 작성에 실패했습니다.');
-    } else {
-      setNewPostTitle('');
-      setNewPostContent('');
-    }
-  };
+  // 2. 게시글 업로드
+  const { error } = await supabase.from('posts').insert([
+    {
+      user_id: profile.id,
+      username: profile.nickname,
+      title: newPostTitle,
+      content: newPostContent,
+      image_urls: uploadedUrls,
+    },
+  ]);
 
-  // 4. 로그아웃 핸들러 (동일)
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace('/login');
+  if (error) {
+    console.error('게시글 작성 오류:', error);
+    alert('게시글 작성에 실패했습니다.');
+  } else {
+    // 3. 초기화
+    setNewPostTitle('');
+    setNewPostContent('');
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setUploadedImageUrls([]);
+  }
+};
+
+ 
+ const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files) return;
+
+  const files = Array.from(e.target.files);
+
+  // 미리보기 저장
+  const localPreviews = files.map(file => URL.createObjectURL(file));
+  setPreviewUrls(localPreviews);
+
+  // 실제 파일 저장 (업로드는 하지 않음)
+  setSelectedFiles(files);
+ };
+
+
+const handleImageUpload = async (file: File): Promise<string | null> => {
+  const filePath = `user-${profile?.id}/${Date.now()}-${file.name}`;
+
+  const { data, error } = await supabase.storage
+    .from('board-image')
+    .upload(filePath, file);
+
+  if (error) {
+    console.error('이미지 업로드 오류:', error.message);
+    alert('이미지 업로드에 실패했습니다.');
+    return null;
+  }
+
+  const { data: urlData } = supabase.storage
+    .from('board-image')
+    .getPublicUrl(filePath);
+
+  return urlData.publicUrl ?? null;
+};
+  const removeImage = (index: number) => {
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (loading) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#555' }}>로딩중...</div>;
@@ -148,8 +203,96 @@ export default function WritePostPage() {
           placeholder="게시글 내용을 입력하세요" value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} rows={7}
           style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical', fontSize: 15, lineHeight: 1.5 }}
         ></textarea>
-        <button
-          type="submit" style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: '#007bff', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s ease-in-out' }}
+            <div>
+              {/* 파일 업로드 버튼 */}
+              <label htmlFor="fileInput">
+                <div
+                  style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 10,
+                  border: '2px dashed #ccc',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  background: '#fafafa',
+                  fontSize: 32,
+                  color: '#aaa',
+                  transition: 'border-color 0.3s',
+                  }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.borderColor = '#007bff';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.borderColor = '#ccc';
+                    }}
+                  >
+                  +
+                  </div>
+              </label>
+              <input
+                id="fileInput"
+                type="file"
+                multiple
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFilesChange}
+              />
+
+            {/* 미리보기 그리드 */}
+              <div
+                style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 10,
+                marginTop: 10,
+                }}
+              >
+                {previewUrls.map((url, idx) => (
+                  <div key={idx} style={{
+                    position: 'relative',
+                    width: 100,
+                    height: 100,
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    border: '1px solid #ddd',
+                    }}
+                  >
+                    <img src={url} alt={`preview-${idx}`} style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      }}
+                      onClick={() => window.open(url, '_blank')}
+                    />
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                style={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  background: 'rgba(0,0,0,0.6)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 20,
+                  height: 20,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  lineHeight: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          </div>
+        </div>
+
+        <button type="submit" style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: '#007bff', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s ease-in-out' }}
         >
           게시글 작성
         </button>
