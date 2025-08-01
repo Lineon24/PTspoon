@@ -53,7 +53,7 @@ const ChatRoomListPage = () => {
       .eq('creator_id', user.id);
 
     if (chatdata != null)  {
-      alert('이미 생성된 채팅방이 있습니다.');
+      alert('당신은 이미 생성한 채팅방이 있습니다.');
       return;
     }
 
