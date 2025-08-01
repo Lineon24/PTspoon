@@ -57,7 +57,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
     <div style={{
       display: 'flex',
       alignItems: 'center',
-      padding: '10px 20px',
+      padding: '7px 15px',
       borderBottom: '1px solid #e0e0e0',
       backgroundColor: '#ffffff',
       position: 'fixed', // sticky 대신 fixed 사용
@@ -91,7 +91,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
       <div style={{ color: iconColor, marginRight: '10px' }}><IconComponent/></div>
       ): null}
 
-      <h1 style={{ fontSize: '15px', fontWeight: 'bold', margin: 0 }}>
+      <h1 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
         {title}
       </h1>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>

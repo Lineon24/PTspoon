@@ -6,6 +6,7 @@ import { ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from "next/navigation"
+import HeaderWithBack from '@/components/HeaderWithBack';
 
 // kakao 전역 선언
 declare global {
@@ -21,8 +22,8 @@ interface Restaurant {
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-4">
-    <h3>{restaurant.restaurant_name}</h3>
+  <div className="p-3 text-[12px]">
+    <div className="text-[15px]">{restaurant.restaurant_name}</div>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
@@ -106,7 +107,6 @@ export default function MapPage() {
         const mapOption = {
           center: new window.kakao.maps.LatLng(36.994444, 127.134466),
           level: 3,
-          scrollwheel: false,
         }
         const map = new window.kakao.maps.Map(mapContainer, mapOption)
         mapRef.current = map
@@ -158,8 +158,9 @@ export default function MapPage() {
         onLoad={handleMapLoad}
         strategy="afterInteractive"
       />
-
-      <div className="relative w-full h-screen overflow-hidden">
+      <HeaderWithBack title="주변 맛집 찾기" backTF= {true} /> {/* 상단 고정 헤더 */}
+      <div className="relative w-full h-screen overflow-hidden max-w-[540px] mx-auto">
+        
         <div
           id="map"
           ref={mapContainerRef}
@@ -169,7 +170,7 @@ export default function MapPage() {
         <div
           ref={sheetRef}
           className={cn(
-            "fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.3)] transition-transform duration-300 ease-in-out z-20",
+            "fixed bottom-7.5 left-0 right-0 max-w-[540px] mx-auto bg-white dark:bg-gray-900 rounded-t-2xl shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.3)] transition-transform duration-300 ease-in-out z-20",
             isSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
           )}
         >
@@ -184,11 +185,11 @@ export default function MapPage() {
             )}
           </button>
 
-          <div className="p-4 pt-0">
+          <div className="p-4 pt-0 ">
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[50vh] px-2">
+          <div className="overflow-y-auto max-h-[45vh] px-2">
             <div className="space-y-2 pb-4">
               {restaurants.map((restaurant) => (
                 <div
