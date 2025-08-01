@@ -61,7 +61,7 @@ const ChatRoomListPage = () => {
     const { data, error } = await supabase
       .from('chat_rooms')
       .insert({
-        room_name: `${user.email}의 채팅방`,
+        room_name: `${user.nickname}의 채팅방`,
         creator_id: user.id
       })
       .select()
