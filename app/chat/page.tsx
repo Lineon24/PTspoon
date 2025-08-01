@@ -77,7 +77,13 @@ const ChatRoomListPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ 
+      padding: '20px', 
+      maxWidth: 540, 
+      margin: '0 auto',
+      width: '100%',
+      
+    }}>
       <HeaderWithBack title="전체 채팅방 목록" backTF= {true} /> {/* 상단 고정 헤더 */}
       <h1>전체 채팅방 목록</h1>
       <button onClick={handleCreateRoom} style={{ marginBottom: '20px' }}>
