@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import HeaderWithBack from '@/components/HeaderWithBack';
 
 interface chat_rooms {
     id: string;
@@ -77,6 +78,7 @@ const ChatRoomListPage = () => {
 
   return (
     <div style={{ padding: '20px' }}>
+      <HeaderWithBack title="전체 채팅방 목록" backTF= {true} /> {/* 상단 고정 헤더 */}
       <h1>전체 채팅방 목록</h1>
       <button onClick={handleCreateRoom} style={{ marginBottom: '20px' }}>
         내 채팅방 만들기

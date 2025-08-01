@@ -17,7 +17,6 @@ export default function MainPage() {
       minHeight: '100vh'
     }}>
       <HeaderWithBack title="PTU 맛집 찾기" iconColor='#3878ff' iconIndex={0} backTF= {false} /> {/* 상단 고정 헤더 */}
-
       <div style={{ color: '#3478ff', fontWeight: 700, fontSize: 25 }} role="img" aria-label="pin">📍 실시간 맞집 찾기</div>
       <div style={{ color: '#787b88', fontSize: 15, marginBottom: 16 }}>
         윤성환 멍청이 
