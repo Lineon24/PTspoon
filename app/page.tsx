@@ -44,7 +44,7 @@ export default function MainPage() {
           width: '100%',
           padding: '14px 0',
           borderRadius: 11,
-          background: '#3478ff',
+          background: '#22C55E',
           color: '#fff',
           fontWeight: 700,
           fontSize: 17,
@@ -52,11 +52,11 @@ export default function MainPage() {
           marginTop: 40,
         }}
         onClick={() => {
-          router.push('/login');
+          router.push('/map');
         }}
       >
-        <span role="img" aria-label="chat" style={{ marginRight: 6 }}>💬</span>
-        채팅방 입장
+        <span role="img" aria-label="map" style={{ marginRight: 6 }}>🗺️</span>
+        지도로 식당 찾기
       </button>
     </main>
   );
