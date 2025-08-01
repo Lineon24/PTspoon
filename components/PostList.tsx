@@ -4,6 +4,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import CommentSection from '@/components/CommentSection'; // CommentSection 컴포넌트 임포트
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 
 // Post 인터페이스 (PostPage와 동일하게 정의)
 interface Post {
@@ -13,6 +15,7 @@ interface Post {
   username: string;
   title: string;
   content: string;
+  image_urls: string[];
 }
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
@@ -100,6 +103,35 @@ export default function PostList({ posts, profile }: PostListProps) {
           <p style={{ fontSize: '13px', color: '#888', margin: '0 0 12px 0' }}>
             작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
           </p>
+          {post.image_urls && post.image_urls.length > 0 && (
+            <div style={{
+              width: '100%', // 캐러셀이 부모 너비에 맞게 조절되도록
+              maxWidth: '500px', // 최대 너비 설정 (선택 사항)
+              margin: '12px 0', // 게시글 내용과 이미지 사이 간격
+            }}>
+              <Carousel
+                showArrows={true} // 좌우 화살표 표시
+                showStatus={false} // 현재 이미지 번호/총 이미지 번호 표시 (선택 사항)
+                showIndicators={false} // 하단 점(dot) 인디케이터 표시
+                infiniteLoop={true} // 무한 루프
+                dynamicHeight={true} // 이미지 높이에 따라 캐러셀 높이 조절 (이미지 크기가 다를 경우 유용)
+                showThumbs={false} // 썸네일 표시 여부 (선택 사항)
+              >
+                {post.image_urls.map((url, idx) => (
+                  <div key={idx} onClick={() => window.open(url, '_blank')}>
+                    <img src={url} alt={`post-${post.id}-img-${idx}`}
+                      style={{
+                        maxHeight: '400px', // 이미지 최대 높이 (컨테이너에 맞게 조절)
+                        objectFit: 'contain', // 이미지가 잘리지 않고 전체 보이도록
+                        width: 'auto', // 높이에 맞춰 너비 자동 조절
+                        cursor: 'pointer',
+                      }}
+                  />
+                  </div>
+                ))}
+                </Carousel>
+              </div>
+              )}
           <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>
 
           {/* CommentSection 컴포넌트 사용 */}

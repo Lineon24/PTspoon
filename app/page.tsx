@@ -17,10 +17,9 @@ export default function MainPage() {
       minHeight: '100vh'
     }}>
       <HeaderWithBack title="PTU 맛집 찾기" iconColor='#3878ff' iconIndex={0} backTF= {false} /> {/* 상단 고정 헤더 */}
-
       <div style={{ color: '#3478ff', fontWeight: 700, fontSize: 25 }} role="img" aria-label="pin">📍 실시간 맞집 찾기</div>
       <div style={{ color: '#787b88', fontSize: 15, marginBottom: 16 }}>
-        윤성환 바부
+        윤성환 멍청이 
       </div>
             {/* 채팅방 입장 버튼 (누구나 노출, 클릭 시 로그인 필요하면 /login 이동) 과 게시글 보기 버튼*/}
       <button
@@ -45,7 +44,7 @@ export default function MainPage() {
           width: '100%',
           padding: '14px 0',
           borderRadius: 11,
-          background: '#3478ff',
+          background: '#22C55E',
           color: '#fff',
           fontWeight: 700,
           fontSize: 17,
@@ -53,11 +52,11 @@ export default function MainPage() {
           marginTop: 40,
         }}
         onClick={() => {
-          router.push('/login');
+          router.push('/map');
         }}
       >
-        <span role="img" aria-label="chat" style={{ marginRight: 6 }}>💬</span>
-        채팅방 입장
+        <span role="img" aria-label="map" style={{ marginRight: 6 }}>🗺️</span>
+        지도로 식당 찾기
       </button>
     </main>
   );
