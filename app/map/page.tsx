@@ -10,14 +10,14 @@ import { useRouter } from "next/navigation"
 // kakao 전역 선언
 declare global {
   interface Window {
-    kakao: any
+    kakao: any;
   }
 }
 interface Restaurant {
-  id: string
-  restaurant_name: string
-  address: string
-  phone: string
+  restaurant_id: string;
+  restaurant_name: string;
+  address: string;
+  phone: string;
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
@@ -70,12 +70,13 @@ export default function MapPage() {
         marker.setMap(map)
 
         window.kakao.maps.event.addListener(marker, "click", () => {
-          setSelectedRestaurantId(restaurant.id)
+          console.log("마커 클릭됨:", restaurant.restaurant_id);
+          setSelectedRestaurantId(restaurant.restaurant_id)
           setIsSheetOpen(true)
           map.panTo(new window.kakao.maps.LatLng(lat, lng))
         })
 
-        markersRef.current.push({ id: restaurant.id, marker, position })
+        markersRef.current.push({ id: restaurant.restaurant_id, marker, position })
       } catch (error) {
         console.warn(`주소 변환 실패: ${restaurant.address}`, error)
       }
@@ -117,7 +118,7 @@ export default function MapPage() {
         }
         if (data && data.length > 0) {
           setRestaurants(data as Restaurant[])
-          setSelectedRestaurantId(data[0].id)
+          setSelectedRestaurantId(data[0].restaurant_id)
           await createMarkers(map, data as Restaurant[])
         }
       })
@@ -139,18 +140,16 @@ export default function MapPage() {
           const newSize = isSelected
             ? new window.kakao.maps.Size(42, 52)
             : new window.kakao.maps.Size(32, 42)
-          const newOption = {
-            image: new window.kakao.maps.MarkerImage(
-              "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-              newSize,
-            ),
-            zIndex: isSelected ? 10 : 1,
-          }
-          marker.setOptions(newOption)
-        }
-      })
-    }
-  }, [selectedRestaurantId])
+        const newImage = new window.kakao.maps.MarkerImage(
+          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+          newSize
+        )
+        marker.setImage(newImage)
+        marker.setZIndex(isSelected ? 10 : 1)
+      }
+    })
+  }
+}, [selectedRestaurantId])
 
   return (
     <>
@@ -193,11 +192,11 @@ export default function MapPage() {
             <div className="space-y-2 pb-4">
               {restaurants.map((restaurant) => (
                 <div
-                  key={restaurant.id}
-                  onClick={() => onClickRestaurant(restaurant.id)}
+                  key={restaurant.restaurant_id}
+                  onClick={() => onClickRestaurant(restaurant.restaurant_id)}
                   className={cn(
                     "rounded-xl transition-all cursor-pointer",
-                    selectedRestaurantId === restaurant.id &&
+                    selectedRestaurantId === restaurant.restaurant_id &&
                       "bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500",
                   )}
                 >
