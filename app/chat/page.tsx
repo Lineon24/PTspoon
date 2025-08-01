@@ -47,12 +47,12 @@ const ChatRoomListPage = () => {
     }
 
     // 이미 채팅방이 있는지 확인
-    const { data: existingRooms } = await supabase
+    const { data : chatdata} = await supabase
       .from('chat_rooms')
-      .select('id')
+      .select('creator_id')
       .eq('creator_id', user.id);
 
-    if (existingRooms && existingRooms.length > 0) {
+    if (chatdata != null)  {
       alert('이미 생성된 채팅방이 있습니다.');
       return;
     }
