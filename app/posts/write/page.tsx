@@ -25,7 +25,6 @@ interface Profile {
 export default function WritePostPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,7 +141,6 @@ export default function WritePostPage() {
     setNewPostContent('');
     setSelectedFiles([]);
     setPreviewUrls([]);
-    setUploadedImageUrls([]);
   }
 };
 
