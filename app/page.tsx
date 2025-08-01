@@ -45,7 +45,7 @@ export default function FilterPage() {
         <Link href="/map" passHref>
           <Button
             asChild // Link 내부에 버튼 자식 컴포넌트로 렌더링
-            className="w-full h-12 bg-green-500 hover:bg-green-600 text-white text-lg font-bold rounded-lg mb-4"
+            className="w-full h-10 bg-green-500 hover:bg-green-600 text-white text-[15px] font-bold rounded-lg mb-4"
           >
             {/* 버튼 내용: 아이콘 + 텍스트 */}
             <span className="flex items-center justify-center">
@@ -60,7 +60,7 @@ export default function FilterPage() {
           <Button
             asChild
             variant="outline" // 테두리만 있는 스타일
-            className="w-full h-12 text-lg font-bold rounded-lg mb-6 bg-transparent"
+            className="w-full h-10 text-[15px] font-bold rounded-lg mb-6 bg-transparent"
           >
             {/* 버튼 내용: 리스트 아이콘 + 텍스트 */}
             <span>

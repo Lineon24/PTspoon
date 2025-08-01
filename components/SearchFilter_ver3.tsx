@@ -94,9 +94,9 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
   const totalSelections = selectedFoodTypes.length + selectedTasteTypes.length;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {/*탭 전환 버튼*/}
-      <div className="">
+      <div className="flex flex-col">
       <div className="flex w-full bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-6">
         
         <button onClick={()=>setActiveTab("foodType")}
@@ -121,7 +121,7 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
           </button>
       </div>
       </div>
-      <div className="flex-grow overflow-auto pb-4">
+      <div className="flex-grow overflow-auto grid pb-2">
       {/*음식 종류,맛 종류를 누르면 해당 요소가 나오도록*/}
       {activeTab==="foodType"?<FoodTypeSelector_ver3 selectedFoodTypes={selectedFoodTypes} onToggleFoodType={toggleFoodType} />
       :<TasteTypeSelector_ver3 selectedTasteTypes={selectedTasteTypes} onToggleTasteType={toggleTaste} />}    
@@ -133,19 +133,19 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
           className={cn(
             // 공통 스타일
             "w-full z-50 border-t dark:border-gray-800 bg-white dark:bg-gray-900",
-            // 메인 페이지일 때 (sideTF가 false일 때)
+            // 조건 검색 버튼이 밑으로 가야할떄
             {
-              "fixed bottom-16 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // ⭐️ sideTF를 조건으로 사용
+              "fixed bottom-16 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // side가 false일때 기본값 중앙에 옴
             },
-            // 필터링 Sheet 내부일 때 (sideTF가 true일 때)
+            // 시트내의 조건 버튼 (sideTF가 true일 때)
             {
-              "static bottom-0 mx-auto py-3": sideTF // ⭐️ sideTF를 조건으로 사용
+              "static bottom-0 mx-auto py-3": sideTF //  sideTF가 true면 컨테이너에 따라서 배치
             }
           )}
         >
             <div className="flex justify-between items-center gap-4 pb-2 px-1 py-4">
               {/*선택된 조건 리스트(표시용 이후 하단의 코드는 로컬 스토리지에 영향을 주지 않음)*/}
-              <div className="mb-2 flex flex-wrap gap-2">
+              <div className="mb-2 flex flex-wrap gap-1 ">
                 {selectedFoodTypes.map((tag)=>(
                   <FilterTag key={tag} label={tag} onRemove={()=>toggleFoodType(tag)}/>
                 ))}
@@ -161,11 +161,11 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
               )}
             </div>
             {/*버튼 스타일 지정 및 기능 추가*/}
-            <Button className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold"
+            <Button className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold"
               onClick={handleSearchClick}>
               {totalSelections}개 조건으로 검색하기
             </Button>
-            <Button className="w-full h-10 bg-white-600 hover:bg-gray-100 text-black text-lg font-bold" variant="ghost" onClick={resetFilters}>초기화</Button>
+            <Button className="w-full h-10 bg-white-600 hover:bg-gray-100 text-black text-sm font-bold" variant="ghost" onClick={resetFilters}>초기화</Button>
         </div>
       )}
     </div>

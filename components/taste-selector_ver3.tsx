@@ -89,7 +89,7 @@ export function TasteTypeSelector_ver3({
           여러 개를 선택해서 더 정확한 추천을 받아보세요
         </p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
         {TasteType.map((type) => (
           <FeatureToggle
             key={type.id}

@@ -36,7 +36,7 @@ export function FilterTag({ label, onRemove }: FilterTagProps) {
   return (
     <Badge
       variant="secondary"
-      className="flex items-center gap-1.5 py-1.5 px-3 whitespace-nowrap bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
+      className=" text-[12px] flex items-center gap-1.5 py-1.5 px-3 whitespace-nowrap bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
     >
       <span>{displayLabel}</span>
       {onRemove&&(
