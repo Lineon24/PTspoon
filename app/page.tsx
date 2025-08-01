@@ -1,4 +1,4 @@
-'use client';
+'use client';//이 파일은 클라이언트임을 명시
 
 import { useRouter } from 'next/navigation';
 import HeaderWithBack from '@/components/HeaderWithBack';
