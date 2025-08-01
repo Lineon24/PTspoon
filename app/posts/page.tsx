@@ -15,6 +15,7 @@ interface Post {
   username: string;
   title: string;
   content: string;
+  image_urls: string[];
 }
 
 interface Profile {
