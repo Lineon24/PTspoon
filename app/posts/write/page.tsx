@@ -205,8 +205,15 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
         ></textarea>
             <div>
               {/* 파일 업로드 버튼 */}
-              <label htmlFor="fileInput">
-                <div
+                <input
+                id="fileInput"
+                type="file"
+                multiple
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFilesChange}
+              />
+              <div
                   style={{
                   width: 100,
                   height: 100,
@@ -227,18 +234,12 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLDivElement).style.borderColor = '#ccc';
                     }}
+                      onClick={() => {
+                        document.getElementById('fileInput')?.click();
+                    }}
                   >
                   +
-                  </div>
-              </label>
-              <input
-                id="fileInput"
-                type="file"
-                multiple
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFilesChange}
-              />
+                </div>
 
             {/* 미리보기 그리드 */}
               <div
