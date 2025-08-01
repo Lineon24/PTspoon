@@ -20,16 +20,6 @@ import { FilterTag } from "@/components/filter-tag";
 import { SearchLogicToggle } from "@/components/search-logic-toggle";
 import HeaderWithBack from '@/components/HeaderWithBack';
 
-// Restaurant 타입 정의는 그대로 유지
-interface Restaurant {
-    restaurant_id: string;
-    restaurant_name: string;
-    address: string;
-    phone: string;
-    type: string[]; // 이전 코드에서 restaurant_profiles를 통해 추가된 필드
-    taste: string[]; // 이전 코드에서 restaurant_profiles를 통해 추가된 필드
-}
-
 
 // 실제 페이지 내용을 담을 컴포넌트 (useSearchParams를 포함한 모든 로직)
 // 이 컴포넌트가 Suspense의 자식이 됩니다.
