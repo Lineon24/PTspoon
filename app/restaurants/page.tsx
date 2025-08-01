@@ -240,9 +240,9 @@ function RestaurantsPageContent() {
       </div>
 
       {/* 상태 메시지 */}
-      {loading && <p>로딩중...</p>}
+      {loading && <p className="py-20">로딩중...</p>}
       {error && <p className="text-red-600">{error}</p>}
-      {!loading && restaurants.length === 0 && <p>등록된 음식점이 없습니다.</p>}
+      {!loading && restaurants.length === 0 && <p className="py-20">등록된 음식점이 없습니다.</p>}
 
       {/* 결과 목록 */}
       <div className="space-y-3 py-20">
