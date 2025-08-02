@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
 
-const showTabBarPaths = ['/', '/login', '/signup', '/posts','/posts/write'];
+const showTabBarPaths = ['/', '/login', '/signup', '/posts','/posts/write', '/chat', '/restaurants', '/map'];
 
 const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},
