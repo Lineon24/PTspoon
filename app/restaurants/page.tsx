@@ -257,6 +257,7 @@ function RestaurantsPageContent() {
           </SheetContent>
         </Sheet>
       </div>
+
       {/*fixed 검색창 아래 공간 확보*/}
       <div style={{ height:(filterHeight>0 ? 0:60) + (filterHeight > 0? filterHeight:0) }} />
 
