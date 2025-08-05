@@ -22,8 +22,8 @@ interface Restaurant {
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-3 text-[12px]">
-    <div className="text-[15px]">{restaurant.restaurant_name}</div>
+  <div className="p-4">
+    <h3>{restaurant.restaurant_name}</h3>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
@@ -83,47 +83,89 @@ export default function MapPage() {
       }
     }
   }
+  useEffect(() => {
+  if (!selectedRestaurantId) return;
+  setRestaurants((prev) => {
+    const index = prev.findIndex(r => r.restaurant_id === selectedRestaurantId);
+    if (index === -1) return prev;
+    const newArr = [...prev];
+    const [selected] = newArr.splice(index, 1);
+    newArr.unshift(selected);
+    return newArr;
+  });
+}, [selectedRestaurantId]);
 
   const onClickRestaurant = (id: string) => {
-    const markerObj = markersRef.current.find((m) => m.id === id)
-    if (!mapRef.current) {
-      console.warn("지도 인스턴스 없음")
-      return
-    }
-    if (markerObj) {
-      const { lat, lng } = markerObj.position
-      mapRef.current.panTo(new window.kakao.maps.LatLng(lat, lng))
-      setSelectedRestaurantId(id)
-      setIsSheetOpen(true)
-    }
+  const markerObj = markersRef.current.find((m) => m.id === id);
+  if (!mapRef.current) {
+    console.warn("지도 인스턴스 없음");
+    return;
   }
+  if (markerObj) {
+    const { lat, lng } = markerObj.position;
+    mapRef.current.panTo(new window.kakao.maps.LatLng(lat, lng));
+    setSelectedRestaurantId(id);
+    setIsSheetOpen(true);
+  }
+};
 
   const handleMapLoad = async () => {
-    if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(async () => {
-        const mapContainer = document.getElementById("map")
-        if (!mapContainer) return
+  if (window.kakao && window.kakao.maps) {
+    window.kakao.maps.load(async () => {
+      const mapContainer = document.getElementById("map");
+      if (!mapContainer) return;
 
-        const mapOption = {
-          center: new window.kakao.maps.LatLng(36.994444, 127.134466),
-          level: 3,
-        }
-        const map = new window.kakao.maps.Map(mapContainer, mapOption)
-        mapRef.current = map
+      const mapOption = {
+        center: new window.kakao.maps.LatLng(36.994444, 127.134466), // 기본 중심
+        level: 3,
+      };
+      const map = new window.kakao.maps.Map(mapContainer, mapOption);
+      mapRef.current = map;
 
-        const { data, error } = await supabase.from("restaurant").select("*")
-        if (error) {
-          console.error("Supabase 데이터 조회 실패:", error)
-          return
-        }
-        if (data && data.length > 0) {
-          setRestaurants(data as Restaurant[])
-          setSelectedRestaurantId(data[0].restaurant_id)
-          await createMarkers(map, data as Restaurant[])
-        }
-      })
-    }
+      // ✅ 현재 위치 마커 추가
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const currentPos = new window.kakao.maps.LatLng(lat, lng);
+
+            // 지도 중심 이동
+            map.setCenter(currentPos);
+
+            // 현재 위치 마커 생성
+            const myMarker = new window.kakao.maps.Marker({
+              map,
+              position: currentPos,
+              zIndex: 100,
+              title: "현재 위치",
+              image: new window.kakao.maps.MarkerImage(
+                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png", // 또는 다른 마커 이미지
+                new window.kakao.maps.Size(36, 40)
+              )
+            });
+          },
+          (error) => {
+            console.warn("위치 정보 조회 실패:", error);
+          }
+        );
+      }
+
+      // Supabase에서 식당 데이터 가져오기
+      const { data, error } = await supabase.from("restaurant").select("*");
+      if (error) {
+        console.error("Supabase 데이터 조회 실패:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setRestaurants(data as Restaurant[]);
+        setSelectedRestaurantId(data[0].restaurant_id);
+        await createMarkers(map, data as Restaurant[]);
+      }
+    });
   }
+};
 
   // 클라이언트 사이드 진입시 지도 직접 실행
   useEffect(() => {
@@ -132,40 +174,37 @@ export default function MapPage() {
     }
   }, [])
 
-  useEffect(() => {
-    if (mapRef.current && markersRef.current.length > 0) {
-      markersRef.current.forEach(({ id, marker }) => {
-        const isSelected = id === selectedRestaurantId
-        if (window.kakao && window.kakao.maps) {
-          const newSize = isSelected
-            ? new window.kakao.maps.Size(42, 52)
-            : new window.kakao.maps.Size(32, 42)
-        const newImage = new window.kakao.maps.MarkerImage(
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          newSize
-        )
-        marker.setImage(newImage)
-        marker.setZIndex(isSelected ? 10 : 1)
-      }
-    })
-  }
-}, [selectedRestaurantId])
+useEffect(() => {
+  if (!window.kakao || !window.kakao.maps || markersRef.current.length === 0) return;
+
+  markersRef.current.forEach(({ id, marker }) => {
+    const isSelected = id === selectedRestaurantId;
+
+    if (isSelected) {
+      const bigSize = new window.kakao.maps.Size(42, 49);
+      const selectedImage = new window.kakao.maps.MarkerImage(
+        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+        bigSize
+      );
+      marker.setImage(selectedImage);
+      marker.setZIndex(10);
+    } else {
+      marker.setImage(null); // 기본 파란 마커 유지
+      marker.setZIndex(1);
+    }
+  });
+}, [selectedRestaurantId]);
 
   return (
     <>
       <Script
-        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
         onLoad={handleMapLoad}
         strategy="afterInteractive"
       />
       <HeaderWithBack title="주변 맛집 찾기" backTF= {true} /> {/* 상단 고정 헤더 */}
       <div className="relative w-full h-screen overflow-hidden max-w-[540px] mx-auto">
-        
-        <div
-          id="map"
-          ref={mapContainerRef}
-          className="absolute left-0 right-0 top-0 bottom-0 z-0 transition-all duration-500"
-        />
+        <div className="fixed inset-0 z-0" ref={mapContainerRef} id="map" />
 
         <div
           ref={sheetRef}
@@ -174,7 +213,7 @@ export default function MapPage() {
             isSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
           )}
         >
-          <button
+          <button   
             onClick={() => setIsSheetOpen(!isSheetOpen)}
             className="w-full h-12 flex justify-center items-center"
           >
@@ -185,11 +224,11 @@ export default function MapPage() {
             )}
           </button>
 
-          <div className="p-4 pt-0 ">
+          <div className="p-2.5 pt-2 ">
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[45vh] px-2">
+          <div className="overflow-y-auto max-h-[45vh] px-2 py-1">
             <div className="space-y-2 pb-4">
               {restaurants.map((restaurant) => (
                 <div
