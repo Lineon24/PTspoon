@@ -9,6 +9,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+
 import { useState, useEffect, Suspense, useRef } from "react"; // Suspense 임포트
 import { supabase } from "@/lib/supabaseClient";
 import { RestaurantListItem, type Restaurant } from "@/components/restaurant-list-item_ver2";
@@ -247,6 +248,7 @@ function RestaurantsPageContent() {
               <SheetTitle>필터링</SheetTitle>
             </SheetHeader>
             <div className="flex-grow overflow-y-auto my-4">
+
               <SearchFilter_ver3 onSearch={(params)=>{
                 handleSearch(params);
                 setIsSheetOpen(false);

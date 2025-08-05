@@ -22,8 +22,8 @@ interface Restaurant {
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-4">
-    <h3>{restaurant.restaurant_name}</h3>
+  <div className="p-3 text-[12px]">
+    <div className="text-[15px]">{restaurant.restaurant_name}</div>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
