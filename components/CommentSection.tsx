@@ -30,6 +30,7 @@ interface CommentSectionProps {
 export default function CommentSection({ postId, comments, profile }: CommentSectionProps) {
   const [newCommentContent, setNewCommentContent] = useState<string>('');
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false); // 댓글 열림 상태 기본값은 닫힌 상태
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,16 +63,44 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
   };
 
   return (
-    <div style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
-      <h4 style={{ fontSize: '16px', marginBottom: '10px', color: '#555' }}>댓글 ({comments.length || 0})</h4>
+    <div style={{ borderTop: '1px solid #eee', marginTop: '10px', paddingTop: '13px'}}>
+      <h2 style={{ fontSize: '16px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0})
+        <button
+          onClick={() => setIsOpen(prev => !prev)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#515bd4',
+            fontSize: 16,
+            fontWeight: 'bold',
+            padding: '10px',
+            }}
+            >
+            {isOpen ? '접기' : '펼치기'}
+            <span
+              style={{
+                padding: '5px',
+                display: 'inline-block',
+                transition: 'transform 0.3s ease',
+                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                lineHeight: 1,
+            }}
+            >
+            ▼
+            </span>
+        </button>
+      </h2>
       {/* 댓글 목록 */}
+      {isOpen && (
+      <>
       {comments.length === 0 ? (
         <p style={{ fontSize: '14px', color: '#999', marginBottom: '10px' }}>아직 댓글이 없습니다.</p>
       ) : (
-        comments.map((comment) => (
-          <div key={comment.id} style={{
-            background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
-            border: '1px solid #f0f0f0'
+          comments.map((comment) => (
+            <div key={comment.id} style={{
+              background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
+              border: '1px solid #f0f0f0'
           }}>
             <p style={{ fontSize: '13px', color: '#666', margin: '0 0 5px 0' }}>
               <span style={{ fontWeight: 'bold', color: '#333' }}>{comment.username}</span> | {new Date(comment.created_at).toLocaleString()}
@@ -94,11 +123,13 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#28a745' : '#ccc', color: 'white', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#28a745' : '#ccc', color: 'white', fontSize: '15px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
         >
           댓글 달기
         </button>
       </form>
+      </>
+      )}
     </div>
   );
 }
