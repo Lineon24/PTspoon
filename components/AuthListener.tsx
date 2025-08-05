@@ -11,9 +11,10 @@ export default function AuthListener() {
         error: userError,
       } = await supabase.auth.getUser();
 
-      if (userError) {
+
+      if (userError && userError.message !== 'Auth session missing!') {
         console.error('유저 정보 가져오기 실패:', userError.message);
-        return;
+      return;
       }
 
       if (!user) return;

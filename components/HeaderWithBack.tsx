@@ -97,7 +97,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
           {user ? (
             <>
-              <span style={{ fontWeight: 600, color: '#3264e8', fontSize: 15 }}>
+              <span style={{ fontWeight: 600, color: '#414de4', fontSize: 15 }}>
                 {profile ? `${profile.nickname} 님` : user.email}
               </span>
               <button
@@ -119,7 +119,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
           ) : (
             <button
               style={{
-                background: '#3878ff',
+                background: '#414de4',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 9,

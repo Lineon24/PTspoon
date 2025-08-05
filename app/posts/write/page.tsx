@@ -150,12 +150,17 @@ export default function WritePostPage() {
 
   const files = Array.from(e.target.files);
 
+  // 파일은 5장 까지 업로드 가능
+  if (selectedFiles.length + files.length > 5) {
+    alert('이미지는 최대 5장까지 업로드할 수 있습니다.');
+    return;
+  }
   // 미리보기 저장
   const localPreviews = files.map(file => URL.createObjectURL(file));
-  setPreviewUrls(localPreviews);
+  setPreviewUrls(prev => [...prev, ...localPreviews]);
 
-  // 실제 파일 저장 (업로드는 하지 않음)
-  setSelectedFiles(files);
+  // 실제 파일 저장 (기존 파일에 추가)
+  setSelectedFiles(prev => [...prev, ...files]);
  };
 
 
@@ -195,12 +200,14 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
       <form onSubmit={handleSubmitPost} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px', padding: '20px', background: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
         <input
           type="text" placeholder="게시글 제목을 입력하세요" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)}
-          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: 16 }}
+          maxLength={50} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: 16 }}
         />
+        <div style={{ textAlign: 'right', fontSize: 12, color: '#888' }}>{newPostTitle.length}/50 </div>
         <textarea
           placeholder="게시글 내용을 입력하세요" value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} rows={7}
-          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical', fontSize: 15, lineHeight: 1.5 }}
+          maxLength={3000} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical', fontSize: 15, lineHeight: 1.5 }}
         ></textarea>
+        <div style={{ textAlign: 'right', fontSize: 12, color: '#888' }}>{newPostContent.length}/3000 </div>
             <div>
               {/* 파일 업로드 버튼 */}
                 <input
@@ -216,8 +223,11 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
                   width: 100,
                   height: 100,
                   borderRadius: 10,
-                  border: '2px dashed #ccc',
+                  borderWidth: '2px',
+                  borderStyle: 'dashed',
+                  borderColor: selectedFiles.length >= 5 ? '#f7888aff' : '#ccc',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
@@ -227,16 +237,19 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
                   transition: 'border-color 0.3s',
                   }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.borderColor = '#007bff';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = selectedFiles.length >= 5 ? '#ff0206ff' : '#007bff';
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.borderColor = '#ccc';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = selectedFiles.length >= 5 ? '#f7888aff' : '#ccc';
                     }}
                       onClick={() => {
                         document.getElementById('fileInput')?.click();
                     }}
                   >
                   +
+                  <div style={{justifyContent: 'center', fontSize: 15,}}>
+                  {selectedFiles.length}/5
+                  </div>
                 </div>
 
             {/* 미리보기 그리드 */}
@@ -291,7 +304,7 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
           </div>
         </div>
 
-        <button type="submit" style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: '#007bff', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s ease-in-out' }}
+        <button type="submit" style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: '#414de4', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s ease-in-out' }}
         >
           게시글 작성
         </button>
