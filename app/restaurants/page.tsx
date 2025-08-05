@@ -9,7 +9,8 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-import { useState, useEffect, Suspense } from "react"; // Suspense 임포트
+
+import { useState, useEffect, Suspense, useRef } from "react"; // Suspense 임포트
 import { supabase } from "@/lib/supabaseClient";
 import { RestaurantListItem, type Restaurant } from "@/components/restaurant-list-item_ver2";
 import { useSearchParams, useRouter } from "next/navigation"; // 쿼리 파라미터 훅 import
@@ -205,6 +206,21 @@ function RestaurantsPageContent() {
     fetchRestaurants(parsedFoodTypes, parsedTasteTypes, logic as "AND" | "OR");
   }, [foodTypes, tasteTypes, logic]);
 
+  // 필터 태그 영역 ref와 높이 상태 추가
+  const filterRef = useRef<HTMLDivElement>(null);
+  const [filterHeight, setFilterHeight] = useState(0);
+  // 필터 태그 높이 측정: 필터가 바뀔 때마다 높이 갱신
+  useEffect(() => {
+    if (filterRef.current) {
+      setFilterHeight(filterRef.current.offsetHeight);
+    } else {
+      setFilterHeight(0);
+    }
+  }, [parsedFoodTypes, parsedTasteTypes]);
+
+  //시트가 열려졌는지 확인
+  const [isSheetOpen,setIsSheetOpen]=useState(false);
+
   return (
     <div className="max-w-[540px] mx-auto p-3">
       <HeaderWithBack title="식당 목록" backTF={true} />
@@ -215,10 +231,10 @@ function RestaurantsPageContent() {
             value={inputValue}
             onChange={setInputValue}
             onEnter={handleEnterSearch}
-
           />
         </div>
-        <Sheet>
+        
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button
               variant={"secondary"}
@@ -232,54 +248,48 @@ function RestaurantsPageContent() {
               <SheetTitle>필터링</SheetTitle>
             </SheetHeader>
             <div className="flex-grow overflow-y-auto my-4">
-              <SearchFilter_ver3 onSearch={handleSearch} loading={loading} sideTF={true} />
+
+              <SearchFilter_ver3 onSearch={(params)=>{
+                handleSearch(params);
+                setIsSheetOpen(false);
+              }}
+               loading={loading} sideTF={true} />
             </div>
             <SheetFooter />
           </SheetContent>
         </Sheet>
       </div>
 
+      {/*fixed 검색창 아래 공간 확보*/}
+      <div style={{ height:(filterHeight>0 ? 0:60) + (filterHeight > 0? filterHeight:0) }} />
+
+      {/* 필터 태그 영역 (검색창 아래에 표시, 높이 측정용 ref 포함) */}
+      {(parsedFoodTypes.length > 0 || parsedTasteTypes.length > 0) && (
+        <div
+          ref={filterRef}
+          className="mt-8" 
+        >
+            <div className="flex flex-wrap gap-2">
+              {parsedFoodTypes.length > 0
+                ? parsedFoodTypes.map((tag) => <FilterTag key={tag} label={tag} />)
+                : <span className="text-sm text-gray-500"></span>}
+                {parsedTasteTypes.length > 0
+                ? parsedTasteTypes.map((tag) => <FilterTag key={tag} label={tag} />)
+                : <span className="text-sm text-gray-500"></span>}
+            </div>
+        </div>
+      )}
+
       {/* 상태 메시지 */}
-      {loading && <p className="py-20">로딩중...</p>}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && restaurants.length === 0 && <p className="py-20">등록된 음식점이 없습니다.</p>}
 
       {/* 결과 목록 */}
-      <div className="space-y-3 py-20">
+      <div className="space-y-3 py-4">
         {restaurants.map((r) => (
           <RestaurantListItem key={r.restaurant_id} restaurant={r} />
         ))}
       </div>
-
-      {/* 필터 조건 표시 */}
-      {(parsedFoodTypes.length > 0 || parsedTasteTypes.length > 0) && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-md space-y-2">
-          <div>
-            <p className="font-semibold">음식 특징</p>
-            <div className="flex flex-wrap gap-2">
-              {parsedFoodTypes.length > 0 ? (
-                parsedFoodTypes.map((tag) => <FilterTag key={tag} label={tag} />)
-              ) : (
-                <span className="text-sm text-gray-500">음식 종류 없음</span>
-              )}
-            </div>
-          </div>
-          <div>
-            <p className="font-semibold">맛 특징</p>
-            <div className="flex flex-wrap gap-2">
-              {parsedTasteTypes.length > 0 ? (
-                parsedTasteTypes.map((tag) => <FilterTag key={tag} label={tag} />)
-              ) : (
-                <span className="text-sm text-gray-500">맛 종류 없음</span>
-              )}
-            </div>
-          </div>
-          <div>
-            <p className="font-semibold">검색 논리:</p>
-            <SearchLogicToggle logic={logic as "AND" | "OR"} onLogicChange={() => {}} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
