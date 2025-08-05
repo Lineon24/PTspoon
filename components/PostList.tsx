@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import CommentSection from '@/components/CommentSection'; // CommentSection 컴포넌트 임포트
 import { Carousel } from 'react-responsive-carousel';
+import { useRouter, usePathname } from 'next/navigation';
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 
 // Post 인터페이스 (PostPage와 동일하게 정의)
@@ -41,7 +42,9 @@ interface PostListProps {
 
 export default function PostList({ posts, profile }: PostListProps) {
   const [commentsByPostId, setCommentsByPostId] = useState<{ [postId: string]: Comment[] }>({});
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const postShow = pathname === '/posts';
   // 1. 모든 게시글의 댓글 목록 불러오기 (한 번에 다 가져옴)
   useEffect(() => {
     const fetchAllComments = async () => {
@@ -88,6 +91,21 @@ export default function PostList({ posts, profile }: PostListProps) {
     };
   }, []); // 의존성 배열 비움: 컴포넌트 마운트 시 한 번만 실행
 
+const deletePost = async (postId: string) => {
+  const confirmDelete = window.confirm('정말로 이 게시글을 삭제하시겠습니까?');
+  if (!confirmDelete) return;
+
+  const { error } = await supabase.from('posts').delete().eq('id', postId);
+  if (error) {
+    alert('게시글 삭제에 실패했습니다.');
+    console.error('삭제 오류:', error);
+    return;
+  }
+
+  alert('게시글이 삭제되었습니다.');
+  // 삭제 후 화면에서도 제거
+  window.location.reload(); 
+};
   if (posts.length === 0) {
     return <p style={{ textAlign: 'center', color: '#777', fontSize: 16 }}>아직 게시글이 없습니다.</p>;
   }
@@ -99,14 +117,38 @@ export default function PostList({ posts, profile }: PostListProps) {
           border: '1px solid #e0e0e0', borderRadius: '10px', padding: '18px', marginBottom: '25px',
           background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)',
         }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '8px',
+          }}>
           <h3 style={{ fontSize: '18px', margin: '0 0 8px 0', color: '#222' }}>{post.title}</h3>
+            {profile?.id === post.user_id && (
+          <button
+            onClick={() => deletePost(post.id)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              fontSize: '25px',
+              color: '#999',
+              cursor: 'pointer',
+              marginLeft: '10px',
+              }}
+            title="게시글 삭제"
+              >
+              ×
+          </button>
+        )}</div>
+          <div onClick={ postShow ? () => router.push(`/posts/${post.id}`) : undefined }
+            style={{cursor: postShow ? 'pointer' : 'default',}}>
           <p style={{ fontSize: '13px', color: '#888', margin: '0 0 12px 0' }}>
             작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
           </p>
           {post.image_urls && post.image_urls.length > 0 && (
             <div style={{
               width: '100%', // 캐러셀이 부모 너비에 맞게 조절되도록
-              maxWidth: '500px', // 최대 너비 설정 (선택 사항)
+              maxWidth: '540px', // 최대 너비 설정 (선택 사항)
               margin: '12px 0', // 게시글 내용과 이미지 사이 간격
             }}>
               <Carousel
@@ -117,8 +159,9 @@ export default function PostList({ posts, profile }: PostListProps) {
                 dynamicHeight={true} // 이미지 높이에 따라 캐러셀 높이 조절 (이미지 크기가 다를 경우 유용)
                 showThumbs={false} // 썸네일 표시 여부 (선택 사항)
               >
+                {/*이미지 목록 출력 근데 posts 페이지일 때는 사진 확대 안됌*/}
                 {post.image_urls.map((url, idx) => (
-                  <div key={idx} onClick={() => window.open(url, '_blank')}>
+                  <div key={idx} onClick={ postShow ? undefined : () => window.open(url, '_blank')}> 
                     <img src={url} alt={`post-${post.id}-img-${idx}`}
                       style={{
                         maxHeight: '400px', // 이미지 최대 높이 (컨테이너에 맞게 조절)
@@ -133,7 +176,7 @@ export default function PostList({ posts, profile }: PostListProps) {
               </div>
               )}
           <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>
-
+          </div>
           {/* CommentSection 컴포넌트 사용 */}
           <CommentSection
             postId={post.id}
