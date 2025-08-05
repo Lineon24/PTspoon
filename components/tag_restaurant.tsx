@@ -46,7 +46,7 @@ export function RestaurantMessage({ tag }: Props) {
   }, [tag]);
 
     useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth'});
   }, [tag]);
 
   if (loading) return <span className="text-gray-400">불러오는 중...</span>;
@@ -61,7 +61,8 @@ export function RestaurantMessage({ tag }: Props) {
       <div className="text-gray-700">📞 {restaurant.phone}</div>
     </div>
     </Link>
-    <div ref={bottomRef} />
+    <div ref={bottomRef} ></div>
     </div>
+
   );
 }
