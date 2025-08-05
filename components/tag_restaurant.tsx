@@ -53,7 +53,7 @@ export function RestaurantMessage({ tag }: Props) {
   if (!restaurant) return <span className="text-red-500">식당 정보를 찾을 수 없습니다</span>;
 
   return (
-    <div ref={bottomRef}>
+    <div>
     <Link href={`/restaurant/${restaurant.restaurant_id}`} className="block">
     <div className="mt-3 p-4 bg-blue-50 rounded-md space-y-2">
       <div className="text-xl font-bold">{restaurant.restaurant_name}</div>
@@ -61,6 +61,7 @@ export function RestaurantMessage({ tag }: Props) {
       <div className="text-gray-700">📞 {restaurant.phone}</div>
     </div>
     </Link>
+    <div ref={bottomRef} />
     </div>
   );
 }
