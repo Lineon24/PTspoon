@@ -125,6 +125,7 @@ export default function ChatPage() {
     <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
     </main>
   );
+  // 없는 채팅방 접속금지
   if (chatRoom == null) return (
     <main>
     <HeaderWithBack title='채팅방' backTF= {true} /> {/* 상단 고정 헤더 */}
