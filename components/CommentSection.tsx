@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { SendHorizontal } from 'lucide-react';
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
 interface Comment {
@@ -71,7 +72,7 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: '#515bd4',
+            color: '#414de4',
             fontSize: 16,
             fontWeight: 'bold',
             padding: '10px',
@@ -123,9 +124,9 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#28a745' : '#ccc', color: 'white', fontSize: '15px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
         >
-          댓글 달기
+          <SendHorizontal size={20}/>
         </button>
       </form>
       </>
