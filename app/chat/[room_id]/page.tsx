@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, useParams } from 'next/navigation'; 
 import HeaderWithBack from '@/components/HeaderWithBack';
+import { RestaurantMessage } from '@/components/tag_restaurant';
 
 interface Message {
   id: number;
@@ -164,7 +165,7 @@ export default function ChatPage() {
             <span style={{
               fontSize: 13, color: '#b6c6e7', fontWeight: 600, marginRight: 7
             }}>{msg.username}</span>
-            {msg.content}
+            {msg.content.startsWith('#')? (<RestaurantMessage tag={msg.content.slice(1)}/>):(msg.content)}
           </div>
         )}
         <div ref={bottomRef} />
