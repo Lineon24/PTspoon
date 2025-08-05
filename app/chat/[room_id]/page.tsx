@@ -119,16 +119,27 @@ export default function ChatPage() {
     setInput('');
   };
 
-  if (loading) return <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>;
+  if (loading) return (
+    <main>
+    <HeaderWithBack title={chatRoom?.room_name ?? '채팅방' } backTF= {true} /> {/* 상단 고정 헤더 */}
+    <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
+    </main>
+  );
+  if (chatRoom == null) return (
+    <main>
+    <HeaderWithBack title='채팅방' backTF= {true} /> {/* 상단 고정 헤더 */}
+    <div style={{ margin: 60, textAlign: 'center' }}>해당 채팅방은 없는 채팅방 입니다.</div>
+    </main>
+  );
   if (!profile) return null;
 
   return (
     <main
         style={{
         maxWidth: 540,
-        width: '100vw', // ★ '100vw'에서 '100%'로 변경하여 부모 너비에 맞춥니다.
+        width: '100vw', 
         margin: '0 auto',
-        minHeight: '100svh', // ★ '100svh'에서 'auto'로 변경하여 레이아웃 충돌을 방지합니다.
+        minHeight: '100svh', 
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
@@ -175,7 +186,7 @@ export default function ChatPage() {
       <div
         style={{
           width: '100%',
-          padding: '14px 9px',
+          padding: '10px 9px',
           background: '#fff',
           borderTop: '1.5px solid #e6eaf2',
           display: 'flex',
