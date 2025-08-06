@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { SendHorizontal } from 'lucide-react';
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
 interface Comment {
@@ -30,6 +31,7 @@ interface CommentSectionProps {
 export default function CommentSection({ postId, comments, profile }: CommentSectionProps) {
   const [newCommentContent, setNewCommentContent] = useState<string>('');
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false); // 댓글 열림 상태 기본값은 닫힌 상태
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,22 +62,87 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
       setNewCommentContent(''); // 입력 필드 초기화
     }
   };
+const deleteComment = async (commentId: string) => {
+  const confirmDelete = window.confirm('정말로 이 댓글을 삭제하시겠습니까?');
+  if (!confirmDelete) return;
+
+  const { error } = await supabase.from('comments')
+    .delete()
+    .eq('id', commentId);
+  if (error) {
+    alert('댓글 삭제에 실패했습니다.');
+    console.error('삭제 오류:', error);
+    return;
+  }
+
+  alert('댓글이 삭제되었습니다.');
+  };
 
   return (
-    <div style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
-      <h4 style={{ fontSize: '16px', marginBottom: '10px', color: '#555' }}>댓글 ({comments.length || 0})</h4>
+    <div style={{ borderTop: '1px solid #eee', marginTop: '10px', paddingTop: '13px'}}>
+      <h2 style={{ fontSize: '16px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0})
+        <button
+          onClick={() => setIsOpen(prev => !prev)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#414de4',
+            fontSize: 16,
+            fontWeight: 'bold',
+            padding: '10px',
+            }}
+            >
+            {isOpen ? '접기' : '펼치기'}
+            <span
+              style={{
+                padding: '5px',
+                display: 'inline-block',
+                transition: 'transform 0.3s ease',
+                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                lineHeight: 1,
+            }}
+            >
+            ▼
+            </span>
+        </button>
+      </h2>
       {/* 댓글 목록 */}
+      {isOpen && (
+      <>
       {comments.length === 0 ? (
         <p style={{ fontSize: '14px', color: '#999', marginBottom: '10px' }}>아직 댓글이 없습니다.</p>
       ) : (
-        comments.map((comment) => (
-          <div key={comment.id} style={{
-            background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
-            border: '1px solid #f0f0f0'
+          comments.map((comment) => (
+            <div key={comment.id} style={{
+              background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
+              border: '1px solid #f0f0f0'
           }}>
+            <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '8px',
+            }}>
             <p style={{ fontSize: '13px', color: '#666', margin: '0 0 5px 0' }}>
               <span style={{ fontWeight: 'bold', color: '#333' }}>{comment.username}</span> | {new Date(comment.created_at).toLocaleString()}
             </p>
+            {profile?.id === comment.user_id && (
+            <button
+            onClick={() => deleteComment(comment.id)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              fontSize: '20px',
+              color: '#999',
+              cursor: 'pointer',
+              marginLeft: '10px',
+              }}
+            title="댓글 삭제"
+              >
+              ×
+          </button>)}
+            </div>
             <p style={{ fontSize: '14px', color: '#444', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{comment.content}</p>
           </div>
         ))
@@ -94,11 +161,13 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#28a745' : '#ccc', color: 'white', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
         >
-          댓글 달기
+          <SendHorizontal size={20}/>
         </button>
       </form>
+      </>
+      )}
     </div>
   );
 }

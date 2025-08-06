@@ -114,6 +114,7 @@ const ChatRoomListPage = () => {
       margin: '0 auto',
       width: '100%',
       position: 'relative',
+
       
     }}>
       <HeaderWithBack title="전체 채팅방 목록" backTF= {true} /> {/* 상단 고정 헤더 */}

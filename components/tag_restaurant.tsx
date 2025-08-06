@@ -1,10 +1,6 @@
 "use client";
 import Link from "next/link"
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-=======
 import { useEffect, useRef, useState } from "react";
->>>>>>> f1a5b85a9e508f08bcfe7fef51717374fb69d430
 import { supabase } from "@/lib/supabaseClient";
 
 // 간단한 식당 정보 타입 정의
@@ -23,10 +19,7 @@ export function RestaurantMessage({ tag }: Props) {
 
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-=======
   const bottomRef = useRef<HTMLDivElement>(null);
->>>>>>> f1a5b85a9e508f08bcfe7fef51717374fb69d430
 
   useEffect(() => {
     console.log("현재 tag:", tag);
@@ -52,21 +45,15 @@ export function RestaurantMessage({ tag }: Props) {
     fetchRestaurant();
   }, [tag]);
 
-<<<<<<< HEAD
-=======
     useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth'});
   }, [tag]);
 
->>>>>>> f1a5b85a9e508f08bcfe7fef51717374fb69d430
   if (loading) return <span className="text-gray-400">불러오는 중...</span>;
   if (!restaurant) return <span className="text-red-500">식당 정보를 찾을 수 없습니다</span>;
 
   return (
-<<<<<<< HEAD
-=======
     <div>
->>>>>>> f1a5b85a9e508f08bcfe7fef51717374fb69d430
     <Link href={`/restaurant/${restaurant.restaurant_id}`} className="block">
     <div className="mt-3 p-4 bg-blue-50 rounded-md space-y-2">
       <div className="text-xl font-bold">{restaurant.restaurant_name}</div>
@@ -74,10 +61,7 @@ export function RestaurantMessage({ tag }: Props) {
       <div className="text-gray-700">📞 {restaurant.phone}</div>
     </div>
     </Link>
-<<<<<<< HEAD
-=======
     <div ref={bottomRef} />
     </div>
->>>>>>> f1a5b85a9e508f08bcfe7fef51717374fb69d430
   );
 }
