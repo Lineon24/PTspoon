@@ -61,7 +61,8 @@ export function RestaurantMessage({ tag }: Props) {
       <div className="text-gray-700">📞 {restaurant.phone}</div>
     </div>
     </Link>
-    <div ref={bottomRef} />
+    <div ref={bottomRef} ></div>
     </div>
+
   );
 }
