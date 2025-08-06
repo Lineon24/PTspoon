@@ -204,7 +204,7 @@ useEffect(() => {
       />
       <HeaderWithBack title="주변 맛집 찾기" backTF= {true} /> {/* 상단 고정 헤더 */}
       <div className="relative w-full h-screen overflow-hidden max-w-[540px] mx-auto">
-        <div className="fixed inset-0 z-0" ref={mapContainerRef} id="map" />
+        <div className="fixed inset-0 z-0 max-w-[540px] mx-auto" ref={mapContainerRef} id="map" />
 
         <div
           ref={sheetRef}
