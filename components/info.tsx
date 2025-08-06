@@ -16,7 +16,7 @@ interface Restaurant{
     address:string;
 }
 
-//아니 시발 레스토랑 영타 왜 잉리 힘드냐 진짜
+//아니 시발 레스토랑 영타 왜 이 힘드냐 진짜
 //레스토랑 정보 표시용 컴포넌트
 export default function RestaurantInfo({restaurantId}:RestaurantInfoProps){
     //식당 정보와 로딩 상태
