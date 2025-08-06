@@ -54,7 +54,7 @@ export function RestaurantMessage({ tag }: Props) {
 
   return (
     <div>
-    <Link href={`/restaurant/${restaurant.restaurant_id}`} className="block">
+    <Link href={`/restaurants/${restaurant.restaurant_id}`} className="block">
     <div className="mt-3 p-4 bg-blue-50 rounded-md space-y-2">
       <div className="text-xl font-bold">{restaurant.restaurant_name}</div>
       <div className="text-gray-700">📍 {restaurant.address}</div>
