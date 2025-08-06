@@ -52,37 +52,48 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   if (!restaurant) {
     return <div className="p-4 text-red-500">레스토랑 정보를 불러올 수 없습니다.</div>
   }
-
   return (
-    <section className="p-4 bg-white rounded-xl shadow-sm mb-6 space-y-4">
-      {/* 식당 이름 */}
-      <h1 className="text-2xl font-bold text-gray-900">{restaurant.restaurant_name}</h1>
+  <section className="p-4 bg-white rounded-xl shadow shadow-gray-200 mb-6 space-y-4">
+    {/* 식당 이름 */}
+    <h1 className="text-2xl font-semibold text-gray-900 break-words">
+      {restaurant.restaurant_name}
+    </h1>
 
-      {/* 주소, 전화번호, (운영시간) */}
-      <ul className="space-y-2 text-gray-700 text-sm">
-        <li className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-gray-500" />
-          <a
-            href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline text-green-600"
-          >
-            {restaurant.address}
-          </a>
+    {/* 주소, 전화번호, 운영시간 */}
+    <ul className="space-y-3 text-sm text-gray-700">
+      {/* 주소 */}
+      <li className="flex items-start gap-2">
+        <MapPin className="w-4 h-4 mt-0.5 text-gray-400" />
+        <a
+          href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline hover:text-green-600 transition-colors duration-200"
+        >
+          {restaurant.address}
+        </a>
+      </li>
+
+      {/* 전화번호 */}
+      <li className="flex items-start gap-2">
+        <Phone className="w-4 h-4 mt-0.5 text-gray-400" />
+        <a
+          href={`tel:${restaurant.phone}`}
+          className="hover:underline hover:text-blue-600 transition-colors duration-200"
+        >
+          {restaurant.phone}
+        </a>
+      </li>
+
+      {/* 운영 시간 */}
+      {restaurant.hours && (
+        <li className="flex items-start gap-2">
+          <Clock className="w-4 h-4 mt-0.5 text-gray-400" />
+          <span>{restaurant.hours}</span>
         </li>
-        <li className="flex items-center gap-2">
-          <Phone className="w-4 h-4 text-gray-500" />
-          <a href={`tel:${restaurant.phone}`} className="hover:underline text-blue-600">
-            {restaurant.phone}
-          </a>
-        </li>
-        {/* 운영시간 확장 가능 */}
-        {/* <li className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-gray-500" />
-          <span className="text-gray-800">11:00 - 22:00</span>
-        </li> */}
-      </ul>
-    </section>
-  )
+      )}
+    </ul>
+  </section>
+)
+
 }

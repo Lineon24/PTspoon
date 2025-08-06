@@ -54,22 +54,18 @@ export default function Menu_list({restaurantId}:Restaurant){
     if(!menu){
         return <div className="p-4 text-red-500">메뉴 정보를 불러올 수 없습니다.</div>;
     }
-
-return (
-  <div className="p-4 bg-white rounded-md shadow-md space-y-4">
-    <h1 className="text-2xl font-bold">메뉴</h1>
-    <ul className="space-y-2">
-      {menu.map((item) => (
-        <li key={item.id} className="flex justify-between items-center border-b pb-2">
-          <div>
-            {/* 메뉴명이 배열이라면 여기서 join으로 문자열로 */}
-            <div className="text-lg font-semibold">{item.menu}</div>
-          </div>
-          <div className="text-gray-700">{item.price}원</div>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+    return(
+      <div className="mb-6">
+        <h2 className="test-2x1 font-bold mb-4">메뉴</h2>
+        <div className="grid gap-3">
+          {menu.map((item:any, index:number)=> (
+            <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span className="font-medium">{item.menu}</span>
+              <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
 }
 
