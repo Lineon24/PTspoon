@@ -9,18 +9,23 @@ import HeaderWithBack from '@/components/HeaderWithBack';
 interface ChatRoom {
   id: string;
   room_name: string;
+  created_at: string;
   creator_id: string;
+  room_image?: string;
+  room_description?: string;
 }
+
+const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png'; // public 폴더에 있는 이미지 경로
 
 const ChatRoomListPage = () => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [hoveredRoomId, setHoveredRoomId] = useState<string | null>(null); // hover 상태 관리
   const router = useRouter();
 
-  // 1. 사용자 정보 및 채팅방 목록 불러오기
+  // 사용자 정보 및 채팅방 목록 불러오기
   useEffect(() => {
     const fetchData = async () => {
-      // 로그인 사용자 정보
       const {
         data: { user },
         error: userError,
@@ -30,11 +35,11 @@ const ChatRoomListPage = () => {
       }
       setUser(user);
 
-      // 채팅방 목록
       const { data: roomsData, error: roomsError } = await supabase
         .from('chat_rooms')
         .select('*')
         .order('created_at', { ascending: false });
+
       if (roomsError) {
         console.error('채팅방 목록 가져오기 오류:', roomsError);
       } else {
@@ -45,14 +50,13 @@ const ChatRoomListPage = () => {
     fetchData();
   }, []);
 
-  // 2. 채팅방 생성 버튼 클릭
+  // 채팅방 생성
   const handleCreateRoom = async () => {
     if (!user) {
       alert('로그인해야 채팅방을 만들 수 있습니다.');
       return;
     }
 
-    // 이미 생성한 방 있는지 확인
     const { data: chatdata } = await supabase
       .from('chat_rooms')
       .select('creator_id')
@@ -66,16 +70,14 @@ const ChatRoomListPage = () => {
     router.push('/chat/chat_create');
   };
 
-  // 3. 채팅방 삭제
+  // 채팅방 삭제
   const handleDeleteRoom = async (roomId: string, creatorId: string) => {
     if (!user || user.id !== creatorId) {
       alert('본인이 만든 채팅방만 삭제할 수 있습니다.');
       return;
     }
 
-    if (!window.confirm('정말로 이 채팅방을 삭제하시겠습니까?')) {
-      return;
-    }
+    if (!window.confirm('정말로 이 채팅방을 삭제하시겠습니까?')) return;
 
     const { error } = await supabase.from('chat_rooms').delete().eq('id', roomId);
     if (error) {
@@ -130,55 +132,111 @@ const ChatRoomListPage = () => {
       <br />
 
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        {rooms.map((room) => (
-          <li
-            key={room.id}
+    {rooms.map((room) => {
+      const isHovered = hoveredRoomId === room.id;
+      return (
+        <li
+          key={room.id}
+          onMouseEnter={() => setHoveredRoomId(room.id)}
+          onMouseLeave={() => setHoveredRoomId(null)}
+          style={{
+            position: 'relative',
+            padding: 14,
+            border: `1px solid #ddd`,
+            borderRadius: 10,
+            marginBottom: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            backgroundColor:
+              isHovered
+              ? '#f0f0f0' // 마우스 올렸을 때는 항상 이 색
+              : user?.id === room.creator_id
+              ? '#f8f8e4ff' // 내가 만든 방이면 기본 배경색을 진하게
+              : 'white',  // 기본은 흰색
+            cursor: isHovered ? 'pointer' : 'default',
+            transition: 'border-color 0.3s',
+          }}
+        >
+          {/* 방 이미지 (없을 경우 기본 이미지 사용) */}
+          <img
+            src={room.room_image || DEFAULT_IMAGE_URL}
+            alt={`${room.room_name} 대표 이미지`}
             style={{
-              padding: 15,
-              border: '1px solid #ddd',
-              borderRadius: 10,
-              marginBottom: 12,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              width: 48,
+              height: 48,
+              borderRadius: 8,
+              objectFit: 'cover', // 크기에 맞게 축소/자르기
+              flexShrink: 0,
+              border: `1px solid #ddd`, // 이미지 테두리도 동일하게 변경
+              transition: 'border-color 0.3s',
+            }}
+          />
+
+          {/* 방 이름 링크 */}
+          <Link
+            href={`/chat/${room.id}`}
+            style={{
+              textDecoration: 'none',
+              color: '#333',
+              flexGrow: 1,
             }}
           >
-            <Link
-              href={`/chat/${room.id}`}
-              style={{
-                textDecoration: 'none',
-                color: '#333',
-                flexGrow: 1,
-                fontWeight: '500',
-              }}
-            >
-              {room.room_name}
-            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: 'bold', fontSize: 16 }}>{room.room_name}</span>
+              {room.room_description && (
+                <span style={{ fontSize: 13, color: '#777', marginTop: 4 }}>
+                  {room.room_description}
+                </span>
+              )}
+            </div>
+          </Link>
 
-            {user?.id === room.creator_id && (
-              <button
-                onClick={() => handleDeleteRoom(room.id, room.creator_id)}
-                style={{
-                  marginLeft: 10,
-                  backgroundColor: 'transparent',
-                  color: 'gray',
-                  border: 'none',
-                  padding: '4px 8px',
-                  borderRadius: '50%',
-                  fontSize: 16,
-                  cursor: 'pointer',
-                }}
-                aria-label="삭제"
-                title="삭제"
-              >
-                ×
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+          {/* 만든 시간 */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              fontSize: 12,
+              color: '#999',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {room.created_at ? new Date(room.created_at).toLocaleDateString() : ''}
+          </div>
+
+          {/* 삭제 버튼 (본인이 만든 방만 표시) */}
+          {user?.id === room.creator_id && (
+            <button
+              onClick={() => handleDeleteRoom(room.id, room.creator_id)}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                backgroundColor: 'transparent',
+                color: 'gray',
+                border: '1px solid gray',
+                padding: '2px 6px',
+                borderRadius: '50%',
+                fontSize: 14,
+                cursor: 'pointer',
+                lineHeight: 1,
+                userSelect: 'none',
+              }}
+              aria-label="삭제"
+              title="삭제"
+            >
+              ×
+            </button>
+          )}
+        </li>
+      );
+    })}
+  </ul>
+</div>
+);
 };
 
 export default ChatRoomListPage;
