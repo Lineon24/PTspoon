@@ -152,7 +152,7 @@ const ChatRoomListPage = () => {
               isHovered
               ? '#f0f0f0' // 마우스 올렸을 때는 항상 이 색
               : user?.id === room.creator_id
-              ? '#f8f8e4ff' // 내가 만든 방이면 기본 배경색을 진하게
+              ? '#eafff8ff' // 내가 만든 방이면 기본 배경색을 진하게
               : 'white',  // 기본은 흰색
             cursor: isHovered ? 'pointer' : 'default',
             transition: 'border-color 0.3s',
