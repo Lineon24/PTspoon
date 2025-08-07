@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
 
-const showTabBarPaths = ['/', '/login', '/signup', '/posts','/posts/write', '/chat', '/restaurants', '/map'];
+const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map'];
+const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/];
 
 const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},
@@ -20,7 +21,9 @@ const navLabelStyle = {
 
 export default function TabBar() {
   const pathname = usePathname();
-  const showTabBar = showTabBarPaths.includes(pathname);
+  const showTabBar =
+  staticPaths.includes(pathname) ||
+  dynamicPatterns.some((pattern) => pattern.test(pathname));
 
   if (!showTabBar) return null;
 
