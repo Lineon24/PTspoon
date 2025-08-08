@@ -22,8 +22,8 @@ interface Restaurant {
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-3 text-[12px]">
-    <div className="text-[15px]">{restaurant.restaurant_name}</div>
+  <div className="p-4">
+    <h3>{restaurant.restaurant_name}</h3>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
@@ -198,7 +198,7 @@ useEffect(() => {
   return (
     <>
       <Script
-        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
         onLoad={handleMapLoad}
         strategy="afterInteractive"
       />

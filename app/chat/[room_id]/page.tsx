@@ -130,6 +130,8 @@ export default function ChatPage() {
     <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
     </main>
   );
+
+
   // 없는 채팅방 접속금지
   if (chatRoom == null) return (
     <main>
@@ -166,27 +168,57 @@ export default function ChatPage() {
           flexDirection: 'column',
         }}
       >
-        {messages.map(msg =>
-          <div key={msg.id} style={{
-            margin: '7px 0',
-            padding: '8px 13px',
-            borderRadius: 13,
-            background: msg.user_id === profile.id ? '#e6f0ff' : '#fff',
-            fontWeight: msg.user_id === profile.id ? 700 : 500,
-            color: msg.user_id === profile.id ? '#3171e3' : '#1d1d1f',
-            alignSelf: msg.user_id === profile.id ? 'flex-end' : 'flex-start',
-            maxWidth: '86%',
-            wordBreak: 'break-word',
-            boxShadow: msg.user_id === profile.id ? '0 2px 7px #e5f0ff55' : '0 0.5px 2px #e0eaf766'
-          }}>
-            <span style={{
-              fontSize: 13, color: '#b6c6e7', fontWeight: 600, marginRight: 7
-            }}>{msg.username}</span>
-            {msg.content.startsWith('#')? (<RestaurantMessage tag={msg.content.slice(1)}/>):(msg.content)}
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
+
+{messages.map(msg =>
+  <div
+    key={msg.id}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: msg.user_id === profile.id ? 'flex-end' : 'flex-start',
+      marginBottom: 10,
+    }}
+  >
+    {/* 닉네임: 그림자 밖 */}
+    <span
+      style={{
+        fontSize: 12,
+        color: msg.user_id === profile.id ? '#3171e3' : '#6c7a89',
+        fontWeight: 600,
+        marginBottom: 3,
+        paddingLeft: 5,
+        paddingRight: 5,
+      }}
+    >
+      {msg.username}
+    </span>
+
+    {/* 메시지 박스: 그림자 포함 */}
+    <div
+      style={{
+        position: 'relative',
+        padding: '8px 13px',
+        borderRadius: 13,
+        background: msg.user_id === profile.id ? '#e6f0ff' : '#fff',
+        fontWeight: 500,
+        color: msg.user_id === profile.id ? '#1d1d1f' : '#1d1d1f',
+        maxWidth: '86%',
+        wordBreak: 'break-word',
+        boxShadow: msg.user_id === profile.id
+          ? '0 2px 7px #e5f0ff55'
+          : '0 0.5px 2px #e0eaf75d',
+      }}
+    >
+      {/* 메시지 본문 */}
+      {msg.content.startsWith('#') ? (
+        <RestaurantMessage tag={msg.content.slice(1)} />
+      ) : (
+        <span style={{ fontSize: 15 }}>{msg.content}</span>
+      )}
+    </div>
+  </div>
+)}
+</div>
 
       {/* 입력창 */}
       <div
