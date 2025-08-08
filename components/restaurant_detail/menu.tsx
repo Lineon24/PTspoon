@@ -14,6 +14,9 @@ interface Restaurant_menu{
 interface Restaurant{
     restaurantId:string;
 }
+interface description{
+  dummy_menu_description:"이건 더미 메뉴 설명임";
+}
 
 //지금부터 컴포넌트 시작
 
@@ -54,6 +57,7 @@ export default function Menu_list({restaurantId}:Restaurant){
     if(!menu){
         return <div className="p-4 text-red-500">메뉴 정보를 불러올 수 없습니다.</div>;
     }
+    //메뉴의 스타일인 초기에 v0로 만든 스타일 코드를 대다수 참고함
     return(
       <div className="mb-6">
         <h2 className="test-2x1 font-bold mb-4">메뉴</h2>
@@ -61,6 +65,7 @@ export default function Menu_list({restaurantId}:Restaurant){
           {menu.map((item:any, index:number)=> (
             <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span className="font-medium">{item.menu}</span>
+              <div className="text-xs text-gray-500">이건 더미 메뉴 설명임</div>
               <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
             </div>
           ))}
