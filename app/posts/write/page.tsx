@@ -166,7 +166,7 @@ export default function WritePostPage() {
 
 
 const handleImageUpload = async (file: File): Promise<string | null> => {
-  const filePath = `${profile?.nickname}/${Date.now()}-${file.name}`; // 파일 저장 경로
+  const filePath = `user-${profile?.id}/${Date.now()}-${file.name}`; // 파일 저장 경로
 
   const { data, error } = await supabase.storage
     .from('board-image') // 저장할 스토리지 이름
