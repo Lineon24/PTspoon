@@ -97,9 +97,14 @@ const deletePost = async (post: Post) => {
 
   const { error:dbError } = await supabase.from('posts').delete().eq('id', post.id); // 데이터베이스의 내용 제거 부분
 
+  const imageUrls = post.image_urls; // 저장된 파일 경로 변수에 넣기
+  const filePaths = imageUrls.map(url => {
+    // 공용 URL을 스토리지 URL로 변경
+    return url.split(`/board-image/`)[1];
+  });
   const { data, error:storageError } = await supabase.storage
   .from('board-image') // 이미지가 있는 게시글 버킷을 선택
-  .remove(post.image_urls); // 제거할 파일 경로의 배열
+  .remove(filePaths); // 제거할 파일 경로의 배열
 
   if (dbError) {
     alert('게시글 삭제에 실패했습니다.');

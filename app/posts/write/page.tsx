@@ -123,7 +123,7 @@ export default function WritePostPage() {
       }
 
   // 게시글 업로드
-  const { error } = await supabase.from('posts').insert([ // 데이터 베이스에 게시글 정보 업로드
+  const { data, error } = await supabase.from('posts').insert([ // 데이터 베이스에 게시글 정보 업로드
     {
       user_id: profile.id,
       username: profile.nickname,
@@ -131,17 +131,19 @@ export default function WritePostPage() {
       content: newPostContent,
       image_urls: uploadedUrls,
     },
-  ]);
+  ])
+  .select();
 
   if (error) {
     console.error('게시글 작성 오류:', error);
     alert('게시글 작성에 실패했습니다.');
   } else {
-    // 오류시 초기화
+    // 업로드 후 초기화
     setNewPostTitle('');
     setNewPostContent('');
     setSelectedFiles([]);
     setPreviewUrls([]);
+    router.push(`/posts/${data[0].id}`); // 해당 게시글 페이지로 이동
   }
 };
 
