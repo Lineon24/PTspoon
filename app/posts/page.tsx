@@ -1,4 +1,4 @@
-// app/posts/page.tsx
+// 모든 게시글을 표현하는 페이지 입니다. 컴포넌트를 활용했기 때문에 게시글 출력 부분은 PostList 컴포넌트 참고 바람
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -29,7 +29,7 @@ export default function AllPostsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const router = useRouter();
 
-  // 1. 사용자 로그인 상태 및 프로필 정보 불러오기
+  // 사용자 로그인 상태 및 프로필 정보 불러오기
   useEffect(() => {
     async function getUserProfile() {
       const { data: userData } = await supabase.auth.getUser();
@@ -48,14 +48,14 @@ export default function AllPostsPage() {
       setLoading(false);
     }
     getUserProfile();
-  }, []);
+  }, []); // 한번만 실행
 
-  // 2. 모든 게시글 목록 불러오기 및 실시간 구독
+  // 모든 게시글 목록 불러오기 및 실시간 구독
   useEffect(() => {
     const fetchAllPosts = async () => {
       const { data, error } = await supabase
         .from('posts')
-        .select('*')
+        .select('*') // 필터링 없이 모든
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -64,9 +64,9 @@ export default function AllPostsPage() {
         setPosts(data || []);
       }
     };
-    fetchAllPosts();
+    fetchAllPosts(); // 함수 실행
 
-    const postsChannel = supabase
+    const postsChannel = supabase // 실시간으로 게시글 받는 부분
       .channel('public:posts_all_page') // 채널 이름 변경 (충돌 방지)
       .on(
         'postgres_changes',
@@ -82,13 +82,8 @@ export default function AllPostsPage() {
     };
   }, []);
 
-  // 3. 로그아웃 핸들러
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace('/login');
-  };
 
-  if (loading) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#555' }}>로딩중...</div>;
+  if (loading) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#555' }}>로딩중...</div>; // 게시글 로딩 전이면 출력
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
