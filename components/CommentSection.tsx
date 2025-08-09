@@ -1,9 +1,9 @@
-// app/posts/components/CommentSection.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { SendHorizontal } from 'lucide-react';
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
 interface Comment {
@@ -26,26 +26,26 @@ interface CommentSectionProps {
   comments: Comment[]; // 해당 게시글의 댓글 목록
   profile: Profile | null; // 현재 로그인된 사용자 프로필 (댓글 작성 권한 확인용)
 }
-
-export default function CommentSection({ postId, comments, profile }: CommentSectionProps) {
+// 인자 값으로 포스트 id, 댓글 리스트, 프로필 정보를 받아옴 
+export default function CommentSection({ postId, comments, profile }: CommentSectionProps) { 
   const [newCommentContent, setNewCommentContent] = useState<string>('');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false); // 댓글 열림 상태 기본값은 닫힌 상태
 
   const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // 폼 제출 시 새로고침 방지
 
-    if (!profile) {
+    if (!profile) { // 댓글 작성 권한 확인용
       alert('댓글을 작성하려면 로그인해주세요.');
       router.push('/login');
       return;
     }
-    if (!newCommentContent.trim()) {
+    if (!newCommentContent.trim()) { // 제출 시 댓글이 빈 내용이면 알림 및 빈 내용을 데이터 베이스에 올리는 것을 방지
       alert('댓글 내용을 입력해주세요.');
       return;
     }
 
-    const { error } = await supabase.from('comments').insert([
+    const { error } = await supabase.from('comments').insert([ // 댓글 내용 데이터 베이스 삽입 부분
       { 
         post_id: postId,
         user_id: profile.id, 
@@ -54,30 +54,45 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
       }
     ]);
 
-    if (error) {
+    if (error) { // 오류 시 처리 부분
       console.error('댓글 작성 오류:', error);
       alert('댓글 작성에 실패했습니다.');
     } else {
       setNewCommentContent(''); // 입력 필드 초기화
     }
   };
+const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
+  const confirmDelete = window.confirm('정말로 이 댓글을 삭제하시겠습니까?');
+  if (!confirmDelete) return; // confirm 윈도우 정보 창이 나오고 거절 시 취소
+
+  const { error } = await supabase.from('comments') // 실제 데이터 베이스 삭제 부분
+    .delete()
+    .eq('id', commentId);
+  if (error) { // 오류 시 처리 부분
+    alert('댓글 삭제에 실패했습니다.');
+    console.error('삭제 오류:', error);
+    return;
+  }
+
+  alert('댓글이 삭제되었습니다.');
+  };
 
   return (
     <div style={{ borderTop: '1px solid #eee', marginTop: '10px', paddingTop: '13px'}}>
-      <h2 style={{ fontSize: '16px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0})
+      <h2 style={{ fontSize: '16px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0}) {/*댓글 수 정보 표현*/}
         <button
-          onClick={() => setIsOpen(prev => !prev)}
+          onClick={() => setIsOpen(prev => !prev)} // 댓글 창 접기 기능
           style={{
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: '#515bd4',
+            color: '#414de4',
             fontSize: 16,
             fontWeight: 'bold',
             padding: '10px',
             }}
             >
-            {isOpen ? '접기' : '펼치기'}
+            {isOpen ? '접기' : '펼치기'} 
             <span
               style={{
                 padding: '5px',
@@ -102,9 +117,31 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
               background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
               border: '1px solid #f0f0f0'
           }}>
+            <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '8px',
+            }}>
             <p style={{ fontSize: '13px', color: '#666', margin: '0 0 5px 0' }}>
               <span style={{ fontWeight: 'bold', color: '#333' }}>{comment.username}</span> | {new Date(comment.created_at).toLocaleString()}
             </p>
+            {profile?.id === comment.user_id && ( // 댓글 작성자와 현 사용자의 id 같으면 삭제 버튼 표시
+            <button
+            onClick={() => deleteComment(comment.id)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              fontSize: '20px',
+              color: '#999',
+              cursor: 'pointer',
+              marginLeft: '10px',
+              }}
+            title="댓글 삭제"
+              >
+              ×
+          </button>)}
+            </div>
             <p style={{ fontSize: '14px', color: '#444', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{comment.content}</p>
           </div>
         ))
@@ -123,9 +160,9 @@ export default function CommentSection({ postId, comments, profile }: CommentSec
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#28a745' : '#ccc', color: 'white', fontSize: '15px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
         >
-          댓글 달기
+          <SendHorizontal size={20}/> {/*전송 아이콘*/}
         </button>
       </form>
       </>

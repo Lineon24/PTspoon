@@ -1,3 +1,4 @@
+// 로그인 버튼 클릭 시 나오는 페이지 입니다.
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,7 @@ export default function LoginPage() {
     checkLogin()
   }, [])
   
-  const handleKakaoLogin = async () => {
+  const handleKakaoLogin = async () => { // 카카오톡 로그인/회원가입 부분
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
@@ -55,7 +56,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({ // 수파베이스 인증 로그인 부분
       email,
       password,
     });
