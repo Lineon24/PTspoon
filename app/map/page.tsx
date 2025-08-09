@@ -22,8 +22,8 @@ interface Restaurant {
 }
 
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-4">
-    <h3>{restaurant.restaurant_name}</h3>
+  <div className="p-3 text-[12px]">
+    <div className="text-[15px]">{restaurant.restaurant_name}</div>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
@@ -34,11 +34,11 @@ export default function MapPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(true)
   const mapRef = useRef<any>(null)
-  const markersRef = useRef<
-    { id: string; marker: any; position: { lat: number; lng: number } }[]
-  >([])
+  const markersRef = useRef<{ id: string; marker: any; position: { lat: number; lng: number } }[]>([])
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
+
+  const router = useRouter()
 
   const KAKAO_MAP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY as string
 
@@ -64,14 +64,21 @@ export default function MapPage() {
       try {
         const { lat, lng } = await geocodeAddress(restaurant.address)
         const position = { lat, lng }
+
+        const defaultImage = new window.kakao.maps.MarkerImage(
+          "/map/icon_black.png",
+          new window.kakao.maps.Size(38, 40)
+        )
+
         const marker = new window.kakao.maps.Marker({
           position: new window.kakao.maps.LatLng(lat, lng),
           clickable: true,
+          image: defaultImage
         })
+
         marker.setMap(map)
 
         window.kakao.maps.event.addListener(marker, "click", () => {
-          console.log("마커 클릭됨:", restaurant.restaurant_id);
           setSelectedRestaurantId(restaurant.restaurant_id)
           setIsSheetOpen(true)
           map.panTo(new window.kakao.maps.LatLng(lat, lng))
@@ -83,128 +90,174 @@ export default function MapPage() {
       }
     }
   }
-  useEffect(() => {
-  if (!selectedRestaurantId) return;
-  setRestaurants((prev) => {
-    const index = prev.findIndex(r => r.restaurant_id === selectedRestaurantId);
-    if (index === -1) return prev;
-    const newArr = [...prev];
-    const [selected] = newArr.splice(index, 1);
-    newArr.unshift(selected);
-    return newArr;
-  });
-}, [selectedRestaurantId]);
 
+  useEffect(() => {
+    if (!selectedRestaurantId) return
+    setRestaurants((prev) => {
+      const index = prev.findIndex(r => r.restaurant_id === selectedRestaurantId)
+      if (index === -1) return prev
+      const newArr = [...prev]
+      const [selected] = newArr.splice(index, 1)
+      newArr.unshift(selected)
+      return newArr
+    })
+  }, [selectedRestaurantId])
+
+  // 여기가 핵심
   const onClickRestaurant = (id: string) => {
-  const markerObj = markersRef.current.find((m) => m.id === id);
-  if (!mapRef.current) {
-    console.warn("지도 인스턴스 없음");
-    return;
+    if (selectedRestaurantId === id) {
+      // 이미 선택된 상태면 이동
+      router.push(`/restaurants`)
+    } else {
+      // 선택만
+      const markerObj = markersRef.current.find((m) => m.id === id)
+      if (markerObj && mapRef.current) {
+        const { lat, lng } = markerObj.position
+        mapRef.current.panTo(new window.kakao.maps.LatLng(lat, lng))
+      }
+      setSelectedRestaurantId(id)
+      setIsSheetOpen(true)
+    }
   }
-  if (markerObj) {
-    const { lat, lng } = markerObj.position;
-    mapRef.current.panTo(new window.kakao.maps.LatLng(lat, lng));
-    setSelectedRestaurantId(id);
-    setIsSheetOpen(true);
-  }
-};
 
   const handleMapLoad = async () => {
-  if (window.kakao && window.kakao.maps) {
-    window.kakao.maps.load(async () => {
-      const mapContainer = document.getElementById("map");
-      if (!mapContainer) return;
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(async () => {
+        const mapContainer = document.getElementById("map")
+        if (!mapContainer) return
 
-      const mapOption = {
-        center: new window.kakao.maps.LatLng(36.994444, 127.134466), // 기본 중심
-        level: 3,
-      };
-      const map = new window.kakao.maps.Map(mapContainer, mapOption);
-      mapRef.current = map;
+        const mapOption = {
+          center: new window.kakao.maps.LatLng(36.994444, 127.134466),
+          level: 3,
+        }
+        const map = new window.kakao.maps.Map(mapContainer, mapOption)
+        mapRef.current = map
 
-      // ✅ 현재 위치 마커 추가
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const currentPos = new window.kakao.maps.LatLng(lat, lng);
+        const { data: { session } } = await supabase.auth.getSession()
 
-            // 지도 중심 이동
-            map.setCenter(currentPos);
+        if (!session) {
+          router.push("/login")
+          return
+        }
 
-            // 현재 위치 마커 생성
-            const myMarker = new window.kakao.maps.Marker({
-              map,
-              position: currentPos,
-              zIndex: 100,
-              title: "현재 위치",
-              image: new window.kakao.maps.MarkerImage(
-                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png", // 또는 다른 마커 이미지
-                new window.kakao.maps.Size(36, 40)
-              )
-            });
-          },
-          (error) => {
-            console.warn("위치 정보 조회 실패:", error);
-          }
-        );
-      }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude
+              const lng = position.coords.longitude
+              const currentPos = new window.kakao.maps.LatLng(lat, lng)
 
-      // Supabase에서 식당 데이터 가져오기
-      const { data, error } = await supabase.from("restaurant").select("*");
-      if (error) {
-        console.error("Supabase 데이터 조회 실패:", error);
-        return;
-      }
+              map.setCenter(currentPos)
 
-      if (data && data.length > 0) {
-        setRestaurants(data as Restaurant[]);
-        setSelectedRestaurantId(data[0].restaurant_id);
-        await createMarkers(map, data as Restaurant[]);
-      }
-    });
+              new window.kakao.maps.Marker({
+                map,
+                position: currentPos,
+                zIndex: 100,
+                title: "현재 위치",
+                image: new window.kakao.maps.MarkerImage(
+                  "/map/icon2.png",
+                  new window.kakao.maps.Size(40, 38)
+                )
+              })
+            },
+            () => { /* 위치 조회 실패 무시 */ }
+          )
+        }
+
+        const { data, error } = await supabase.from("restaurant").select("*")
+        if (error) {
+          console.error("Supabase 데이터 조회 실패:", error)
+          return
+        }
+
+        if (data && data.length > 0) {
+          setRestaurants(data as Restaurant[])
+          setSelectedRestaurantId(data[0].restaurant_id)
+          await createMarkers(map, data as Restaurant[])
+        }
+      })
+    }
   }
-};
 
-  // 클라이언트 사이드 진입시 지도 직접 실행
   useEffect(() => {
     if (typeof window !== "undefined" && window.kakao?.maps) {
       handleMapLoad()
     }
   }, [])
 
-useEffect(() => {
-  if (!window.kakao || !window.kakao.maps || markersRef.current.length === 0) return;
+  useEffect(() => {
+    if (!window.kakao || !window.kakao.maps || markersRef.current.length === 0) return
 
-  markersRef.current.forEach(({ id, marker }) => {
-    const isSelected = id === selectedRestaurantId;
+    markersRef.current.forEach(({ id, marker }) => {
+      const isSelected = id === selectedRestaurantId
 
-    if (isSelected) {
-      const bigSize = new window.kakao.maps.Size(42, 49);
-      const selectedImage = new window.kakao.maps.MarkerImage(
-        "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
-        bigSize
-      );
-      marker.setImage(selectedImage);
-      marker.setZIndex(10);
-    } else {
-      marker.setImage(null); // 기본 파란 마커 유지
-      marker.setZIndex(1);
-    }
-  });
-}, [selectedRestaurantId]);
+      if (isSelected) {
+        const selectedImage = new window.kakao.maps.MarkerImage(
+          "/map/icon_red.png",
+          new window.kakao.maps.Size(38, 40)
+        )
+
+        marker.setImage(selectedImage)
+        marker.setZIndex(10)
+      }
+      else {
+        const defaultImage = new window.kakao.maps.MarkerImage(
+          "/map/icon_black.png",
+          new window.kakao.maps.Size(38, 40)
+        )
+        marker.setImage(defaultImage)
+        marker.setZIndex(1)
+      }
+    })
+  }, [selectedRestaurantId])
+
+  // (P) 버튼 클릭 시 지정 좌표로 이동하는 함수
+  const moveToPresetPosition = () => {
+    if (!mapRef.current) return
+    const lat = 36.994444
+    const lng = 127.134466
+    const latLng = new window.kakao.maps.LatLng(lat, lng)
+    mapRef.current.panTo(latLng)
+    setIsSheetOpen(false)
+  }
 
   return (
     <>
       <Script
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
+        src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`}
         onLoad={handleMapLoad}
         strategy="afterInteractive"
       />
-      <HeaderWithBack title="주변 맛집 찾기" backTF= {true} /> {/* 상단 고정 헤더 */}
+      <HeaderWithBack title="주변 맛집 찾기" backTF={true} />
       <div className="relative w-full h-screen overflow-hidden max-w-[540px] mx-auto">
-        <div className="fixed inset-0 z-0 max-w-[540px] mx-auto" ref={mapContainerRef} id="map" />
+
+        <div
+          id="map"
+          ref={mapContainerRef}
+          className="absolute left-0 right-0 top-0 bottom-0 z-0 transition-all duration-500"
+        />
+
+        {/* 우측 상단 (P) 버튼 */}
+        <button
+          onClick={moveToPresetPosition}
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            zIndex: 40,
+            backgroundColor: "rgba(13, 97, 27, 0.9)",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            padding: "6px 10px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            userSelect: "none",
+          }}
+          aria-label="Move to preset position"
+        >
+          평택대
+        </button>
 
         <div
           ref={sheetRef}
@@ -213,7 +266,7 @@ useEffect(() => {
             isSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
           )}
         >
-          <button   
+          <button
             onClick={() => setIsSheetOpen(!isSheetOpen)}
             className="w-full h-12 flex justify-center items-center"
           >
@@ -224,11 +277,11 @@ useEffect(() => {
             )}
           </button>
 
-          <div className="p-2.5 pt-2 ">
+          <div className="p-4 pt-0">
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[45vh] px-2 py-1">
+          <div className="overflow-y-auto max-h-[30vh] px-2">
             <div className="space-y-2 pb-4">
               {restaurants.map((restaurant) => (
                 <div
