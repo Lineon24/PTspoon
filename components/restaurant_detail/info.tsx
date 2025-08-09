@@ -53,46 +53,40 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     return <div className="p-4 text-red-500">레스토랑 정보를 불러올 수 없습니다.</div>
   }
   return (
-  <section className="p-4 bg-white rounded-xl shadow shadow-gray-200 mb-6 space-y-4">
+  <section className="p-4 mb-6 space-y-4">
     {/* 식당 이름 */}
+    <div className="text-center">
     <h1 className="text-2xl font-semibold text-gray-900 break-words">
       {restaurant.restaurant_name}
     </h1>
-
-    {/* 주소, 전화번호, 운영시간 */}
-    <ul className="space-y-3 text-sm text-gray-700">
-      {/* 주소 */}
-      <li className="flex items-start gap-2">
-        <MapPin className="w-4 h-4 mt-0.5 text-gray-400" />
-        <a
-          href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline hover:text-green-600 transition-colors duration-200"
+    </div>
+    {/*일단 버튼 모양으로 변경*/}
+    {/*주소*/}
+    <div className="flex justify-center gap-8">
+    <div className="flex items-center gap-3 bg-white-100 rounded-lg px-4 h-14 w-64">
+      <a
+        href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
+        target="_blank"
+        rel="nooperner noreferrer"
+        aria-label="주소"
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg transition-colors duration-200"
         >
-          {restaurant.address}
+          <MapPin className="w-6 h-6"/>
         </a>
-      </li>
-
-      {/* 전화번호 */}
-      <li className="flex items-start gap-2">
-        <Phone className="w-4 h-4 mt-0.5 text-gray-400" />
-        <a
-          href={`tel:${restaurant.phone}`}
-          className="hover:underline hover:text-blue-600 transition-colors duration-200"
+        <span className="text-sm text-gray-800 whitespace-nowrap">{restaurant.address}</span>
+      </div>
+      {/*전화*/}
+      <div className="flex items-center gap-2 bg-white-100 rounded-lg px-4 h-14 w-64">
+      <a
+        href={`tel:${restaurant.phone}`}
+        aria-label="전화번호"
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-colors duration-200"
         >
-          {restaurant.phone}
-        </a>
-      </li>
-
-      {/* 운영 시간 */}
-      {restaurant.hours && (
-        <li className="flex items-start gap-2">
-          <Clock className="w-4 h-4 mt-0.5 text-gray-400" />
-          <span>{restaurant.hours}</span>
-        </li>
-      )}
-    </ul>
+          <Phone className="w-6 h-6"/>
+      </a>
+      <span className="text-sm text-gray-800 whitespace-nowrap">{restaurant.phone}</span>
+      </div>
+    </div>
   </section>
 )
 

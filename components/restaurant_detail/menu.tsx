@@ -63,7 +63,7 @@ export default function Menu_list({restaurantId}:Restaurant){
         <h2 className="test-2x1 font-bold mb-4">메뉴</h2>
         <div className="grid gap-3">
           {menu.map((item:any, index:number)=> (
-            <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <div key={index} className="p-3 bg-gray-50 rounded-lg">
               <span className="font-medium">{item.menu}</span>
               <div className="text-xs text-gray-500">이건 더미 메뉴 설명임</div>
               <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
