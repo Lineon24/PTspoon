@@ -1,32 +1,32 @@
+// 상단바 출력 부분으로 페이지에 따라 매개변수 값을 넣어주시면 됩니다. 그리고 임포트 시켜 사용해주세요
 'use client';
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, usePathname } from 'next/navigation';
 import { UtensilsCrossed } from 'lucide-react';
-interface Profile {
+interface Profile { // 프로필에서 사용할 테이블 속성들
   id: string;
   nickname: string;
-  // ...다른 정보 추가 가능
 }
 
-const iconList = [UtensilsCrossed];
+const iconList = [UtensilsCrossed]; // 아이콘 리스트들 상단바에 추가할 아이콘은 여기에 추가
 
-
+{/*매개변수로 타이틀, 아이콘 모양 번호(iconList 인덱스), 아이콘 색깔, 이전 버튼 추가 설정를 받음 */}
 export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | 'black'; }) {
-  const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null;
-  const router = useRouter();
+  const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null; // 아이콘 인덱스에 아무값도 안넣었다면 널 값을 넣음
+  const router = useRouter(); 
   const pathname = usePathname();
 
   const handleGoBack = () => {
     const parentPath = pathname.split('/').slice(0, -1).join('/') || '/';
     router.replace(parentPath);
-  };
+  }; // 이전 페이지로 돌아가기 위한 함수
 
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   
-    // 1. 로그인 상태 확인
+    //  로그인 상태 확인
     useEffect(() => {
       supabase.auth.getUser().then(async (res) => {
         if (res.data.user) {
@@ -45,7 +45,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
       });
     }, []);
   
-    // 2. 로그아웃 함수
+    //  로그아웃 함수
     const handleLogout = async () => {
       await supabase.auth.signOut();
       setUser(null);
@@ -60,16 +60,16 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
       padding: '7px 15px',
       borderBottom: '1px solid #e0e0e0',
       backgroundColor: '#ffffff',
-      position: 'fixed', // sticky 대신 fixed 사용
+      position: 'fixed', // 상단바 고정
       top: 0,
-      left: 0, // 왼쪽 정렬
+      left: 0, 
       width: '100%', // 전체 너비 차지
       right: 0,
       maxWidth: 540,
       margin: '0 auto',
-      zIndex: 10 // 다른 요소 위에 오도록 z-index 설정 (TabBar의 2000보다는 낮게)
+      zIndex: 10 // 다른 요소 위에 오도록 z-index 설정
     }}>
-      {backTF ? (
+      {backTF ? ( // backTF의 인자값에 따라 <- 버튼 출력 여부 부분
       
       <button
         onClick={handleGoBack}
@@ -87,7 +87,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
         ←
       </button>
       ): null}
-      {IconComponent != null ? (
+      {IconComponent != null ? ( // 인자값으로 아이콘 인덱스 값을 받으면 아이콘 출력
       <div style={{ color: iconColor, marginRight: '10px' }}><IconComponent/></div>
       ): null}
 
@@ -95,10 +95,10 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
         {title}
       </h1>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-          {user ? (
+          {user ? ( // 로그인 여부에 따라 로그인 버튼 혹은 로그아웃 버튼이 보임
             <>
               <span style={{ fontWeight: 600, color: '#414de4', fontSize: 15 }}>
-                {profile ? `${profile.nickname} 님` : user.email}
+                {profile ? `${profile.nickname} 님` : user.name}
               </span>
               <button
                 style={{
