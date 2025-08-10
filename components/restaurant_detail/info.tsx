@@ -62,8 +62,8 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     </div>
     {/*일단 버튼 모양으로 변경*/}
     {/*주소*/}
-    <div className="flex justify-center gap-8">
-    <div className="flex items-center gap-3 bg-white-100 rounded-lg px-4 h-14 w-64">
+    <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 w-full max-w-[857px] mx-auto">
+    <div className="flex items-center gap-3 bg-white-100 rounded-lg px-4 h-14 w-full max-w-[403px]">
       <a
         href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
         target="_blank"
@@ -76,7 +76,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
         <span className="text-sm text-gray-800 whitespace-nowrap">{restaurant.address}</span>
       </div>
       {/*전화*/}
-      <div className="flex items-center gap-2 bg-white-100 rounded-lg px-4 h-14 w-64">
+      <div className="flex items-center gap-2 bg-white-100 rounded-lg px-4 h-14 w-full max-w-[403px]">
       <a
         href={`tel:${restaurant.phone}`}
         aria-label="전화번호"

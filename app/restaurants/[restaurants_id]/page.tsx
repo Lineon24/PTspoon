@@ -4,6 +4,8 @@ import {useParams} from 'next/navigation';
 import RestaurantInfo from '@/components/restaurant_detail/info';
 import Menu_list from '@/components/restaurant_detail/menu'
 import RestaurantImage from '@/components/restaurant_detail/photo';
+import Review_write from '@/components/restaurant_detail/Review_write';
+import RestaurantReviewList from '@/components/restaurant_detail/Review';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { Suspense } from 'react';
 function RestaurantDetail(){
@@ -33,6 +35,10 @@ function RestaurantDetail(){
       </div>
       {/*3.메뉴들*/}
       <Menu_list restaurantId={restaurantId}/>
+      {/*4.레스토랑 리뷰 작성*/}
+      <Review_write restaurantId={restaurantId}/>
+      {/*5.레스토랑 리뷰 출력*/}
+      <RestaurantReviewList restaurantId={restaurantId}/>
     </div>
   )
 }
