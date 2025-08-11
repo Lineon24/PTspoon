@@ -27,7 +27,7 @@ function RestaurantDetail(){
     <div className="max-w-md mx-auto pb-10">
       <HeaderWithBack title="식당 상세" backTF={true}/>
       {/*1.식당 대표 이미지*/}
-      <RestaurantImage imageName='음식점1.jpg' alt='테스트 사진'/>
+      <RestaurantImage restaurantId={restaurantId}/>
 
       {/*2.식당 기본 정보*/}
       <div className='p-4'>
