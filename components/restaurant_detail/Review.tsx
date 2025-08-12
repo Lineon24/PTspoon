@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { FilterTag } from "@/components/filter-tag";
 
 interface Restaurant_review {
   id: string;
@@ -9,6 +10,8 @@ interface Restaurant_review {
   user_id: string;
   nickname: string;
   review: string;
+  menu?: string | null;        // 단일 메뉴 이름 (nullable)
+  tags?: string[] | null;      // 맛 태그 배열 (nullable)
   created_at?: string;
 }
 
@@ -27,7 +30,7 @@ export default function RestaurantReviewList({ restaurantId }: RestaurantInfoPro
       const { data, error } = await supabase
         .from("restaurant_review")
         .select("*")
-        .eq("restaurant_id", restaurantId) // 해당 식당 리뷰만 가져오기
+        .eq("restaurant_id", restaurantId);
 
       if (error) {
         console.error("리뷰 목록 불러오기 실패", error);
@@ -66,6 +69,22 @@ export default function RestaurantReviewList({ restaurantId }: RestaurantInfoPro
                 : ""}
             </span>
           </div>
+
+          {/* 메뉴 필터태그 (단일 문자열) */}
+          {item.menu && (
+            <div className="mb-2">
+              <FilterTag label={item.menu} />
+            </div>
+          )}
+
+          {/* 맛 태그들 (배열) */}
+          {item.tags && item.tags.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {item.tags.map((tag) => (
+                <FilterTag key={tag} label={tag} />
+              ))}
+            </div>
+          )}
 
           {/* 리뷰 내용 */}
           <p className="text-gray-700 whitespace-pre-line leading-relaxed">

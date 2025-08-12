@@ -1,36 +1,44 @@
-//리뷰 컴포넌트는 작성용이랑 출력용을 나눔 
-//이 컴포넌트는 준희가 만든 write 페이지의 코드를 대다수 참고함
+// Review_write.tsx
 'use client';
 
-import {useEffect,useState} from 'react';
-import {supabase} from '@/lib/supabaseClient';
-import {useRouter} from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
-//리뷰,Profile 인터페이스(최대한 supabase와 비슷하게 설계함)
-interface Reviews{
-    id:string;
-    user_id:string;
-    nickname:string;
-    review:string;
+// 리뷰 데이터 타입
+interface Reviews {
+  id: string;
+  user_id: string;
+  nickname: string;
+  review: string;
 }
 
-interface Restaurant{
-    restaurantId:any;
+// 상위 컴포넌트에서 받을 props 타입
+interface ReviewWriteProps {
+  restaurantId: string;
+  menus?: string|null;  // 선택된 메뉴 목록
+  tastes?: string[]; // 선택된 맛 목록
 }
 
-interface Profile{
-    id:string;
-    nickname:string;
+// 사용자 프로필 타입
+interface Profile {
+  id: string;
+  nickname: string;
 }
 
-export default function Review_write({restaurantId}:Restaurant){
-    const [reviews,setreviews]=useState<Reviews[]>([]);
-    const [profile,setProfile]=useState<Profile|null>(null);
-    const [loading,setLoading]=useState(true);
-    const [newReviewContent,setNewReviewContent]=useState('');
-    const router=useRouter();
+export default function Review_write({
+  restaurantId,
+  menus,
+  tastes = [],
+}: ReviewWriteProps) {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [newReviewContent, setNewReviewContent] = useState('');
+  const router = useRouter();
 
-  // 1. 사용자 로그인 및 프로필 불러오기(write페이지의 함수를 가져옴)
+  // 1. 사용자 로그인 상태 확인 및 프로필 불러오기
+  // 원래는 레스토랑 리뷰 버튼에서 비로그인자를 발견시 바로 로그인창으로 리다이렉트하게 만들었으나
+  // 혹시 모르니 여기서도 적용하겠음
   useEffect(() => {
     async function getUserProfile() {
       const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -61,36 +69,50 @@ export default function Review_write({restaurantId}:Restaurant){
     getUserProfile();
   }, [router]);
 
-    //리뷰 작성
-    const handleSubmitReview=async(e:React.FormEvent)=>{e.preventDefault();
-        //내용이 비어있으면 출력
-        if(!newReviewContent.trim()){
-            alert('내용을 입력하세요')
-        return;
-        }
-        else if(!profile){
-          alert('로그인이 필요합니다.')
-          return;
-        }
-    //리뷰 업로드
-    const {error}=await supabase.from('restaurant_review').insert([
-        {
-            user_id:profile.id,
-            nickname:profile.nickname,
-            review:newReviewContent,
-            restaurant_id:restaurantId
-        },
-    ]);
-    if(error){
-      console.error('리뷰 작성 오류',error)
-      alert('리뷰 작성에 실패했습니다.');
+  // 2. 리뷰 작성 처리
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 내용이 비어있으면 경고
+    if (!newReviewContent.trim()) {
+      alert('내용을 입력하세요');
+      return;
     }
-    else{
-      //초기화
+
+    // 로그인 안된 경우
+    if (!profile) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // Supabase에 리뷰 업로드
+    const { error } = await supabase.from('restaurant_review').insert([
+      {
+        user_id: profile.id,
+        nickname: profile.nickname,
+        review: newReviewContent,
+        restaurant_id: restaurantId,
+        menu: menus,   // 선택한 메뉴
+        tags: tastes, // 선택한 맛
+      },
+    ]);
+
+    if (error) {
+      console.error('리뷰 작성 오류', error);
+      alert('리뷰 작성에 실패했습니다.');
+    } else {
+      // 작성 후 입력창 초기화
       setNewReviewContent('');
+      alert('리뷰가 등록되었습니다.');
+      goToDetail();
     }
   };
-    return (
+
+  const goToDetail = () => {
+  router.push(`/restaurants/${restaurantId}/`);
+  };
+
+  return (
     <form
       onSubmit={handleSubmitReview}
       className="w-full max-w-md mx-auto p-4 bg-white rounded-xl shadow-md space-y-4"

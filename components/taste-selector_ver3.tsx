@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FeatureToggle } from "./feature-toggle";
+import { FeatureToggle } from "@/components/feature-toggle";
 import { supabase } from "@/lib/supabaseClient";
 
 interface TasteType {

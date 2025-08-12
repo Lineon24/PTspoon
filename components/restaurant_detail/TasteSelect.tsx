@@ -1,72 +1,118 @@
 "use client";
-//선택된 맛 종류를 출력 및 페이지에 넘기는 컴포넌트
-import { TasteTypeSelector_ver3 } from "@/components/taste-selector_ver3"
-import { useEffect,useState } from "react";
-import { FilterTag } from "@/components/filter-tag"
-import { Button } from "@/components/ui/button"
 
-//부모 페이지에서 전달 받는 props 타입 정의
-interface SelectedTasteProps{
-    onSearch:(params:{
-        selectedTasteTypes:string[]; //선택된 맛 종류 배열
-    })=> void;
+import { useEffect, useState } from "react";
+import { FeatureToggle } from "@/components/feature-toggle";
+import { supabase } from "@/lib/supabaseClient";
+
+// 음식 맛 종류 데이터 타입 정의
+interface TasteType {
+  id: string;
+  taste: string;
+  description: string;
 }
-//SearchFilter_ver3의 코드 대부분을 재활용함
-export function TasteSelect_Review({onSearch}:SelectedTasteProps){
-    const [selectedTaste,setSelectedTaste]=useState<string[]>([]);
+interface TasteTypeSelectorProps {
+  selectedTasteTypes: string[];
+  onToggleTasteType: (taste: string) => void;
+}
 
-    //맛 종류 토글 함수
-    const toggleTaste=(label:string)=>{
-        setSelectedTaste((prev)=>
-            prev.includes(label)?prev.filter((t)=>t!==label):[...prev,label]
-        );
+export function TasteTypeSelect({
+  selectedTasteTypes,
+  onToggleTasteType,
+}: TasteTypeSelectorProps) {
+  const [tasteTypes, setTasteTypes] = useState<TasteType[]>([]);
+  const [loading, setLoading] = useState(true);
+  //준희가 만든 댓글 창 여닫는 기능을 가져옴
+  const [isOpen, setIsOpen] = useState(false); // 기본값 false → 처음엔 닫힘
+
+  // Supabase에서 맛 종류 데이터 불러오기
+  useEffect(() => {
+    const fetchTasteTypes = async () => {
+      setLoading(true);
+      console.log("Supabase에서 데이터 불러오기 시작");
+
+      const { data, error } = await supabase
+        .from("foodtaste")
+        .select("id,taste, description");
+
+      if (error) {
+        console.error("음식 종류 불러오기 실패:", error);
+        setTasteTypes([]);
+      } else if (data) {
+        setTasteTypes(data);
+      }
+      setLoading(false);
     };
 
-    //리셋 함수
-    const resetFilters=()=>{
-        setSelectedTaste([]);
-    }
-    //
-    //맛 종류를 부모컴포넌트에 전달
-    const handleSelect=()=>{
-        onSearch({
-            selectedTasteTypes:selectedTaste
-        });
-    }
+    fetchTasteTypes();
+  }, []);
 
-    const totalSelections=selectedTaste.length
+  if (loading) {
+    return (
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          맛 종류를 불러오는 중...
+        </h2>
+      </div>
+    );
+  }
 
-    return(
-        <div className="flex flex-col">
-            <div className="flex w-full bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-6">
-                <span className="mr-2">✨</span>
-                <h2 className="font-semibold text-gray-900 dark:text-gray-50">맛 특징</h2>
-            </div>
+  return (
+    <div>
+      {/* 제목 + 펼치기/접기 버튼 */}
+      <h2
+        style={{
+          fontSize: "16px",
+          marginBottom: "0px",
+          color: "#555",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        맛 종류 ({tasteTypes.length || 0})
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#414de4",
+            fontSize: 16,
+            fontWeight: "bold",
+            padding: "10px",
+          }}
+        >
+          {isOpen ? "접기" : "펼치기"}
+          <span
+            style={{
+              padding: "5px",
+              display: "inline-block",
+              transition: "transform 0.3s ease",
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              lineHeight: 1,
+            }}
+          >
+            ▼
+          </span>
+        </button>
+      </h2>
 
-            {/*맛 종류 선택 UI*/}
-            <TasteTypeSelector_ver3
-            selectedTasteTypes={selectedTaste}
-            onToggleTasteType={toggleTaste}
+      {/* 맛 종류 선택 버튼 목록 */}
+      {isOpen && (
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-3 mt-3">
+          {tasteTypes.map((type) => (
+            <FeatureToggle
+              key={type.id}
+              id={type.id}
+              type={type.taste}
+              description=""
+              isSelected={selectedTasteTypes.includes(type.taste)}
+              emoji=""
+              onToggle={() => onToggleTasteType(type.taste)}
             />
-
-            <div className="flex flex-wrap gap-2 mt-4 mb-4">
-                {selectedTaste.map((taste)=>(
-                    <FilterTag key={taste} label={taste} onRemove={()=>toggleTaste(taste)}/>
-                ))}
-            </div>
-            {/*버튼*/}
-            <div className="flex gap-3">
-                <Button
-                    className="flex-grow"
-                    onClick={handleSelect}
-                    disabled={totalSelections===0}
-                >
-                    {totalSelections}개 조건으로 검색하기
-                </Button>
-                <Button className="flex-grow" variant="ghost" onClick={resetFilters}>
-                    초기화
-                </Button>
-            </div>
+          ))}
         </div>
-    )
+      )}
+    </div>
+  );
 }
