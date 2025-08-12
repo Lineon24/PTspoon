@@ -1,9 +1,9 @@
 "use client";
 //선택된 맛 종류를 출력 및 페이지에 넘기는 컴포넌트
-import { TasteTypeSelector_ver3 } from "../taste-selector_ver3";
+import { TasteTypeSelector_ver3 } from "@/components/taste-selector_ver3"
 import { useEffect,useState } from "react";
-import { FilterTag } from "../filter-tag";
-import { Button } from "../ui/button";
+import { FilterTag } from "@/components/filter-tag"
+import { Button } from "@/components/ui/button"
 
 //부모 페이지에서 전달 받는 props 타입 정의
 interface SelectedTasteProps{
