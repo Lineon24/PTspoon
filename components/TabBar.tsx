@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
 
-const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map'];
-const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/];
+const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map','/review_write'];
+const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/,/^\/restaurants\/[^/]+\/review_write$/];
 
 const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},

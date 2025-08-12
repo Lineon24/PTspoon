@@ -83,10 +83,10 @@ export function TasteTypeSelector_ver3({
     <div>
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-          어떤 맛을 원하시나요?
+          맛을 선택해 주세요
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          여러 개를 선택해서 더 정확한 추천을 받아보세요
+          여러 개를 선택하시면 더 좋습니다.
         </p>
       </div>
       <div className="grid grid-cols-3 md:grid-cols-3 gap-3">

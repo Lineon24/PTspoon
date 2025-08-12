@@ -15,7 +15,7 @@ interface Reviews{
 }
 
 interface Restaurant{
-    restaurantId:string;
+    restaurantId:any;
 }
 
 interface Profile{
