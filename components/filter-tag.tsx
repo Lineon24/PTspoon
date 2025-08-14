@@ -31,7 +31,8 @@ const TypeEmojis: Record<string, string> = {
   "감칠맛": "💪"
 }
 export function FilterTag({ label, onRemove }: FilterTagProps) {
-  const emoji=TypeEmojis[label]||"❓"
+  if(!label?.trim()) return null;
+  const emoji=TypeEmojis[label]||""
   const displayLabel=`${emoji} ${label}`
   return (
     <Badge

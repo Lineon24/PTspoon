@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { useParams } from "next/navigation"
 import { useState,useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient";
 //너는 레스토랑 메뉴

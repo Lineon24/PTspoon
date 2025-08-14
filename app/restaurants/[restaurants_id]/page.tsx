@@ -3,7 +3,6 @@
 import {useParams} from 'next/navigation';
 import RestaurantInfo from '@/components/restaurant_detail/info';
 import Menu_list from '@/components/restaurant_detail/menu'
-import RestaurantImage from '@/components/restaurant_detail/photo';
 import RestaurantReviewList from '@/components/restaurant_detail/Review';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { Suspense, useEffect, useState } from 'react';
@@ -53,8 +52,6 @@ function RestaurantDetail(){
   return(
     <div className="max-w-md mx-auto pb-10">
       <HeaderWithBack title="식당 상세" backTF={true}/>
-      {/*1.식당 대표 이미지*/}
-      <RestaurantImage restaurantId={restaurantId}/>
       {/*2.식당 기본 정보*/}
       <div className='p-4'>
         <RestaurantInfo restaurantId={restaurantId}/>

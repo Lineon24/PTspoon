@@ -7,7 +7,6 @@ import {Button} from "@/components/ui/button"
 import { useEffect,useState } from "react";
 import { supabase } from "@/lib/supabaseClient"
 import {useRouter} from "next/navigation"
-import Review_write from "./Review_write";
 //사용자 프로필 정보
 interface Profile{
     id:string

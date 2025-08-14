@@ -13,7 +13,7 @@ interface Restaurant {
   restaurant_name: string
   phone: string
   address: string
-  hours?: string // 필요시 운영시간 확장 가능
+  image_url:string;
 }
 
 export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
@@ -26,7 +26,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
 
       const { data, error } = await supabase
         .from("restaurant")
-        .select("restaurant_name, phone, address")
+        .select("restaurant_name, phone, address,image_url")
         .eq("restaurant_id", restaurantId)
         .single()
 
@@ -54,6 +54,19 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   }
   return (
   <section className="p-4 mb-6 space-y-4">
+    <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">
+      <img
+        src={restaurant.image_url}
+        alt="레스토랑 이미지"
+        loading="lazy"
+        style={{
+          width:'100%',
+          height:'100%',
+          objectFit:'cover',
+          borderRadius:'8px',
+          display:'block',
+        }}/>
+    </div>
     {/* 식당 이름 */}
     <div className="text-center">
     <h1 className="text-2xl font-semibold text-gray-900 break-words">

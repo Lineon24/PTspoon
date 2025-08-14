@@ -69,27 +69,25 @@ export default function RestaurantReviewList({ restaurantId }: RestaurantInfoPro
                 : ""}
             </span>
           </div>
-
           {/* 메뉴 필터태그 (단일 문자열) */}
           {item.menu && (
-            <div className="mb-2">
+            <div className="flex flex-wrap gap-1 mb-1 py-1">
               <FilterTag label={item.menu} />
             </div>
           )}
+          {/* 리뷰 내용 */}
+          <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+            {item.review}
+          </p>
 
           {/* 맛 태그들 (배열) */}
           {item.tags && item.tags.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
+            <div className="mb-2 flex flex-wrap gap-1">
               {item.tags.map((tag) => (
                 <FilterTag key={tag} label={tag} />
               ))}
             </div>
           )}
-
-          {/* 리뷰 내용 */}
-          <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-            {item.review}
-          </p>
         </div>
       ))}
     </section>
