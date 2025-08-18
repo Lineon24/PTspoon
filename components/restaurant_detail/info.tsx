@@ -1,4 +1,5 @@
-// 레스토랑 정보 (연락처, 이름, 주소) 컴포넌트
+// 레스토랑 정보 (연락처, 이름, 주소),리뷰 컴포넌트
+//버튼으로 조절하기 때문에 하나로 묶음
 "use client"
 
 import { useEffect, useState } from "react"
@@ -104,3 +105,5 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
 )
 
 }
+
+

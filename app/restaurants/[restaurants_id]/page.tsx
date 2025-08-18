@@ -2,13 +2,12 @@
 
 import {useParams} from 'next/navigation';
 import RestaurantInfo from '@/components/restaurant_detail/info';
-import Menu_list from '@/components/restaurant_detail/menu'
-import RestaurantReviewList from '@/components/restaurant_detail/Review';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { Suspense, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient'
-import IsLogin from "@/components/restaurant_detail/IsLogin"
-
+import { Menu_list,RestaurantReviewList } from '@/components/restaurant_detail/menu';
+import IsLogin from '@/components/restaurant_detail/IsLogin'; //이 친구 이름이 왜 IsLogin이냐면 레스토랑 리뷰 쓰기를 하기전에 로그인이 되었는지 확인하기 때문
+import {Button} from "@/components/ui/button"
 interface Profile{
   id:string;
   nickname:string;
@@ -16,6 +15,7 @@ interface Profile{
 
 function RestaurantDetail(){
   const params=useParams();
+  const [contentType,setContentType]=useState<"menu"|"review"|null>(null); //보여질 내용
 
   // 폴더명이 [restaurants_id]라면 아래처럼:
   const restaurantId = Array.isArray(params.restaurants_id)
@@ -48,20 +48,52 @@ function RestaurantDetail(){
     }
   },[]);
 
+//메뉴 보기를 눌렀을때
+const openMenu=()=>{
+  setContentType("menu");
+};
+//리뷰 보기를 눌렀을때
+const openReview=()=>{
+  setContentType("review");
+};
 
   return(
     <div className="max-w-md mx-auto pb-10">
       <HeaderWithBack title="식당 상세" backTF={true}/>
-      {/*2.식당 기본 정보*/}
+      {/*식당 기본 정보*/}
       <div className='p-4'>
         <RestaurantInfo restaurantId={restaurantId}/>
       </div>
-      {/*3.메뉴들*/}
-      <Menu_list restaurantId={restaurantId}/>
-      {/*레스토랑 리뷰 쓰기*/}
+      <div className='flex border-b border-gray-300'>
+      <Button
+        className={`flex-1 py-2 text-center transition-colors 
+        ${
+          contentType === "menu"
+          ? "text-blue-500 border-b-1 border-blue-500" // 선택 시 파란색
+          : "text-gray-500 hover:text-blue-400" // 선택 안 됐을 때 회색
+        }`}
+        
+        onClick={openMenu}
+        >
+          메뉴보기
+      </Button>
+      <div className="w-px bg-gray-300"></div> {/* | 구분선 */}
+      <Button
+        className={`flex-1 py-2 text-center transition-colors 
+        ${
+          contentType === "review"
+          ? "text-blue-500 border-b-1 border-blue-500" // 선택 시 파란색
+          : "text-gray-500 hover:text-blue-400" // 선택 안 됐을 때 회색
+        }`} // 호버 시 글자색 변화
+        onClick={openReview}
+        >
+          리뷰보기
+      </Button>
+      </div>
       <IsLogin profile={profile} retaurant_id={restaurantId}/>
-      {/*4.레스토랑 리뷰 출력*/}
-      <RestaurantReviewList restaurantId={restaurantId}/>
+      <div className="p-4">
+      {contentType==="review"?<RestaurantReviewList restaurantId={restaurantId}/>:<Menu_list restaurantId={restaurantId}/>}
+      </div>
     </div>
   )
 }

@@ -9,7 +9,6 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-
 import { useState, useEffect, Suspense, useRef } from "react"; // Suspense 임포트
 import { supabase } from "@/lib/supabaseClient";
 import { RestaurantListItem, type Restaurant } from "@/components/restaurant-list-item_ver2";

@@ -48,9 +48,9 @@ function ReviewWrite() {
     <div className="max-w-md mx-auto pb-10">
       {/* 상단 헤더 (뒤로가기 버튼, 제목) */}
       <HeaderWithBack title="리뷰 쓰기" backTF={true} />
-
+      <div className="p-4">
       {/* 맛 선택 영역 */}
-      <div className="mb-8 border p-4 rounded bg-gray-50">
+      <div className="mb-8 border p-4 rounded bg-white-50">
         <h3 className="mb-2 font-semibold">드신 음식의 맛은 어떠셨나요?</h3>
 
         {/* 맛 선택 UI 컴포넌트 */}
@@ -66,7 +66,7 @@ function ReviewWrite() {
       </div>
 
       {/* 메뉴 선택 영역 */}
-      <div className="mb-8 border p-4 rounded bg-gray-50">
+      <div className="mb-8 border p-4 rounded bg-white-50">
         <h3 className="mb-2 font-semibold">드신 메뉴를 선택해주세요</h3>
 
         {/* 메뉴 선택 UI 컴포넌트 */}
@@ -88,6 +88,7 @@ function ReviewWrite() {
         menus={selectedMenu} // 선택된 메뉴
         tastes={selectedTasteTypes} // 선택된 맛 리스트
       />
+      </div>
     </div>
   );
 }

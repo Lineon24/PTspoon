@@ -3,6 +3,7 @@
 import React from "react"
 import { useState,useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient";
+import { FilterTag } from "@/components/filter-tag";
 //너는 레스토랑 메뉴
 interface Restaurant_menu{
     id:string;
@@ -10,13 +11,26 @@ interface Restaurant_menu{
     price:string;
     description:string;
 }
+
 //너는 레스토랑 id받아오는 새끼
-interface Restaurant{
+interface RestaurantInfoProps{
     restaurantId:string;
 }
-//지금부터 컴포넌트 시작
 
-export default function Menu_list({restaurantId}:Restaurant){
+interface Restaurant_review {
+  id: string;
+  restaurant_id: string;
+  user_id: string;
+  nickname: string;
+  review: string;
+  menu?:string;
+  tags?: string[] | null;      // 맛 태그 배열 (nullable)
+  created_at?: string;
+}
+
+
+//지금부터 컴포넌트 시작
+export function Menu_list({restaurantId}:RestaurantInfoProps){
     //메뉴 정보 및 로딩 상태
     const [menu,setmenu]=useState<Restaurant_menu[]|null>(null);
     const [loading,setLoading]=useState(true);
@@ -56,7 +70,6 @@ export default function Menu_list({restaurantId}:Restaurant){
     //메뉴의 스타일인 초기에 v0로 만든 스타일 코드를 대다수 참고함
     return(
       <div className="mb-6">
-        <h2 className="test-2xl font-bold mb-4 ml-8">메뉴</h2>
         <div className="grid gap-3">
           {menu.map((item:any, index:number)=> (
             <div key={index} className="p-3 bg-gray-50 rounded-lg">
@@ -68,5 +81,116 @@ export default function Menu_list({restaurantId}:Restaurant){
         </div>
       </div>
     );
+}
+//레스토랑 리뷰 함수
+export function RestaurantReviewList({ restaurantId }: RestaurantInfoProps) {
+  const [reviewList, setReviewList] = useState<Restaurant_review[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [userId,setUserId]=useState<string|null>(null);
+  useEffect(() => {
+    const fetchReview = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("restaurant_review")
+        .select("*")
+        .eq("restaurant_id", restaurantId);
+
+      if (error) {
+        console.error("리뷰 목록 불러오기 실패", error);
+        setReviewList(null);
+      } else {
+        setReviewList(data);
+      }
+      setLoading(false);
+    };
+
+    fetchReview();
+  }, [restaurantId]);
+  useEffect(()=>{
+    const fetchUser=async()=>{
+      const {data:userData}=await supabase.auth.getUser();
+      setUserId(userData?.user?.id??null);
+    };
+    fetchUser();
+  },[]);
+
+  if (loading) {
+    return <div className="p-4 text-gray-500">로딩 중...</div>;
+  }
+
+  if (!reviewList || reviewList.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        아직 리뷰가 없습니다. 첫 리뷰어가 되어보세요! 🚀
+      </div>
+    );
+  }
+  //리뷰 삭제
+  const handleDeletereview=async(reviewID:string)=>{
+    const confirmDelete=confirm("리뷰를 삭제하시겠습니까?");
+    if(!confirmDelete)return;
+    const {error}=await supabase
+    .from("restaurant_review")
+    .delete()
+    .eq("id",reviewID);
+
+    if(error){
+      //에러나면 콘솔 출력
+      console.error("리뷰 삭제 실패",error);
+      alert("리뷰 삭제에 실패하였습니다.")
+    }
+    else{
+      setReviewList((prev)=>prev?.filter((r)=>r.id!==reviewID)||null);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl shadow shadow-gray-200 p-4 space-y-6">
+
+      {reviewList.map((item) => (
+        <div key={item.id} className="border-b border-gray-100 pb-4 last:border-none">
+          {/*삭제 버튼*/}
+          {userId===item.user_id &&(
+            <button
+              onClick={()=>handleDeletereview(item.id)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+              title="리뷰 삭제"
+            >
+              ✕
+            </button>
+          )}
+          {/* 닉네임 + 작성일 */}
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-semibold text-gray-800">{item.nickname}</span>
+            <span className="text-sm text-gray-400">
+              {item.created_at
+                ? new Date(item.created_at).toLocaleDateString()
+                : ""}
+            </span>
+          </div>
+          {/* 메뉴 필터태그 (단일 문자열) */}
+          {item.menu && (
+            <div className="inline-block bg-gray-100 rounded-lg px-3 py-3 mb-3">
+              <span className="font-mediun text-gray-800">{item.menu}</span>
+            </div>
+          )}
+          {/* 리뷰 내용 */}
+          <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+            {item.review}
+          </p>
+
+          {/* 맛 태그들 (배열) */}
+          {item.tags && item.tags.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-1 py-6">
+              {item.tags.map((tag) => (
+                <FilterTag key={tag} label={tag} />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </section>
+  );
 }
 
