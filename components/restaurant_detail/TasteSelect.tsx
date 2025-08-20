@@ -55,64 +55,49 @@ export function TasteTypeSelect({
       </div>
     );
   }
-
   return (
-    <div>
-      {/* 제목 + 펼치기/접기 버튼 */}
-      <h2
-        style={{
-          fontSize: "16px",
-          marginBottom: "0px",
-          color: "#555",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        맛 종류 ({tasteTypes.length || 0})
-        <button
-          onClick={() => setIsOpen((prev) => !prev)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#414de4",
-            fontSize: 16,
-            fontWeight: "bold",
-            padding: "10px",
-          }}
-        >
-          {isOpen ? "접기" : "펼치기"}
-          <span
-            style={{
-              padding: "5px",
-              display: "inline-block",
-              transition: "transform 0.3s ease",
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              lineHeight: 1,
-            }}
-          >
-            ▼
-          </span>
-        </button>
-      </h2>
+    <div className="bg-white rounded-xl shadow-sm p-4">
+    {/* 제목 + 펼치기/접기 버튼 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-[16px] font-semibold text-gray-700">
+          맛 종류 <span className="text-gray-400 text-sm">({tasteTypes.length || 0})</span>
+        </h2>
 
-      {/* 맛 종류 선택 버튼 목록 */}
-      {isOpen && (
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-3 mt-3">
-          {tasteTypes.map((type) => (
-            <FeatureToggle
-              key={type.id}
-              id={type.id}
-              type={type.taste}
-              description=""
-              isSelected={selectedTasteTypes.includes(type.taste)}
-              emoji=""
-              onToggle={() => onToggleTasteType(type.taste)}
-            />
-          ))}
-        </div>
-      )}
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center gap-1 text-blue-500 font-semibold hover:text-blue-600 transition-colors"
+      >
+        {isOpen ? "접기" : "펼치기"}
+        <span
+          className={`transform transition-transform duration-300 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+        >
+          ▼
+        </span>
+      </button>
     </div>
-  );
+
+    {/* 맛 종류 선택 버튼 목록 */}
+    {isOpen && (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+        {tasteTypes.map((type) => (
+          <div
+            key={type.id}
+            className={`p-3 rounded-xl border text-center text-sm font-medium cursor-pointer transition 
+              ${
+                selectedTasteTypes.includes(type.taste)
+                  ? "bg-blue-50 border-blue-400 text-blue-600"
+                  : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+              }`}
+            onClick={() => onToggleTasteType(type.taste)}
+          >
+            {type.taste}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 }

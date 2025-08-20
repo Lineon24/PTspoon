@@ -6,20 +6,9 @@ import { supabase } from "@/lib/supabaseClient"; // Supabase 클라이언트
 import { FeatureToggle } from "@/components/feature-toggle"; // 메뉴 선택 토글 버튼 컴포넌트
 import { FilterTag } from "@/components/filter-tag";
 
-interface Restaurant_review {
-  id: string;
-  restaurant_id: string;
-  user_id: string;
-  nickname: string;
-  review: string;
-  menu?: string | null;        // 단일 메뉴 이름 (nullable)
-  tags?: string[] | null;      // 맛 태그 배열 (nullable)
-  created_at?: string;
-}
-
 // Supabase에서 불러올 메뉴 데이터 타입 정의
 interface Menu {
-  menu: string;
+  menu:string;
 }
 
 // 컴포넌트 props 타입 정의
@@ -67,144 +56,48 @@ export function MenuSelect({ restaurantID, selectedMenu, onToggleMenu }: Menusel
   // 메뉴가 없을 때 표시
   if (menu.length === 0) return <div>메뉴가 없습니다.</div>;
 
-  return (
-    <div>
-      {/* 제목 + 펼치기/접기 버튼 */}
-      <h2
-        style={{
-          fontSize: "16px",
-          marginBottom: "0px",
-          color: "#555",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* 메뉴 제목 & 개수 */}
-        메뉴 ({menu.length || 0})
-        
-        {/* 펼치기/접기 버튼 */}
+  return(
+    <div className="bg-white rounded-xl shadow-sm p-4">
+      {/*제목,펼지기/접기 버튼*/}
+      <div className="flex items-center justify-between">
+        {/*메뉴 제목,개수*/}
+        <h2 className="flex items-center justify-between">
+          메뉴 <span className="text-gray-400 text-sm">({menu.length || 0})</span>
+        </h2>
+        {/*펼치기/접기 버튼*/}
         <button
-          onClick={() => setIsOpen(prev => !prev)} // 클릭 시 isOpen 상태 토글
-          style={{
-            background: "none", // 배경 없음
-            border: "none", // 테두리 없음
-            cursor: "pointer", // 커서 모양 변경
-            color: "#414de4", // 버튼 텍스트 색상
-            fontSize: 16,
-            fontWeight: "bold",
-            padding: "10px",
-          }}
+          onClick={()=>setIsOpen((prev)=>!prev)}
+          className="flex items-center gap-1 text-blue-500 font-semibold hover:text-blue-600 transition-colors"
         >
-          {/* 버튼 텍스트: 상태에 따라 변경 */}
-          {isOpen ? "접기" : "펼치기"}
-          {/* 화살표 아이콘 */}
+          {isOpen?"접기":"펼치기"}
           <span
-            style={{
-              padding: "5px",
-              display: "inline-block",
-              transition: "transform 0.3s ease", // 부드러운 회전 애니메이션
-              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", // 열렸을 때 뒤집힘
-              lineHeight: 1,
-            }}
-          >
-            ▼
-          </span>
+            className={`transform transition-transform duration-300 ${
+              isOpen?"rotate-180":"rotate-0"
+            }`}
+            >
+              ▼
+            </span>
         </button>
-      </h2>
-
-      {/* 메뉴 목록: isOpen이 true일 때만 표시 */}
+      </div>
+      {/*메뉴 목록*/}
       {isOpen && (
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-3 mt-3">
-          {menu.map((item, index) => (
-            <FeatureToggle
-              key={index} // React 리스트 key
-              id={String(index)} // id는 인덱스를 문자열로 변환
-              type={item.menu} // 메뉴 이름
-              description="" // 설명은 비워둠
-              emoji="" // 이모지도 비워둠
-              isSelected={selectedMenu===item.menu} // 선택 여부
-              onToggle={() => onToggleMenu?.(item.menu)} // 클릭 시 부모에서 받은 함수 실행
-            />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+          {menu.map((item,index)=>(
+            <div
+              key={index}
+              className={`p-3 rounded-xl border text-center text-sm font-medium cursor-pointer transition 
+              ${
+                selectedMenu === item.menu
+                  ? "bg-blue-50 border-blue-400 text-blue-600"
+                  : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+              }`}
+              onClick={()=>onToggleMenu?.(item.menu)}>
+                {item.menu}
+              </div>
           ))}
         </div>
       )}
     </div>
-  );
-}
-
-export function RestaurantReviewList({ restaurantID}: MenuselectProps) {
-  const [reviewList, setReviewList] = useState<Restaurant_review[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchReview = async () => {
-      setLoading(true);
-
-      const { data, error } = await supabase
-        .from("restaurant_review")
-        .select("*")
-        .eq("restaurant_id", restaurantID);
-
-      if (error) {
-        console.error("리뷰 목록 불러오기 실패", error);
-        setReviewList(null);
-      } else {
-        setReviewList(data);
-      }
-      setLoading(false);
-    };
-
-    fetchReview();
-  }, [restaurantID]);
-
-  if (loading) {
-    return <div className="p-4 text-gray-500">로딩 중...</div>;
-  }
-
-  if (!reviewList || reviewList.length === 0) {
-    return (
-      <div className="p-4 text-center text-gray-500">
-        아직 리뷰가 없습니다. 첫 리뷰어가 되어보세요! 🚀
-      </div>
-    );
-  }
-
-  return (
-    <section className="bg-white rounded-xl shadow shadow-gray-200 p-4 space-y-6">
-
-      {reviewList.map((item) => (
-        <div key={item.id} className="border-b border-gray-100 pb-4 last:border-none">
-          {/* 닉네임 + 작성일 */}
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold text-gray-800">{item.nickname}</span>
-            <span className="text-sm text-gray-400">
-              {item.created_at
-                ? new Date(item.created_at).toLocaleDateString()
-                : ""}
-            </span>
-          </div>
-          {/* 메뉴 필터태그 (단일 문자열) */}
-          {item.menu && (
-            <div className="flex flex-wrap gap-1 mb-1 py-1">
-              <FilterTag label={item.menu} />
-            </div>
-          )}
-          {/* 리뷰 내용 */}
-          <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-            {item.review}
-          </p>
-
-          {/* 맛 태그들 (배열) */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-1">
-              {item.tags.map((tag) => (
-                <FilterTag key={tag} label={tag} />
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </section>
-  );
+  )
+  
 }

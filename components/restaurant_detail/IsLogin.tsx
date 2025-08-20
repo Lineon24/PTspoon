@@ -8,7 +8,6 @@ import { useEffect,useState } from "react";
 import { supabase } from "@/lib/supabaseClient"
 import {useRouter} from "next/navigation"
 import { FilterTag } from "@/components/filter-tag";
-import { get } from "http";
 //사용자 프로필 정보
 interface Profile{
     id:string
@@ -197,8 +196,9 @@ export function RestaurantReviewList({profile,restaurant_id}:logininfo) {
 
           {/* 메뉴 필터태그 (단일 문자열) */}
           {item.menu && (
-            <div className="inline-block bg-gray-100 rounded-lg px-3 py-3 mb-3">
-              <span className="font-mediun text-gray-800">{item.menu}</span>
+            <div className="inline-flex items-center gap-2 bg-white-50 border border-blue-200 
+                  rounded-full px-4 py-1 mb-3">
+              <span className="text-sm font-medium text-black-700">{item.menu}</span>
             </div>
           )}
           {/* 리뷰 내용 */}
