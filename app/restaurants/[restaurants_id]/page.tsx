@@ -5,8 +5,8 @@ import RestaurantInfo from '@/components/restaurant_detail/info';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { Suspense, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient'
-import { Menu_list,RestaurantReviewList } from '@/components/restaurant_detail/menu';
-import IsLogin from '@/components/restaurant_detail/IsLogin'; //이 친구 이름이 왜 IsLogin이냐면 레스토랑 리뷰 쓰기를 하기전에 로그인이 되었는지 확인하기 때문
+import Menu_list from '@/components/restaurant_detail/menu';
+import {IsLogin,RestaurantReviewList}from '@/components/restaurant_detail/IsLogin'; //이 친구 이름이 왜 IsLogin이냐면 레스토랑 리뷰 쓰기를 하기전에 로그인이 되었는지 확인하기 때문
 import {Button} from "@/components/ui/button"
 interface Profile{
   id:string;
@@ -15,7 +15,7 @@ interface Profile{
 
 function RestaurantDetail(){
   const params=useParams();
-  const [contentType,setContentType]=useState<"menu"|"review"|null>(null); //보여질 내용
+  const [contentType,setContentType]=useState<"menu"|"review"|null>("menu"); //보여질 내용
 
   // 폴더명이 [restaurants_id]라면 아래처럼:
   const restaurantId = Array.isArray(params.restaurants_id)
@@ -90,9 +90,9 @@ const openReview=()=>{
           리뷰보기
       </Button>
       </div>
-      <IsLogin profile={profile} retaurant_id={restaurantId}/>
+      <IsLogin profile={profile} restaurant_id={restaurantId}/>
       <div className="p-4">
-      {contentType==="review"?<RestaurantReviewList restaurantId={restaurantId}/>:<Menu_list restaurantId={restaurantId}/>}
+      {contentType==="review"?<RestaurantReviewList  profile={profile} restaurant_id={restaurantId}/>:<Menu_list restaurantId={restaurantId}/>}
       </div>
     </div>
   )
