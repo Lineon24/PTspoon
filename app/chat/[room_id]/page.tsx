@@ -12,6 +12,7 @@ interface Message {
   username: string;
   content: string;
   created_at: string;
+  msg_image?: string | null;
 }
 interface Profile {
   id: string;
@@ -34,9 +35,17 @@ export default function ChatPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [chatRoom, setChatRoom] = useState<Chat_rooms | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { room_id } = useParams();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   if (e.target.files && e.target.files[0]) {
+    setImageFile(e.target.files[0]);
+  }
+};
+  const previewUrl = imageFile ? URL.createObjectURL(imageFile) : null;
 
 
   // 로그인/프로필 불러오기
@@ -91,9 +100,6 @@ export default function ChatPage() {
     }
   }, [room_id]);
 
-
-
-
   // 실시간 구독
   useEffect(() => {
     const channel = supabase
@@ -115,13 +121,46 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 4. 메시지 전송
+  // ✅ 메시지 전송 (최종 수정 반영)
   const sendMessage = async () => {
-    if (!profile || !input.trim()) return;
-    await supabase.from('messages').insert([
-      { user_id: profile.id, room_id, username: profile.nickname, content: input }
+    if (!profile || (!input.trim() && !imageFile)) return;
+
+    let imageUrl: string | null = null;
+
+    if (imageFile) {
+      // 파일 확장자만 추출
+      const ext = imageFile.name.split(".").pop();
+      // 안전한 파일명 생성 (UUID나 timestamp 기반)
+      const safeFileName = `${Date.now()}.${ext}`;
+      const filePath = `${profile.id}/${safeFileName}`;
+
+      const { error } = await supabase.storage
+        .from("chat-images")
+        .upload(filePath, imageFile);
+
+      if (error) {
+        console.error("이미지 업로드 실패:", error.message || error);
+        return;
+      } else {
+        const { data: urlData } = supabase.storage
+          .from("chat-images")
+          .getPublicUrl(filePath);
+        imageUrl = urlData.publicUrl;
+      }
+    }
+
+    await supabase.from("messages").insert([
+      {
+        user_id: profile.id,
+        room_id,
+        username: profile.nickname,
+        content: input,
+        msg_image: imageUrl,
+      },
     ]);
-    setInput('');
+
+    setInput("");
+    setImageFile(null);
   };
 
   if (loading) return (
@@ -130,7 +169,6 @@ export default function ChatPage() {
     <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
     </main>
   );
-
 
   // 없는 채팅방 접속금지
   if (chatRoom == null) return (
@@ -179,7 +217,7 @@ export default function ChatPage() {
       marginBottom: 10,
     }}
   >
-    {/* 닉네임: 그림자 밖 */}
+    {/* 닉네임 */}
     <span
       style={{
         fontSize: 12,
@@ -193,7 +231,7 @@ export default function ChatPage() {
       {msg.username}
     </span>
 
-    {/* 메시지 박스: 그림자 포함 */}
+    {/* 메시지 박스 */}
     <div
       style={{
         position: 'relative',
@@ -201,7 +239,7 @@ export default function ChatPage() {
         borderRadius: 13,
         background: msg.user_id === profile.id ? '#e6f0ff' : '#fff',
         fontWeight: 500,
-        color: msg.user_id === profile.id ? '#1d1d1f' : '#1d1d1f',
+        color: '#1d1d1f',
         maxWidth: '86%',
         wordBreak: 'break-word',
         boxShadow: msg.user_id === profile.id
@@ -210,10 +248,19 @@ export default function ChatPage() {
       }}
     >
       {/* 메시지 본문 */}
-      {msg.content.startsWith('#') ? (
-        <RestaurantMessage tag={msg.content.slice(1)} />
-      ) : (
-        <span style={{ fontSize: 15 }}>{msg.content}</span>
+      {msg.content && (
+        msg.content.startsWith('#')
+          ? <RestaurantMessage tag={msg.content.slice(1)} />
+          : <span style={{ fontSize: 15 }}>{msg.content}</span>
+      )}
+
+      {/* 이미지 */}
+      {msg.msg_image && (
+        <img
+          src={msg.msg_image}
+          alt="msg-img"
+          style={{ marginTop: 8, maxWidth: '100%', borderRadius: 8 }}
+        />
       )}
     </div>
   </div>
@@ -228,8 +275,8 @@ export default function ChatPage() {
           background: '#fff',
           borderTop: '1.5px solid #e6eaf2',
           display: 'flex',
+          flexDirection: 'column',
           gap: 7,
-          alignItems: 'center',
           position: 'fixed',
           maxWidth: 540,
           margin: '0 auto',
@@ -237,33 +284,91 @@ export default function ChatPage() {
           zIndex: 3
         }}
       >
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && sendMessage()}
-          placeholder="메시지를 입력하세요"
-          style={{
-            flex: 1,
-            borderRadius: 8,
-            border: '1.2px solid #d2e0f4',
-            fontSize: 15,
-            padding: '11px 13px'
-          }}
-        />
-        <button
-          onClick={sendMessage}
-          style={{
-            background: '#2e7fff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            padding: '0 20px',
-            fontWeight: 700,
-            fontSize: 15,
-            minHeight: 40,
-            minWidth: 54
-          }}
-        >전송</button>
+        {/* 이미지 미리보기 */}
+        {previewUrl && (
+          <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img
+              src={previewUrl}
+              alt="preview"
+              style={{ maxHeight: 80, borderRadius: 8 }}
+            />
+            <button
+              onClick={() => setImageFile(null)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#ff4d4f',
+                fontSize: 14,
+                cursor: 'pointer'
+              }}
+            >
+              ❌ 제거
+            </button>
+          </div>
+        )}
+
+        {/* 입력 영역 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          {/* 이미지 업로드 버튼 */}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            id="image-upload"
+          />
+          <label
+            htmlFor="image-upload"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              backgroundColor: '#007bff', // 전송 버튼 색상과 동일하게
+              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+            }}
+  >
+    <img
+      src="/image/icon_image_upload.png"
+      alt="이미지 업로드"
+      style={{ width: 20, height: 20, filter: 'invert(1)' }} // 흰색 아이콘 효과
+    />
+  </label>
+
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && sendMessage()}
+            placeholder="메시지를 입력하세요"
+            style={{
+              flex: 1,
+              borderRadius: 8,
+              border: '1.2px solid #d2e0f4',
+              fontSize: 15,
+              padding: '11px 13px'
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            style={{
+              background: '#2e7fff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '0 20px',
+              fontWeight: 700,
+              fontSize: 15,
+              minHeight: 40,
+              minWidth: 54
+            }}
+          >
+            전송
+          </button>
+        </div>
       </div>
     </main>
   );
