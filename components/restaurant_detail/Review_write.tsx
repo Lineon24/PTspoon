@@ -129,7 +129,7 @@ export default function Review_write({
       {/* 제출 버튼 */}
       <button
         type="submit"
-        className="w-full py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors"
+        className="w-full py-2 bg-[#414de4] text-white rounded-lg hover:bg-[#414de4] transition-colors"
       >
         리뷰 등록
       </button>

@@ -181,17 +181,10 @@ export function RestaurantReviewList({profile,restaurant_id}:logininfo) {
             onClick={() => handleDelete(item.id)}
             className="text-xs text-red-500 hover:underline"
           >
-            삭제
+            X
           </button>
           )}
           </div>
-
-          {/* 작성일은 오른쪽 끝 */}
-          <span className="text-sm text-gray-400">
-          {item.created_at
-            ? new Date(item.created_at).toLocaleDateString()
-            : ""}
-          </span>
         </div>
 
           {/* 메뉴 필터태그 (단일 문자열) */}
@@ -214,6 +207,15 @@ export function RestaurantReviewList({profile,restaurant_id}:logininfo) {
               ))}
             </div>
           )}
+
+          {/* 작성일은 오른쪽 끝 */}
+          <div className="flex justify-end">
+          <span className="text-sm text-gray-400">
+          {item.created_at
+            ? new Date(item.created_at).toLocaleDateString()
+            : ""}
+          </span>
+          </div>
         </div>
       ))}
     </section>
