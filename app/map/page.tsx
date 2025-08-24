@@ -1,12 +1,16 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import Script from "next/script"
-import { ChevronUp, ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from "next/navigation"
-import HeaderWithBack from '@/components/HeaderWithBack';
+import { useState, useEffect, useRef } from "react"                               // React에서 상태/생명주기/참조(레퍼런스) 기능을 쓰기 위한 훅들
+import Script from "next/script"                                                  // Next.js에서 외부 스크립트(Kakao Map SDK 같은 것)를 안전하게 로드하는 컴포넌트
+import { ChevronUp, ChevronDown, SlidersHorizontal } from "lucide-react"          // 아이콘 라이브러리(lucide-react)에서 위/아래 화살표 아이콘 컴포넌트를 가져옴
+import { cn } from "@/lib/utils"                                                  // 조건에 따라 Tailwind 클래스명을 깔끔하게 합쳐주는 유틸 함수
+import { supabase } from '@/lib/supabaseClient';                                  // Supabase와 통신(인증, DB조회 등)하기 위한 미리 설정해둔 클라이언트
+import { useRouter } from "next/navigation"                                       // Next.js 클라이언트 라우터 훅. 코드로 페이지 이동(router.push)할 때 사용
+import HeaderWithBack from '@/components/HeaderWithBack';                         // 프로젝트에 만든 커스텀 헤더 컴포넌트(뒤로가기 버튼 포함)
+import { SearchAutocomplete } from "@/components/SearchBar";
+import { SearchFilter_ver3 } from "@/components/SearchFilter_ver3";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 // kakao 전역 선언
 declare global {
@@ -127,7 +131,7 @@ export default function MapPage() {
         if (!mapContainer) return
 
         const mapOption = {
-          center: new window.kakao.maps.LatLng(36.994444, 127.134466),
+          center: new window.kakao.maps.LatLng(36.995050, 127.134444),
           level: 3,
         }
         const map = new window.kakao.maps.Map(mapContainer, mapOption)
@@ -214,9 +218,7 @@ export default function MapPage() {
   // (P) 버튼 클릭 시 지정 좌표로 이동하는 함수
   const moveToPresetPosition = () => {
     if (!mapRef.current) return
-    const lat = 36.994444
-    const lng = 127.134466
-    const latLng = new window.kakao.maps.LatLng(lat, lng)
+    const latLng = new window.kakao.maps.LatLng(36.995050, 127.134444)
     mapRef.current.panTo(latLng)
     setIsSheetOpen(false)
   }
