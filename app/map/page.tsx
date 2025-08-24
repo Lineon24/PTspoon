@@ -481,6 +481,20 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-    </>
+      <div className="relative bg-white rounded-lg shadow p-4 flex flex-col">
+      {/* 하단 오른쪽: 길찾기 버튼 */}
+      <div className="mt-auto flex justify-end">
+      <button
+        className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition"
+        onClick={() => {
+          // 길찾기 기능 연결 (예: 구글맵 링크)
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=위도,경도`, "_blank");
+        }}
+      >
+        길찾기
+      </button>
+    </div>
+  </div>
+  </>
   )
 }

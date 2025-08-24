@@ -171,7 +171,7 @@ export function RestaurantReviewList({profile,restaurant_id}:logininfo) {
     <section className="bg-white rounded-xl shadow shadow-gray-200 p-4 space-y-6">
 
       {reviewList.map((item) => (
-        <div key={item.id} className="border-b border-gray-100 pb-4 last:border-none">
+        <div key={item.id} className="border-b border-gray-100 pb-2 last:border-none">
           <div className="flex justify-between items-center mb-2">
           {/* 닉네임 + 삭제 버튼 묶음 */}
           <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export function RestaurantReviewList({profile,restaurant_id}:logininfo) {
 
           {/* 맛 태그들 (배열) */}
           {item.tags && item.tags.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-1 py-6">
+            <div className="mb-2 flex flex-wrap gap-1 py-3">
               {item.tags.map((tag) => (
                 <FilterTag key={tag} label={tag} />
               ))}
