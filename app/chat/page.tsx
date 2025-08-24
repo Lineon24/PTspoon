@@ -21,6 +21,8 @@ const ChatRoomListPage = () => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [user, setUser] = useState<any>(null);
   const [hoveredRoomId, setHoveredRoomId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'all' | 'mine'>('all');
+  const [myRoomIds, setMyRoomIds] = useState<string[]>([]);
   const router = useRouter();
 
   // 사용자 정보 및 채팅방 목록 불러오기
@@ -38,12 +40,29 @@ const ChatRoomListPage = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (roomsError) console.error('채팅방 목록 가져오기 오류:', roomsError);
-      else setRooms(roomsData || []);
+      if (roomsError) {
+        console.error('채팅방 목록 가져오기 오류:', roomsError);
+        setRooms([]);
+        return;
+      }
+
+      setRooms(roomsData || []);
+
+      // 내가 메시지를 남긴 채팅방 id 목록 가져오기
+      if (user) {
+        const { data: myMsgs } = await supabase
+          .from('messages')
+          .select('room_id')
+          .eq('user_id', user.id);
+
+        // 중복 제거
+        const ids = Array.from(new Set((myMsgs || []).map((msg: any) => msg.room_id)));
+        setMyRoomIds(ids);
+      }
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   // 채팅방 생성
   const handleCreateRoom = async () => {
@@ -136,14 +155,48 @@ const ChatRoomListPage = () => {
     >
       <HeaderWithBack title="전체 채팅방 목록" backTF={false} />
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 20,
-        }}
-      >
+      {/* 슬라이드 토글 버튼 + 채팅방 만들기 버튼 한 줄에 배치 */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        gap: 8,
+      }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => setViewMode('all')}
+            style={{
+              backgroundColor: viewMode === 'all' ? '#3478ff' : '#eee',
+              color: viewMode === 'all' ? 'white' : '#333',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: 20,
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: 15,
+              transition: 'background 0.2s',
+            }}
+          >
+            전체 채팅방
+          </button>
+          <button
+            onClick={() => setViewMode('mine')}
+            style={{
+              backgroundColor: viewMode === 'mine' ? '#3478ff' : '#eee',
+              color: viewMode === 'mine' ? 'white' : '#333',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: 20,
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: 15,
+              transition: 'background 0.2s',
+            }}
+          >
+            참여한 방
+          </button>
+        </div>
         <button
           onClick={handleCreateRoom}
           style={{
@@ -154,7 +207,6 @@ const ChatRoomListPage = () => {
             borderRadius: 8,
             cursor: 'pointer',
             fontSize: 14,
-            marginLeft: 'auto',
             display: 'block'
           }}
         >
@@ -162,8 +214,23 @@ const ChatRoomListPage = () => {
         </button>
       </div>
 
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+
+      </div>
+
+      {/* rooms 목록 필터링 */}
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        {rooms.map((room) => {
+        {(viewMode === 'all'
+          ? rooms
+          : rooms.filter(room => myRoomIds.includes(room.id))
+        ).map((room) => {
           const isHovered = hoveredRoomId === room.id;
           return (
             <li
@@ -218,6 +285,7 @@ const ChatRoomListPage = () => {
                       {room.room_description}
                     </span>
                   )}
+                  {/* 최근 메시지 내용/이미지 관련 코드 삭제 */}
                 </div>
               </Link>
 
