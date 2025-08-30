@@ -1,4 +1,5 @@
-// 레스토랑 정보 (연락처, 이름, 주소) 컴포넌트
+// 레스토랑 정보 (연락처, 이름, 주소),리뷰 컴포넌트
+//버튼으로 조절하기 때문에 하나로 묶음
 "use client"
 
 import { useEffect, useState } from "react"
@@ -13,7 +14,7 @@ interface Restaurant {
   restaurant_name: string
   phone: string
   address: string
-  hours?: string // 필요시 운영시간 확장 가능
+  image_url:string;
 }
 
 export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
@@ -26,7 +27,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
 
       const { data, error } = await supabase
         .from("restaurant")
-        .select("restaurant_name, phone, address")
+        .select("restaurant_name, phone, address,image_url")
         .eq("restaurant_id", restaurantId)
         .single()
 
@@ -54,6 +55,19 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   }
   return (
   <section className="p-4 mb-6 space-y-4">
+    <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">
+      <img
+        src={restaurant.image_url}
+        alt="레스토랑 이미지"
+        loading="lazy"
+        style={{
+          width:'100%',
+          height:'100%',
+          objectFit:'cover',
+          borderRadius:'8px',
+          display:'block',
+        }}/>
+    </div>
     {/* 식당 이름 */}
     <div className="text-center">
     <h1 className="text-2xl font-semibold text-gray-900 break-words">
@@ -62,8 +76,8 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     </div>
     {/*일단 버튼 모양으로 변경*/}
     {/*주소*/}
-    <div className="flex justify-center gap-8">
-    <div className="flex items-center gap-3 bg-white-100 rounded-lg px-4 h-14 w-64">
+    <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 w-full max-w-[857px] mx-auto">
+    <div className="flex items-center gap-3 bg-white-100 rounded-lg px-4 h-14 w-full max-w-[403px]">
       <a
         href={`https://map.kakao.com/link/search/${encodeURIComponent(restaurant.address)}`}
         target="_blank"
@@ -76,7 +90,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
         <span className="text-sm text-gray-800 whitespace-nowrap">{restaurant.address}</span>
       </div>
       {/*전화*/}
-      <div className="flex items-center gap-2 bg-white-100 rounded-lg px-4 h-14 w-64">
+      <div className="flex items-center gap-2 bg-white-100 rounded-lg px-4 h-14 w-full max-w-[403px]">
       <a
         href={`tel:${restaurant.phone}`}
         aria-label="전화번호"
@@ -91,3 +105,5 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
 )
 
 }
+
+

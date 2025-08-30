@@ -36,15 +36,24 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const [chatRoom, setChatRoom] = useState<Chat_rooms | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatListRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { room_id } = useParams();
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-   if (e.target.files && e.target.files[0]) {
-    setImageFile(e.target.files[0]);
-  }
-};
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    imageInputRef.current && (imageInputRef.current.value = '');
+  };
+
   const previewUrl = imageFile ? URL.createObjectURL(imageFile) : null;
 
 
@@ -89,7 +98,7 @@ export default function ChatPage() {
       const { data } = await supabase
         .from('messages')
         .select('*')
-        .eq('room_id', room_id) // 해당 방 ID만 가져오기
+        .eq('room_id', room_id)
         .order('created_at', { ascending: true });
 
       setMessages(data || []);
@@ -99,6 +108,31 @@ export default function ChatPage() {
       fetchMessages();
     }
   }, [room_id]);
+
+  // 채팅방 진입 시 맨 아래로 스크롤
+  useEffect(() => {
+    if (messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+      setIsAtBottom(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
+
+  // 새 메시지 도착 시, 스크롤이 맨 아래일 때만 자동 스크롤
+  useEffect(() => {
+    if (isAtBottom && messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // 스크롤 위치 추적
+  const handleScroll = () => {
+    const el = chatListRef.current;
+    if (!el) return;
+    // 10px 오차 허용
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 10;
+    setIsAtBottom(atBottom);
+  };
 
   // 실시간 구독
   useEffect(() => {
@@ -116,10 +150,6 @@ export default function ChatPage() {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   // ✅ 메시지 전송 (최종 수정 반영)
   const sendMessage = async () => {
@@ -195,6 +225,8 @@ export default function ChatPage() {
       <HeaderWithBack title={chatRoom?.room_name ?? '채팅방' } backTF= {true} /> {/* 상단 고정 헤더 */}
       {/* 메시지 리스트 */}
       <div
+        ref={chatListRef}
+        onScroll={handleScroll}
         style={{
           flex: 1,
           minHeight: 0,
@@ -262,9 +294,11 @@ export default function ChatPage() {
           style={{ marginTop: 8, maxWidth: '100%', borderRadius: 8 }}
         />
       )}
+      <div ref={bottomRef} > </div>
     </div>
   </div>
 )}
+<div ref={bottomRef} />
 </div>
 
       {/* 입력창 */}
@@ -284,7 +318,7 @@ export default function ChatPage() {
           zIndex: 3
         }}
       >
-        {/* 이미지 미리보기 */}
+        {/* 이미지 미리보기 - 입력창 위쪽 */}
         {previewUrl && (
           <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
             <img
@@ -293,7 +327,7 @@ export default function ChatPage() {
               style={{ maxHeight: 80, borderRadius: 8 }}
             />
             <button
-              onClick={() => setImageFile(null)}
+              onClick={handleRemoveImage}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -316,6 +350,7 @@ export default function ChatPage() {
             onChange={handleFileChange}
             style={{ display: 'none' }}
             id="image-upload"
+            ref={imageInputRef}
           />
           <label
             htmlFor="image-upload"
@@ -326,18 +361,23 @@ export default function ChatPage() {
               width: 36,
               height: 36,
               borderRadius: '50%',
-              backgroundColor: '#007bff', // 전송 버튼 색상과 동일하게
+              backgroundColor: '#007bff',
               boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
               cursor: 'pointer',
               transition: 'background-color 0.2s ease',
             }}
-  >
-    <img
-      src="/image/icon_image_upload.png"
-      alt="이미지 업로드"
-      style={{ width: 20, height: 20, filter: 'invert(1)' }} // 흰색 아이콘 효과
-    />
-  </label>
+          >
+            {/* 이미지 전송 버튼 + */}
+            <span style={{
+              fontSize: 24,
+              color: 'white',
+              fontWeight: 'bold',
+              lineHeight: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>+</span>
+          </label>
 
           <input
             value={input}

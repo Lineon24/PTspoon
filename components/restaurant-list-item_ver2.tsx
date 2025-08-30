@@ -1,6 +1,7 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { FilterTag } from "@/components/filter-tag";
+import { useEffect } from "react";
 // 레스토랑 타입 정의: id, 이름, 주소, 전화번호 (모두 문자열)
 export interface Restaurant {
   restaurant_id: string;      // 식당 고유 ID
@@ -18,6 +19,13 @@ interface RestaurantListItemProps {
 
 // 레스토랑 리스트 아이템 컴포넌트
 export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
+  //레스토랑 ID를 로컬 스토리지에 저장
+  useEffect(()=>{
+    localStorage.setItem("restaurantID",restaurant.restaurant_id);
+  },[restaurant.restaurant_id]);
+
+
+
   return (
     // 상세 페이지로 이동하는 링크 (식당 ID를 포함)
     <Link href={`/restaurants/${restaurant.restaurant_id}`} className="block">
