@@ -4,17 +4,21 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, usePathname } from 'next/navigation';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, SquarePen } from 'lucide-react';
 interface Profile { // 프로필에서 사용할 테이블 속성들
   id: string;
   nickname: string;
 }
 
-const iconList = [UtensilsCrossed]; // 아이콘 리스트들 상단바에 추가할 아이콘은 여기에 추가
+const iconList = [UtensilsCrossed, SquarePen]; // 아이콘 리스트들 상단바에 추가할 아이콘은 여기에 추가
 
 {/*매개변수로 타이틀, 아이콘 모양 번호(iconList 인덱스), 아이콘 색깔, 이전 버튼 추가 설정를 받음 */}
-export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | 'black'; }) {
+export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, buttonCustomName, buttonCustomPath, buttonCustomicon, buttonCustomiconColor}: 
+  { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | 'black'; 
+    buttonCustomName?: string; buttonCustomPath?: string; buttonCustomicon?: number; buttonCustomiconColor?: string | 'black';
+  }) {
   const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null; // 아이콘 인덱스에 아무값도 안넣었다면 널 값을 넣음
+  const ButtonIconComponent = buttonCustomicon !== undefined ? iconList[buttonCustomicon] : null; // 아이콘 인덱스에 아무값도 안넣었다면 널 값을 넣음
   const router = useRouter(); 
   const pathname = usePathname();
 
@@ -95,7 +99,32 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
         {title}
       </h1>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-          {user ? ( // 로그인 여부에 따라 로그인 버튼 혹은 로그아웃 버튼이 보임
+
+          {buttonCustomName != null ? (
+            <div>
+             <button
+              style={{
+                display: 'flex',
+                background: '#414de4',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 9,
+                fontWeight: 600,
+                fontSize: 15,
+                padding: '7px 18px',
+                cursor: 'pointer',
+                alignItems: 'center', // 세로 중앙 정렬
+                gap: '2px', // 아이콘과 텍스트 사이 간격
+              }}
+              onClick={() => router.push(`${buttonCustomPath}`)}
+            >
+              {ButtonIconComponent != null ? ( // 인자값으로 아이콘 인덱스 값을 받으면 아이콘 출력
+              <div style={{ color: buttonCustomiconColor, marginRight: '10px' }}><ButtonIconComponent/></div>): null}
+              {buttonCustomName}
+            </button>
+            </div>
+          ) : (
+          user ? ( // 로그인 여부에 따라 로그인 버튼 혹은 로그아웃 버튼이 보임
             <>
               <span style={{ fontWeight: 600, color: '#414de4', fontSize: 15 }}>
                 {profile ? `${profile.nickname} 님` : user.name}
@@ -132,7 +161,9 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF}: {
             >
               로그인
             </button>
-          )}
+          ))
+          }
+          
         </div>
     </div>
   );

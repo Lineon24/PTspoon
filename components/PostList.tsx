@@ -38,9 +38,10 @@ interface Profile {
 interface PostListProps {
   posts: Post[]; // 외부에서 받아올 게시글 목록
   profile: Profile | null; // 현재 로그인된 사용자 프로필 (댓글 작성 권한 확인용)
+  onPostDeleted: (deletedPostId: string) => void; // 게시글 삭제 후 UI 업데이트를 위한 콜백 함수 추가
 }
 
-export default function PostList({ posts, profile }: PostListProps) {
+export default function PostList({ posts, profile, onPostDeleted }: PostListProps) {
   const [commentsByPostId, setCommentsByPostId] = useState<{ [postId: string]: Comment[] }>({});
   const router = useRouter();
   const pathname = usePathname();
@@ -84,44 +85,83 @@ export default function PostList({ posts, profile }: PostListProps) {
           }));
         }
       )
-      .subscribe();
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'comments' },
+        (payload) => {
+          // DB 복합 키 설정으로 payload.old에 id와 post_id가 모두 들어옵니다.
+          const deletedComment = payload.old as Partial<Comment>;
+        
+          if (deletedComment.id && deletedComment.post_id) {
+            const commentId = deletedComment.id;
+            const postId = deletedComment.post_id;
+
+            // React 상태(State)에서 삭제된 댓글을 제거하여 UI를 업데이트합니다.
+            setCommentsByPostId(prevComments => {
+              const updatedComments = { ...prevComments };
+              if (updatedComments[postId]) {
+                updatedComments[postId] = updatedComments[postId].filter(
+                  // ID 타입을 문자열로 통일하여 안전하게 비교합니다.
+                  comment => String(comment.id) !== String(commentId)
+               );
+              }
+             return updatedComments;
+            });
+         }
+        }
+     )
+     .subscribe();
 
     return () => {
       supabase.removeChannel(commentsChannel);
     };
   }, []); // 의존성 배열 비움을 비워 컴포넌트 마운트 시 한 번만 실행
 
-const deletePost = async (post: Post) => {
-  const confirmDelete = window.confirm('정말로 이 게시글을 삭제하시겠습니까?');
-  if (!confirmDelete) return;
+  const deletePost = async (post: Post) => {
+    // 본인 게시글이 맞는지 확인
+    if (profile?.id !== post.user_id) {
+        alert('삭제 권한이 없습니다.');
+        return;
+    }
+    // 게시글 삭제 확인 메시지
+    const confirmDelete = window.confirm('정말로 이 게시글을 삭제하시겠습니까?');
+    if (!confirmDelete) return;
 
-  const { error:dbError } = await supabase.from('posts').delete().eq('id', post.id); // 데이터베이스의 내용 제거 부분
+    try {
+      // 이미지가 있다면 스토리지에서 먼저 삭제
+      if (post.image_urls && post.image_urls.length > 0) {
+        const filePaths = post.image_urls.map(url => {
+          return url.split('/board-image/')[1];
+        });
 
-  const imageUrls = post.image_urls; // 저장된 파일 경로 변수에 넣기
-  const filePaths = imageUrls.map(url => {
-    // 공용 URL을 스토리지 URL로 변경
-    return url.split(`/board-image/`)[1];
-  });
-  const { data, error:storageError } = await supabase.storage
-  .from('board-image') // 이미지가 있는 게시글 버킷을 선택
-  .remove(filePaths); // 제거할 파일 경로의 배열
+        const { error: storageError } = await supabase.storage
+          .from('board-image')
+          .remove(filePaths);
 
-  if (dbError) {
-    alert('게시글 삭제에 실패했습니다.');
-    console.error('삭제 오류:', dbError);
-    return;
-  }
-  if (storageError) {
-    alert('게시글 삭제에 실패했습니다.');
-    console.error('삭제 오류:', storageError );
-    return;
-  }
+        if (storageError) {
+          throw storageError; // 에러 발생 시 catch 블록으로 이동
+        }
+      }
 
+      // 데이터베이스에서 게시글 레코드 삭제
+      const { error: dbError } = await supabase.from('posts').delete().eq('id', post.id);
 
-  alert('게시글이 삭제되었습니다.');
-  // 삭제 후 화면 리로드하기 
-  window.location.reload(); 
-};
+      if (dbError) {
+        throw dbError; // 에러 발생 시 catch 블록으로 이동
+      }
+
+      // 부모 컴포넌트에 삭제 사실을 알려 업데이트
+      onPostDeleted(post.id);
+
+      // 모든 과정이 성공했을 때 사용자에게 알림
+      alert('게시글이 삭제되었습니다.'); 
+
+    } catch (error: any) {
+      console.error('삭제 오류:', error);
+      alert('게시글 삭제에 실패했습니다.');
+    }
+  };
+
   if (posts.length === 0) {
     return <p style={{ textAlign: 'center', color: '#777', fontSize: 16 }}>아직 게시글이 없습니다.</p>;
   }

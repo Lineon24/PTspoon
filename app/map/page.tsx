@@ -10,6 +10,7 @@ import { SearchAutocomplete } from "@/components/SearchBar";
 import { SearchFilter_ver3 } from "@/components/SearchFilter_ver3";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
+import { LocateFixed, Utensils} from 'lucide-react';
 
 // kakao 전역 선언
 declare global {
@@ -77,7 +78,7 @@ export default function MapPage() {
         const marker = new window.kakao.maps.Marker({
           position: new window.kakao.maps.LatLng(lat, lng),
           clickable: true,
-          image: new window.kakao.maps.MarkerImage("/map/icon1.png", new window.kakao.maps.Size(38, 40)),
+          image: new window.kakao.maps.MarkerImage("/map/mappin.png", new window.kakao.maps.Size(30, 30)),
         })
 
         marker.setMap(map)
@@ -130,7 +131,7 @@ export default function MapPage() {
         if (!container) return
 
         const map = new window.kakao.maps.Map(container, {
-          center: new window.kakao.maps.LatLng(36.994444, 127.134466),
+          center: new window.kakao.maps.LatLng(36.9954, 127.1345),
           level: 3,
         })
         mapRef.current = map
@@ -146,7 +147,7 @@ export default function MapPage() {
               position: current,
               zIndex: 100,
               title: "현재 위치",
-              image: new window.kakao.maps.MarkerImage("/map/pin_icon.png", new window.kakao.maps.Size(40, 38)),
+              image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20)),
             })
           })
         }
@@ -171,10 +172,15 @@ export default function MapPage() {
   useEffect(() => {
     markersRef.current.forEach(({ id, marker }) => {
       const isSelected = id === selectedRestaurantId
+      const imageUrl = isSelected ? "/map/mappinExpand.png" : "/map/mappin.png";
+      const imageSize = isSelected
+       ? new window.kakao.maps.Size(48, 60) // 선택된 마커는 더 큰 사이즈
+        : new window.kakao.maps.Size(30, 30); // 선택되지 않은 마커는 기본 사이즈
+
       marker.setImage(new window.kakao.maps.MarkerImage(
-        isSelected ? "/map/icon2.png" : "/map/icon1.png",
-        new window.kakao.maps.Size(38, 40)
-      ))
+        imageUrl,
+        imageSize // isSelected에 따라 동적으로 생성된 imageSize 객체 사용
+      ));
       marker.setZIndex(isSelected ? 10 : 1)
     })
   }, [selectedRestaurantId])
@@ -182,9 +188,38 @@ export default function MapPage() {
   // 평택대 버튼
   const moveToPresetPosition = () => {
     if (!mapRef.current) return
-    mapRef.current.panTo(new window.kakao.maps.LatLng(36.995555, 127.134466))
+    mapRef.current.panTo(new window.kakao.maps.LatLng(36.9954, 127.1345))
     setIsSheetOpen(false)
   }
+  // 내 위치 버튼
+  const moveToMyPosition = () => {
+  if (!mapRef.current) {
+    alert("지도가 아직 로드되지 않았습니다.");
+    return;
+  }
+
+  // 내 위치 받기
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const currentPos = new window.kakao.maps.LatLng(lat, lng);
+        
+        // panTo를 사용해 지도를 부드럽게 현재 위치로 이동
+        mapRef.current.panTo(currentPos);
+      },
+      (err) => {
+        // 위치 정보 얻기를 실패했을 때 실행됩니다.
+        alert("위치 정보를 가져오는 데 실패했습니다.");
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+      }
+    );
+  } else {
+    // Geolocation을 지원하지 않는 브라우저일 경우 실행됩니다.
+    alert("이 브라우저에서는 위치 정보가 지원되지 않습니다.");
+  }
+};
 
   // -----------------------
   // ✅ 이름 검색
@@ -333,14 +368,13 @@ export default function MapPage() {
       <HeaderWithBack title="주변 맛집 찾기" backTF={true} />
 
       {/* 검색창 + 필터 */}
-      <div className="fixed top-[45px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between p-2 bg-white shadow">
-        <div className="flex-1 mr-2">
+      <div className="fixed top-[45px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between p-2">
+        <div className="flex-1 mr-2 ">
           <SearchAutocomplete value={inputValue} onChange={setInputValue} onEnter={handleEnterSearch} />
         </div>
-
         <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <SheetTrigger asChild>
-            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full shadow-lg">
+            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full shadow-lgv bg-white shadow">
               <SlidersHorizontal className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -357,9 +391,17 @@ export default function MapPage() {
 
         <button
           onClick={moveToPresetPosition}
-          className="absolute top-[80px] right-3 z-40 bg-green-800 text-white px-3 py-1 rounded shadow"
-        >
-          평택대
+          className= "absolute bottom-25 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+            <img 
+              src="/image/ptu_logo.png" // 이미지 파일 경로 (public 폴더 기준)
+              alt="평택대" 
+              className="w-8 h-8" // 이미지 크기 조절 (Tailwind CSS)
+            />
+        </button>
+        <button
+          onClick={moveToMyPosition}
+          className="absolute bottom-10 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+          <LocateFixed size={32}/>
         </button>
 
         {/* 하단 시트 */}
@@ -374,18 +416,19 @@ export default function MapPage() {
             {isSheetOpen ? <ChevronDown className="h-6 w-6 text-gray-400" /> : <ChevronUp className="h-6 w-6 text-gray-400" />}
           </button>
 
-          <div className="p-4 pt-0">
+          <div className="p-3 pt-0">
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[30vh] px-2">
-            <div className="space-y-2 pb-4">
+          <div className="overflow-y-auto max-h-[60vh] px-2">
+            <div className="space-y-2 pb-10 py-2">
               {restaurants.map((r) => (
                 <div
                   key={r.restaurant_id}
                   onClick={() => onClickRestaurant(r.restaurant_id)}
                   className={cn(
                     "rounded-xl transition-all cursor-pointer",
+                    "ring-1 ring-black-700",
                     selectedRestaurantId === r.restaurant_id && "bg-blue-50 ring-2 ring-blue-500"
                   )}
                 >

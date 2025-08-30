@@ -11,7 +11,7 @@ import HeaderWithBack from '@/components/HeaderWithBack';                       
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("home"); // 현재 활성화된 탭
-  const [nickname, setNickname] = useState("???"); // 닉네임 상태
+  const [nickname, setNickname] = useState(""); // 닉네임 상태
   const router = useRouter();
 
   // 로그인 유저 닉네임 불러오기
@@ -82,12 +82,11 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-800">
+    <div className="min-h-screen bg-white text-gray-800 max-w-[540px] mx-auto">
       {/* 상단바 header */}
       <HeaderWithBack
         title={`${nickname}의 프로필`}
         backTF={true}
-        onBack={() => router.push("/")} // 홈으로 이동
       />
 
       {/* 배너 영역 */}
@@ -137,7 +136,6 @@ export default function ProfilePage() {
 
       {/* 탭 컨텐츠 */}
       <main className="p-4 text-center sm:text-left">
-        {tabContents[activeTab]}
       </main>
     </div>
   );

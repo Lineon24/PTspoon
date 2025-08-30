@@ -137,10 +137,10 @@ export default function ChatPage() {
   // 실시간 구독
   useEffect(() => {
     const channel = supabase
-      .channel('public:messages')
+      .channel(`public:messages-${room_id}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `room_id=eq.${room_id}`},
         (payload) => {
           setMessages((prev) => [...prev, payload.new as Message]);}
       )
@@ -149,7 +149,7 @@ export default function ChatPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [room_id]);
 
   // ✅ 메시지 전송 (최종 수정 반영)
   const sendMessage = async () => {
@@ -182,7 +182,7 @@ export default function ChatPage() {
     await supabase.from("messages").insert([
       {
         user_id: profile.id,
-        room_id,
+        room_id: room_id,
         username: profile.nickname,
         content: input,
         msg_image: imageUrl,

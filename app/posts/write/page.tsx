@@ -113,7 +113,9 @@ export default function WritePostPage() {
     let uploadedUrls: string[] = []; // 여러 장 받기에 배열로
       if (selectedFiles.length > 0) {
         try { // 예외처리 부분
-        const uploadPromises = selectedFiles.map((file) => handleImageUpload(file)); // 선택된 파일 스토리지에 업로드
+        const uploadPromises = selectedFiles.map((file, index) => 
+          handleImageUpload(file, profile, index) // profile과 index를 추가로 전달
+        );
         uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[]; // 모든 프로미스 객체(모든 파일 업로드 되어야 정상 작동) 이미지 공용 주소 받아옴
         } catch (err) {
           console.error('이미지 업로드 중 오류:', err);
@@ -167,8 +169,14 @@ export default function WritePostPage() {
  };
 
 
-const handleImageUpload = async (file: File): Promise<string | null> => {
-  const filePath = `user-${profile?.id}/${Date.now()}-${file.name}`; // 파일 저장 경로
+const handleImageUpload = async (file: File, profile: Profile | null, index: number): Promise<string | null> => {
+  // 0. 사용자 프로필이 없는 경우 업로드 중단 (안정성)
+  if (!profile?.id) {
+    console.error('사용자 정보가 없어 업로드를 중단합니다.');
+    return null;
+  }
+
+  const filePath = `user-${profile?.id}/${Date.now()}-${index}`; // 파일 저장 경로
 
   const { data, error } = await supabase.storage
     .from('board-image') // 저장할 스토리지 이름
@@ -190,13 +198,18 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
+  const handlePostDeleted = (deletedPostId: string) => { // 실시간 삭제 적용 부분
+    setPosts(currentPosts =>
+    currentPosts.filter(post => post.id !== deletedPostId)
+  );
+};
 
   if (loading) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#555' }}>로딩중...</div>;
   if (!profile) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#ff0000' }}>프로필 정보 없음. 로그인 상태를 확인해주세요.</div>;
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
-      <HeaderWithBack title="내 게시글" backTF= {true} /> {/* 상단 고정 헤더 */}
+      <HeaderWithBack title="게시글 작성" backTF= {true} /> {/* 상단 고정 헤더 */}
       <div style={{ height: '60px' }}></div>
 
       {/* 게시글 작성 폼 */}
@@ -317,7 +330,7 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
       <div style={{ borderTop: '1px solid #eee', paddingTop: '20px' }}>
         <h2 style={{ fontSize: '22px', marginBottom: '20px', color: '#333' }}>나의 게시글 목록</h2>
         {/* PostList 컴포넌트에 게시글과 프로필 정보를 전달 */}
-        <PostList posts={posts} profile={profile} />
+        <PostList posts={posts} profile={profile} onPostDeleted={handlePostDeleted} />
       </div>
     </div>
   );

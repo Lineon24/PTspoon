@@ -160,7 +160,8 @@ return (
           type="text"
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
-          placeholder="예: 성환이 뒷담화방"
+          placeholder="채팅방 이름(필수)"
+          maxLength={30}
           style={{
             width: '100%',
             padding: '10px 5px',
@@ -173,6 +174,7 @@ return (
           onFocus={(e) => (e.currentTarget.style.borderBottom = '2px solid #007bff')}
           onBlur={(e) => (e.currentTarget.style.borderBottom = '2px solid #ccc')}
         />
+        <div style={{ textAlign: 'right', fontSize: 13, color: '#888' }}>{roomName.length}/30 </div>
       </label>
       <br />
       <label>
@@ -181,6 +183,7 @@ return (
           value={roomDescription}
           onChange={(e) => setRoomDescription(e.target.value)}
           placeholder="이 채팅방은 어떤 곳인가요?"
+          maxLength={200}
           rows={3}
           style={{
             width: '100%',
@@ -194,6 +197,7 @@ return (
           onFocus={(e) => (e.currentTarget.style.border = '1px solid #007bff')}
           onBlur={(e) => (e.currentTarget.style.border = '1px solid #ccc')}
         />
+        <div style={{ textAlign: 'right', fontSize: 13, color: '#888' }}>{roomDescription.length}/200 </div>
       </label>
 
       <button

@@ -73,7 +73,6 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
     console.error('삭제 오류:', error);
     return;
   }
-
   alert('댓글이 삭제되었습니다.');
   };
 

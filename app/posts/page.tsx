@@ -82,17 +82,23 @@ export default function AllPostsPage() {
     };
   }, []);
 
+    const handlePostDeleted = (deletedPostId: string) => { // 실시간 삭제 적용 부분
+      setPosts(currentPosts =>
+      currentPosts.filter(post => post.id !== deletedPostId)
+    );
+  };
 
   if (loading) return <div style={{ margin: 60, textAlign: 'center', fontSize: 18, color: '#555' }}>로딩중...</div>; // 게시글 로딩 전이면 출력
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
-    <HeaderWithBack title="전체 게시글" backTF= {true} /> {/* 상단 고정 헤더 */}
+    <HeaderWithBack title="전체 게시글" backTF= {true} 
+      buttonCustomName='게시글 작성' buttonCustomPath='/posts/write' buttonCustomicon={1} /> {/* 상단 고정 헤더 */}
       <div style={{ height: '10px' }}></div>
 
       {/* 게시글 목록 (PostList 컴포넌트를 사용하여 렌더링) */}
       <div style={{ paddingTop: '0px' }}>
-        <PostList posts={posts} profile={profile} />
+        <PostList posts={posts} profile={profile} onPostDeleted={handlePostDeleted} />
       </div>
     </div>
   );
