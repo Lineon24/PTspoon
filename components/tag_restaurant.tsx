@@ -47,7 +47,7 @@ export function RestaurantMessage({ tag }: Props) {
 
     useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth'});
-  }, [tag]);
+  }, [restaurant]);
 
   if (loading) return <span className="text-gray-400">불러오는 중...</span>;
   if (!restaurant) return <span className="text-red-500">식당 정보를 찾을 수 없습니다</span>;

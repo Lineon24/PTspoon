@@ -215,6 +215,7 @@ export default function ChatPage() {
       ) : (
         <span style={{ fontSize: 15 }}>{msg.content}</span>
       )}
+      <div ref={bottomRef} > </div>
     </div>
   </div>
 )}
