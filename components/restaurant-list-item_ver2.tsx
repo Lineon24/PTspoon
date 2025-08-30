@@ -29,12 +29,12 @@ export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
 
   return (
     // 상세 페이지로 이동하는 링크 (식당 ID를 포함)
-    <Link href={`/restaurants/${restaurant.restaurant_id}`} className="block">
+    <Link href={`/restaurants/${restaurant.restaurant_id}`} className="block"> 
       <div
         // 전체 아이템 컨테이너 스타일: padding, 테두리, 라운딩, 호버 시 배경색 변화
-        className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center"
+        className="px-1 py-2 border rounded-lg border-gray-300 shadow-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center "
       >
-        <div className="w-30 h-30 flex-shrink-0 mr-4"> {/* 이미지 크기 및 오른쪽 여백 설정 */}
+        <div className="w-30 h-30 flex-shrink-0 mr-3"> {/* 이미지 크기 및 오른쪽 여백 설정 */}
           <img
             src={restaurant.image_url || DEFAULT_IMAGE_URL}
             alt={`${restaurant.restaurant_name} 대표 이미지`}
@@ -67,7 +67,7 @@ export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
           ))}
         </div>
       </div>
-  </div>
+      </div>
   </Link>
   );
 }

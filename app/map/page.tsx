@@ -432,16 +432,15 @@ export default function MapPage() {
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[60vh] px-2">
+          <div className="overflow-y-auto max-h-[45vh] px-1">
             <div className="space-y-2 pb-10 py-2">
               {restaurants.map((r) => (
                 <div
                   key={r.restaurant_id}
                   onClick={() => onClickRestaurant(r.restaurant_id)}
                   className={cn(
-                    "rounded-xl transition-all cursor-pointer",
-                    "ring-1 ring-black-700",
-                    selectedRestaurantId === r.restaurant_id && "bg-blue-50 ring-2 ring-blue-500"
+                    " transition-all cursor-pointer",
+                    selectedRestaurantId === r.restaurant_id && "bg-blue-100 "
                   )}
                 >
                   <RestaurantListItem restaurant={r} />
