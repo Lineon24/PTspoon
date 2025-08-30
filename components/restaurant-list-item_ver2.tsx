@@ -10,13 +10,14 @@ export interface Restaurant {
   phone: string;   // 식당 전화번호
   type: string[];
   taste: string[];
+  image_url: string;
   }
 
 // 컴포넌트가 받을 props 타입 정의
 interface RestaurantListItemProps {
   restaurant: Restaurant;  // 렌더링할 레스토랑 객체
 } 
-
+const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png';
 // 레스토랑 리스트 아이템 컴포넌트
 export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
   //레스토랑 ID를 로컬 스토리지에 저장
@@ -31,8 +32,16 @@ export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
     <Link href={`/restaurants/${restaurant.restaurant_id}`} className="block">
       <div
         // 전체 아이템 컨테이너 스타일: padding, 테두리, 라운딩, 호버 시 배경색 변화
-        className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center"
       >
+        <div className="w-30 h-30 flex-shrink-0 mr-4"> {/* 이미지 크기 및 오른쪽 여백 설정 */}
+          <img
+            src={restaurant.image_url || DEFAULT_IMAGE_URL}
+            alt={`${restaurant.restaurant_name} 대표 이미지`}
+            className="w-full h-full object-cover rounded-lg border border-gray-200"
+            />
+        </div>
+        <div className="flex-1">
         {/* 식당 이름, 굵고 큰 글씨 */}
         <h3 className="text-lg font-bold mb-1">{restaurant.restaurant_name}</h3>
 
@@ -57,6 +66,7 @@ export function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
             <FilterTag key={tag} label={tag}/>
           ))}
         </div>
+      </div>
   </div>
   </Link>
   );

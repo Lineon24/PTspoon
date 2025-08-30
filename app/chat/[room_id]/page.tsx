@@ -1,5 +1,4 @@
 'use client';
-import {TagAutoSearch } from '@/components/TagAutoSearch';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, useParams } from 'next/navigation'; 
@@ -24,10 +23,6 @@ interface Chat_rooms {
   room_name: string;
 }
 
-function getTagKeyword(text:string):string{
-    const match=text.match(/#(\S+)$/);
-    return match?match[1]:'';
-}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
