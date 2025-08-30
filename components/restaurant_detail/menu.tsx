@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { useParams } from "next/navigation"
 import { useState,useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient";
 //너는 레스토랑 메뉴
@@ -9,18 +8,17 @@ interface Restaurant_menu{
     id:string;
     menu:string;
     price:string;
+    description:string;
 }
+
 //너는 레스토랑 id받아오는 새끼
-interface Restaurant{
+interface RestaurantInfoProps{
     restaurantId:string;
 }
-interface description{
-  dummy_menu_description:"이건 더미 메뉴 설명임";
-}
+
 
 //지금부터 컴포넌트 시작
-
-export default function Menu_list({restaurantId}:Restaurant){
+export default function Menu_list({restaurantId}:RestaurantInfoProps){
     //메뉴 정보 및 로딩 상태
     const [menu,setmenu]=useState<Restaurant_menu[]|null>(null);
     const [loading,setLoading]=useState(true);
@@ -32,7 +30,7 @@ export default function Menu_list({restaurantId}:Restaurant){
 
             const{data,error}=await supabase
             .from('menu') //menu 테이블에서
-            .select('id,menu,price') //값을 찾기
+            .select('id,menu,price,description') //값을 찾기
             .eq('restaurant_id',restaurantId) //물론 레스토랑 id가 일치할때만
         if (error){
             console.error('메뉴 조회 실패',error) //만약 에러나면 콘솔에 로그 남기고
@@ -60,12 +58,11 @@ export default function Menu_list({restaurantId}:Restaurant){
     //메뉴의 스타일인 초기에 v0로 만든 스타일 코드를 대다수 참고함
     return(
       <div className="mb-6">
-        <h2 className="test-2x1 font-bold mb-4">메뉴</h2>
         <div className="grid gap-3">
           {menu.map((item:any, index:number)=> (
             <div key={index} className="p-3 bg-gray-50 rounded-lg">
               <span className="font-medium">{item.menu}</span>
-              <div className="text-xs text-gray-500">이건 더미 메뉴 설명임</div>
+              <div className="text-xs text-gray-500">{item.description}</div>
               <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
             </div>
           ))}
