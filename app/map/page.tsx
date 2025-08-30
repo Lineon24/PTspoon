@@ -1,12 +1,16 @@
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import Script from "next/script"
-import { ChevronUp, ChevronDown } from "lucide-react"
+import { ChevronUp, ChevronDown, SlidersHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from "next/navigation"
 import HeaderWithBack from '@/components/HeaderWithBack';
+import { SearchAutocomplete } from "@/components/SearchBar";
+import { SearchFilter_ver3 } from "@/components/SearchFilter_ver3";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
+import { LocateFixed, Utensils} from 'lucide-react';
 
 // kakao 전역 선언
 declare global {
@@ -14,13 +18,18 @@ declare global {
     kakao: any;
   }
 }
+
+// 맛집 데이터 구조 정의
 interface Restaurant {
   restaurant_id: string;
   restaurant_name: string;
   address: string;
   phone: string;
+  food_type: string[];
+  taste_types: string[];
 }
 
+// 맛집 리스트 아이템
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
   <div className="p-3 text-[12px]">
     <div className="text-[15px]">{restaurant.restaurant_name}</div>
@@ -33,15 +42,17 @@ export default function MapPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(true)
+  const [inputValue, setInputValue] = useState("")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const router = useRouter()
+
   const mapRef = useRef<any>(null)
   const markersRef = useRef<{ id: string; marker: any; position: { lat: number; lng: number } }[]>([])
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
-
-  const router = useRouter()
-
   const KAKAO_MAP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY as string
 
+  // 주소 → 좌표 변환
   const geocodeAddress = (address: string): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       if (!window.kakao) return reject("Kakao maps not loaded")
@@ -50,12 +61,13 @@ export default function MapPage() {
         if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
           resolve({ lat: Number(result[0].y), lng: Number(result[0].x) })
         } else {
-          reject("주소를 좌표로 변환하지 못함")
+          reject("주소 변환 실패")
         }
       })
     })
   }
 
+  // 마커 생성
   const createMarkers = async (map: any, restaurantList: Restaurant[]) => {
     markersRef.current.forEach(({ marker }) => marker.setMap(null))
     markersRef.current = []
@@ -63,17 +75,10 @@ export default function MapPage() {
     for (const restaurant of restaurantList) {
       try {
         const { lat, lng } = await geocodeAddress(restaurant.address)
-        const position = { lat, lng }
-
-        const defaultImage = new window.kakao.maps.MarkerImage(
-          "/map/icon_black.png",
-          new window.kakao.maps.Size(38, 40)
-        )
-
         const marker = new window.kakao.maps.Marker({
           position: new window.kakao.maps.LatLng(lat, lng),
           clickable: true,
-          image: defaultImage
+          image: new window.kakao.maps.MarkerImage("/map/mappin.png", new window.kakao.maps.Size(30, 30)),
         })
 
         marker.setMap(map)
@@ -84,93 +89,73 @@ export default function MapPage() {
           map.panTo(new window.kakao.maps.LatLng(lat, lng))
         })
 
-        markersRef.current.push({ id: restaurant.restaurant_id, marker, position })
-      } catch (error) {
-        console.warn(`주소 변환 실패: ${restaurant.address}`, error)
+        markersRef.current.push({ id: restaurant.restaurant_id, marker, position: { lat, lng } })
+      } catch (err) {
+        console.warn("마커 생성 실패:", restaurant.address, err)
       }
     }
   }
 
+  // 선택된 맛집 최상단 이동
   useEffect(() => {
     if (!selectedRestaurantId) return
     setRestaurants((prev) => {
-      const index = prev.findIndex(r => r.restaurant_id === selectedRestaurantId)
-      if (index === -1) return prev
+      const idx = prev.findIndex(r => r.restaurant_id === selectedRestaurantId)
+      if (idx === -1) return prev
       const newArr = [...prev]
-      const [selected] = newArr.splice(index, 1)
+      const [selected] = newArr.splice(idx, 1)
       newArr.unshift(selected)
       return newArr
     })
   }, [selectedRestaurantId])
 
-  // 여기가 핵심
+  // 리스트에서 클릭
   const onClickRestaurant = (id: string) => {
     if (selectedRestaurantId === id) {
-      // 이미 선택된 상태면 이동
-      router.push(`/restaurants`)
+      router.push(`/restaurants/${id}`)
     } else {
-      // 선택만
-      const markerObj = markersRef.current.find((m) => m.id === id)
+      const markerObj = markersRef.current.find(m => m.id === id)
       if (markerObj && mapRef.current) {
-        const { lat, lng } = markerObj.position
-        mapRef.current.panTo(new window.kakao.maps.LatLng(lat, lng))
+        mapRef.current.panTo(new window.kakao.maps.LatLng(markerObj.position.lat, markerObj.position.lng))
       }
       setSelectedRestaurantId(id)
       setIsSheetOpen(true)
     }
   }
 
+  // 지도 초기화 + 맛집 로드
   const handleMapLoad = async () => {
     if (window.kakao && window.kakao.maps) {
       window.kakao.maps.load(async () => {
-        const mapContainer = document.getElementById("map")
-        if (!mapContainer) return
+        const container = document.getElementById("map")
+        if (!container) return
 
-        const mapOption = {
-          center: new window.kakao.maps.LatLng(36.994444, 127.134466),
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(36.9954, 127.1345),
           level: 3,
-        }
-        const map = new window.kakao.maps.Map(mapContainer, mapOption)
+        })
         mapRef.current = map
 
-        const { data: { session } } = await supabase.auth.getSession()
-
-        if (!session) {
-          router.push("/login")
-          return
-        }
-
+        // 현재 위치
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude
-              const lng = position.coords.longitude
-              const currentPos = new window.kakao.maps.LatLng(lat, lng)
-
-              map.setCenter(currentPos)
-
-              new window.kakao.maps.Marker({
-                map,
-                position: currentPos,
-                zIndex: 100,
-                title: "현재 위치",
-                image: new window.kakao.maps.MarkerImage(
-                  "/map/icon2.png",
-                  new window.kakao.maps.Size(40, 38)
-                )
-              })
-            },
-            () => { /* 위치 조회 실패 무시 */ }
-          )
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude, lng = pos.coords.longitude
+            const current = new window.kakao.maps.LatLng(lat, lng)
+            map.setCenter(current)
+            new window.kakao.maps.Marker({
+              map,
+              position: current,
+              zIndex: 100,
+              title: "현재 위치",
+              image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20)),
+            })
+          })
         }
 
+        // DB 불러오기
         const { data, error } = await supabase.from("restaurant").select("*")
-        if (error) {
-          console.error("Supabase 데이터 조회 실패:", error)
-          return
-        }
-
-        if (data && data.length > 0) {
+        if (error) return console.error(error)
+        if (data) {
           setRestaurants(data as Restaurant[])
           setSelectedRestaurantId(data[0].restaurant_id)
           await createMarkers(map, data as Restaurant[])
@@ -180,47 +165,198 @@ export default function MapPage() {
   }
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.kakao?.maps) {
-      handleMapLoad()
-    }
+    if (typeof window !== "undefined" && window.kakao?.maps) handleMapLoad()
   }, [])
 
+  // 선택된 마커 강조
   useEffect(() => {
-    if (!window.kakao || !window.kakao.maps || markersRef.current.length === 0) return
-
     markersRef.current.forEach(({ id, marker }) => {
       const isSelected = id === selectedRestaurantId
+      const imageUrl = isSelected ? "/map/mappinExpand.png" : "/map/mappin.png";
+      const imageSize = isSelected
+       ? new window.kakao.maps.Size(48, 60) // 선택된 마커는 더 큰 사이즈
+        : new window.kakao.maps.Size(30, 30); // 선택되지 않은 마커는 기본 사이즈
 
-      if (isSelected) {
-        const selectedImage = new window.kakao.maps.MarkerImage(
-          "/map/icon_red.png",
-          new window.kakao.maps.Size(38, 40)
-        )
-
-        marker.setImage(selectedImage)
-        marker.setZIndex(10)
-      }
-      else {
-        const defaultImage = new window.kakao.maps.MarkerImage(
-          "/map/icon_black.png",
-          new window.kakao.maps.Size(38, 40)
-        )
-        marker.setImage(defaultImage)
-        marker.setZIndex(1)
-      }
+      marker.setImage(new window.kakao.maps.MarkerImage(
+        imageUrl,
+        imageSize // isSelected에 따라 동적으로 생성된 imageSize 객체 사용
+      ));
+      marker.setZIndex(isSelected ? 10 : 1)
     })
   }, [selectedRestaurantId])
 
-  // (P) 버튼 클릭 시 지정 좌표로 이동하는 함수
+  // 평택대 버튼
   const moveToPresetPosition = () => {
     if (!mapRef.current) return
-    const lat = 36.994444
-    const lng = 127.134466
-    const latLng = new window.kakao.maps.LatLng(lat, lng)
-    mapRef.current.panTo(latLng)
+    mapRef.current.panTo(new window.kakao.maps.LatLng(36.9954, 127.1345))
     setIsSheetOpen(false)
   }
+  // 내 위치 버튼
+  const moveToMyPosition = () => {
+  if (!mapRef.current) {
+    alert("지도가 아직 로드되지 않았습니다.");
+    return;
+  }
 
+  // 내 위치 받기
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const currentPos = new window.kakao.maps.LatLng(lat, lng);
+        
+        // panTo를 사용해 지도를 부드럽게 현재 위치로 이동
+        mapRef.current.panTo(currentPos);
+      },
+      (err) => {
+        // 위치 정보 얻기를 실패했을 때 실행됩니다.
+        alert("위치 정보를 가져오는 데 실패했습니다.");
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+      }
+    );
+  } else {
+    // Geolocation을 지원하지 않는 브라우저일 경우 실행됩니다.
+    alert("이 브라우저에서는 위치 정보가 지원되지 않습니다.");
+  }
+};
+
+  // -----------------------
+  // ✅ 이름 검색
+  // -----------------------
+  const handleEnterSearch = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("restaurant")
+        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste)")
+        .ilike("restaurant_name", `%${inputValue || ""}%`);
+
+      if (error) throw error;
+
+      if (data && data.length > 0 && mapRef.current) {
+        const cleaned: Restaurant[] = data.map((item: any) => {
+          const profiles = Array.isArray(item.restaurant_profiles)
+            ? item.restaurant_profiles
+            : item.restaurant_profiles
+            ? [item.restaurant_profiles]
+            : [];
+          const typeSet = new Set<string>();
+          const tasteSet = new Set<string>();
+          profiles.forEach((p: any) => {
+            (p.type || []).forEach((t: string) => typeSet.add(t));
+            (p.taste || []).forEach((t: string) => tasteSet.add(t));
+          });
+          return {
+            restaurant_id: item.restaurant_id,
+            restaurant_name: item.restaurant_name,
+            address: item.address,
+            phone: item.phone,
+            food_type: Array.from(typeSet),
+            taste_types: Array.from(tasteSet),
+          };
+        });
+
+        setRestaurants(cleaned);
+        await createMarkers(mapRef.current, cleaned);
+
+        const first = cleaned[0];
+        setSelectedRestaurantId(first.restaurant_id);
+        const markerObj = markersRef.current.find(m => m.id === first.restaurant_id);
+        if (markerObj) {
+          mapRef.current.panTo(new window.kakao.maps.LatLng(markerObj.position.lat, markerObj.position.lng));
+        }
+
+        setIsSheetOpen(true);
+      } else {
+        alert("검색 결과가 없습니다.");
+      }
+    } catch (err) {
+      console.error("검색 오류", err);
+    }
+  };
+
+  // -----------------------
+  // ✅ 필터 검색
+  // -----------------------
+  const handleFilterSearch = async (params: {
+    selectedFoodTypes: string[];
+    selectedTasteTypes: string[];
+    tasteSearchLogic: "AND" | "OR";
+  }) => {
+    try {
+      let query = supabase.from("restaurant_profiles").select("restaurant_id");
+
+      if (params.selectedFoodTypes.length > 0) {
+        query = query.overlaps("type", params.selectedFoodTypes);
+      }
+      if (params.selectedTasteTypes.length > 0) {
+        if (params.tasteSearchLogic === "AND") {
+          params.selectedTasteTypes.forEach((taste) => {
+            query = query.contains("taste", [taste]);
+          });
+        } else {
+          query = query.overlaps("taste", params.selectedTasteTypes);
+        }
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      if (data && data.length > 0 && mapRef.current) {
+        const ids = data.map((d) => d.restaurant_id);
+        const { data: restaurantsData, error: rErr } = await supabase
+          .from("restaurant")
+          .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste)")
+          .in("restaurant_id", ids);
+        if (rErr) throw rErr;
+
+        if (restaurantsData) {
+          const cleaned: Restaurant[] = restaurantsData.map((item: any) => {
+            const profiles = Array.isArray(item.restaurant_profiles)
+              ? item.restaurant_profiles
+              : item.restaurant_profiles
+              ? [item.restaurant_profiles]
+              : [];
+            const typeSet = new Set<string>();
+            const tasteSet = new Set<string>();
+            profiles.forEach((p: any) => {
+              (p.type || []).forEach((t: string) => typeSet.add(t));
+              (p.taste || []).forEach((t: string) => tasteSet.add(t));
+            });
+            return {
+              restaurant_id: item.restaurant_id,
+              restaurant_name: item.restaurant_name,
+              address: item.address,
+              phone: item.phone,
+              food_type: Array.from(typeSet),
+              taste_types: Array.from(tasteSet),
+            };
+          });
+
+          setRestaurants(cleaned);
+          await createMarkers(mapRef.current, cleaned);
+
+          if (cleaned.length > 0) {
+            const first = cleaned[0];
+            setSelectedRestaurantId(first.restaurant_id);
+            const markerObj = markersRef.current.find(m => m.id === first.restaurant_id);
+            if (markerObj) {
+              mapRef.current.panTo(new window.kakao.maps.LatLng(markerObj.position.lat, markerObj.position.lng));
+            }
+          }
+        }
+      }
+
+      setIsFilterOpen(false);
+      setIsSheetOpen(true);
+    } catch (err) {
+      console.error("필터 검색 오류", err);
+    }
+  };
+
+  // -----------------------
+  // JSX
+  // -----------------------
   return (
     <>
       <Script
@@ -228,72 +364,75 @@ export default function MapPage() {
         onLoad={handleMapLoad}
         strategy="afterInteractive"
       />
+
       <HeaderWithBack title="주변 맛집 찾기" backTF={true} />
-      <div className="relative w-full h-screen overflow-hidden max-w-[540px] mx-auto">
 
-        <div
-          id="map"
-          ref={mapContainerRef}
-          className="absolute left-0 right-0 top-0 bottom-0 z-0 transition-all duration-500"
-        />
+      {/* 검색창 + 필터 */}
+      <div className="fixed top-[45px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between p-2">
+        <div className="flex-1 mr-2 ">
+          <SearchAutocomplete value={inputValue} onChange={setInputValue} onEnter={handleEnterSearch} />
+        </div>
+        <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+          <SheetTrigger asChild>
+            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full shadow-lgv bg-white shadow">
+              <SlidersHorizontal className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-full sm:max-w-[540px] flex flex-col">
+            <SheetTitle className="sr-only">검색 필터</SheetTitle>
+            <SearchFilter_ver3 onSearch={handleFilterSearch} loading={false} sideTF={true} />
+          </SheetContent>
+        </Sheet>
+      </div>
 
-        {/* 우측 상단 (P) 버튼 */}
+      {/* 지도 */}
+      <div className="relative w-full max-w-[540px] mx-auto h-[calc(95vh-90px)]">
+        <div id="map" ref={mapContainerRef} className="absolute inset-0" />
+
         <button
           onClick={moveToPresetPosition}
-          style={{
-            position: "absolute",
-            top: "16px",
-            right: "16px",
-            zIndex: 40,
-            backgroundColor: "rgba(13, 97, 27, 0.9)",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            padding: "6px 10px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            userSelect: "none",
-          }}
-          aria-label="Move to preset position"
-        >
-          평택대
+          className= "absolute bottom-25 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+            <img 
+              src="/image/ptu_logo.png" // 이미지 파일 경로 (public 폴더 기준)
+              alt="평택대" 
+              className="w-8 h-8" // 이미지 크기 조절 (Tailwind CSS)
+            />
+        </button>
+        <button
+          onClick={moveToMyPosition}
+          className="absolute bottom-10 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+          <LocateFixed size={32}/>
         </button>
 
+        {/* 하단 시트 */}
         <div
           ref={sheetRef}
           className={cn(
-            "fixed bottom-7.5 left-0 right-0 max-w-[540px] mx-auto bg-white dark:bg-gray-900 rounded-t-2xl shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.3)] transition-transform duration-300 ease-in-out z-20",
+            "fixed bottom-7.5 left-0 right-0 max-w-[540px] mx-auto bg-white rounded-t-2xl shadow transition-transform duration-300 z-20",
             isSheetOpen ? "translate-y-0" : "translate-y-[calc(100%-80px)]"
           )}
         >
-          <button
-            onClick={() => setIsSheetOpen(!isSheetOpen)}
-            className="w-full h-12 flex justify-center items-center"
-          >
-            {isSheetOpen ? (
-              <ChevronDown className="h-6 w-6 text-gray-400" />
-            ) : (
-              <ChevronUp className="h-6 w-6 text-gray-400" />
-            )}
+          <button onClick={() => setIsSheetOpen(!isSheetOpen)} className="w-full h-12 flex justify-center items-center">
+            {isSheetOpen ? <ChevronDown className="h-6 w-6 text-gray-400" /> : <ChevronUp className="h-6 w-6 text-gray-400" />}
           </button>
 
-          <div className="p-4 pt-0">
+          <div className="p-3 pt-0">
             <h2 className="text-xl font-bold">지도 내 맛집 목록</h2>
           </div>
 
-          <div className="overflow-y-auto max-h-[30vh] px-2">
-            <div className="space-y-2 pb-4">
-              {restaurants.map((restaurant) => (
+          <div className="overflow-y-auto max-h-[60vh] px-2">
+            <div className="space-y-2 pb-10 py-2">
+              {restaurants.map((r) => (
                 <div
-                  key={restaurant.restaurant_id}
-                  onClick={() => onClickRestaurant(restaurant.restaurant_id)}
+                  key={r.restaurant_id}
+                  onClick={() => onClickRestaurant(r.restaurant_id)}
                   className={cn(
                     "rounded-xl transition-all cursor-pointer",
-                    selectedRestaurantId === restaurant.restaurant_id &&
-                      "bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500",
+                    "ring-1 ring-black-700",
+                    selectedRestaurantId === r.restaurant_id && "bg-blue-50 ring-2 ring-blue-500"
                   )}
                 >
-                  <RestaurantListItem restaurant={restaurant} />
+                  <RestaurantListItem restaurant={r} />
                 </div>
               ))}
             </div>

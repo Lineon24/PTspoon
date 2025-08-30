@@ -3,16 +3,17 @@
 
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
-import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
+import { Home, Newspaper, MessageSquare, SquarePen, MapPinned, UserRound } from "lucide-react";
 // 특정 페이지들만 하단바를 출력을 위해 출력할 페이지들 적는 부분
-const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map']; // 정적 라우팅 페이지
-const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/]; // 동적 라우팅 페이지 정규화를 이용해 추가하기
+const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/chat/chat_create', '/restaurants', '/map', '/My']; 
+const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/]; 
 
-const navItems = [ // 하단바 네이게이션 종류 여기서 추가하면 하단바에 추가됌
+const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},
+  {href: "/map", label: "지도", icon: <MapPinned size={20} />},
   {href: "/posts", label: "게시판", icon: <Newspaper size={20} />},
-  {href: "/posts/write", label: "게시글 작성", icon: <SquarePen size={20} />},
   {href: "/chat", label: "채팅방", icon: <MessageSquare size={20} />},
+  {href: "/My", label: "마이", icon: <UserRound size={20} />},
 ];
 
 const navLabelStyle = {
