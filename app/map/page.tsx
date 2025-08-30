@@ -27,14 +27,24 @@ interface Restaurant {
   phone: string;
   food_type: string[];
   taste_types: string[];
+  image_url: string;
 }
-
+const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png';
 // 맛집 리스트 아이템
 const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
-  <div className="p-3 text-[12px]">
+  <div className="flex items-center">
+    <div className="px-1 py-1 w-30 h-30 flex-shrink-0 mr-3"> {/* 이미지 크기 및 오른쪽 여백 설정 */}
+      <img
+        src={restaurant.image_url || DEFAULT_IMAGE_URL}
+        alt={`${restaurant.restaurant_name} 대표 이미지`}
+        className="w-full h-full object-cover rounded-lg border border-gray-200"
+        />
+    </div>
+  <div className=" text-[12px]">
     <div className="text-[15px]">{restaurant.restaurant_name}</div>
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
+  </div>
   </div>
 )
 
@@ -228,7 +238,7 @@ export default function MapPage() {
     try {
       const { data, error } = await supabase
         .from("restaurant")
-        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste)")
+        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste), image_url")
         .ilike("restaurant_name", `%${inputValue || ""}%`);
 
       if (error) throw error;
@@ -253,6 +263,7 @@ export default function MapPage() {
             phone: item.phone,
             food_type: Array.from(typeSet),
             taste_types: Array.from(tasteSet),
+            image_url: item.image_url,
           };
         });
 
@@ -306,7 +317,7 @@ export default function MapPage() {
         const ids = data.map((d) => d.restaurant_id);
         const { data: restaurantsData, error: rErr } = await supabase
           .from("restaurant")
-          .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste)")
+          .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste), image_url")
           .in("restaurant_id", ids);
         if (rErr) throw rErr;
 
@@ -330,6 +341,7 @@ export default function MapPage() {
               phone: item.phone,
               food_type: Array.from(typeSet),
               taste_types: Array.from(tasteSet),
+              image_url: item.image_url,
             };
           });
 

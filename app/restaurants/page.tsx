@@ -81,7 +81,7 @@ function RestaurantsPageContent() {
     try {
       const { data, error } = await supabase
         .from("restaurant")
-        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type,taste)")
+        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type,taste), image_url")
         .ilike("restaurant_name", `%${inputValue}%`);
 
       if (error) throw error
@@ -112,6 +112,7 @@ function RestaurantsPageContent() {
             phone: item.phone,
             type: Array.from(typeSet),
             taste: Array.from(tasteSet),
+            image_url: item.image_url
           };
         });
         // 최종적으로 상태에 저장 (Restaurant[] 타입으로 타입 에러 없이 안전함)
@@ -163,7 +164,7 @@ function RestaurantsPageContent() {
 
       const { data: restaurants, error: restaurantsError } = await supabase
         .from("restaurant")
-        .select("restaurant_id, restaurant_name, address, phone,restaurant_profiles(type, taste)")
+        .select("restaurant_id, restaurant_name, address, phone,restaurant_profiles(type, taste), image_url")
         .in("restaurant_id", restaurantID);
       if (restaurantsError) throw restaurantsError;
       if (restaurants) {
@@ -186,6 +187,7 @@ function RestaurantsPageContent() {
             phone: item.phone,
             type: Array.from(typeSet),
             taste: Array.from(tasteSet),
+            image_url: item.image_url
           };
         });
         setRestaurants(cleaned);
