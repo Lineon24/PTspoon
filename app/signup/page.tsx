@@ -1,3 +1,4 @@
+// 회원가입을 위한 페이지 입니다.
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -23,7 +24,7 @@ export default function SignupPage() {
     checkLogin()
   }, [])
 
-  const handleKakaoLogin = async () => {
+  const handleKakaoLogin = async () => { // 카카오톡 회원가입/로그인 부분
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
@@ -40,7 +41,7 @@ const handleSignup = async (e: React.FormEvent) => {
   e.preventDefault();
   setError('');
 
-  // 1. profiles 테이블에서 이메일 중복 체크
+  //  profiles 테이블에서 이메일 중복 체크
   const { data: existingProfiles, error: profileError } = await supabase
     .from('profiles')
     .select('id')
@@ -56,7 +57,7 @@ const handleSignup = async (e: React.FormEvent) => {
     return;
   }
 
-  // 2. 회원 생성
+  // 회원 생성
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -67,7 +68,7 @@ const handleSignup = async (e: React.FormEvent) => {
     return;
   }
 
-  // 3. 닉네임 저장
+  //  닉네임 저장
   if (data.user) {
     await supabase
       .from('profiles')

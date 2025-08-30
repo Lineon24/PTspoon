@@ -1,3 +1,4 @@
+// 게시글 작성 페이지 입니다.
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -61,18 +62,18 @@ export default function WritePostPage() {
       setLoading(false);
     }
     getUserProfile();
-  }, [router]);
+  }, [router]); // 주소가 바뀔 경우 함수 재실행
 
   // 내 게시글 목록 불러오기 및 실시간 구독
   useEffect(() => {
     if (!profile) return;
 
-    const fetchMyPosts = async () => {
+    const fetchMyPosts = async () => { // 게시글 불러오는 함수
       const { data, error } = await supabase
         .from('posts')
         .select('*')
         .eq('user_id', profile.id) // 내 게시글만 필터링
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }); // 만든 시간 순 내림차 순으로
       
       if (error) {
         console.error('내 게시글 불러오기 오류:', error);
@@ -80,7 +81,7 @@ export default function WritePostPage() {
         setPosts(data || []);
       }
     };
-    fetchMyPosts();
+    fetchMyPosts(); 
 
     const channel = supabase
       .channel('my_posts_channel')
@@ -102,18 +103,18 @@ export default function WritePostPage() {
   }, [profile]); // profile이 변경될 때마다 이 useEffect가 다시 실행
 
   // 게시글 작성 
-  const handleSubmitPost = async (e: React.FormEvent) => { e.preventDefault();
+  const handleSubmitPost = async (e: React.FormEvent) => { e.preventDefault(); // 폼 제출 시 발동 이벤트
     if (!profile || !newPostTitle.trim() || !newPostContent.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
+      alert('제목과 내용을 모두 입력해주세요.'); // 로그인 상태 포스트 제목, 포스트 내용이 모두 들어가 있어야 제출 가능
     return;
     }
 
-  // 1. 이미지 업로드
-    let uploadedUrls: string[] = [];
+  //  이미지 업로드
+    let uploadedUrls: string[] = []; // 여러 장 받기에 배열로
       if (selectedFiles.length > 0) {
-        try {
-        const uploadPromises = selectedFiles.map((file) => handleImageUpload(file));
-        uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
+        try { // 예외처리 부분
+        const uploadPromises = selectedFiles.map((file) => handleImageUpload(file)); // 선택된 파일 스토리지에 업로드
+        uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[]; // 모든 프로미스 객체(모든 파일 업로드 되어야 정상 작동) 이미지 공용 주소 받아옴
         } catch (err) {
           console.error('이미지 업로드 중 오류:', err);
           alert('이미지 업로드에 실패했습니다.');
@@ -121,8 +122,8 @@ export default function WritePostPage() {
         }
       }
 
-  // 2. 게시글 업로드
-  const { error } = await supabase.from('posts').insert([
+  // 게시글 업로드
+  const { data, error } = await supabase.from('posts').insert([ // 데이터 베이스에 게시글 정보 업로드
     {
       user_id: profile.id,
       username: profile.nickname,
@@ -130,25 +131,27 @@ export default function WritePostPage() {
       content: newPostContent,
       image_urls: uploadedUrls,
     },
-  ]);
+  ])
+  .select();
 
   if (error) {
     console.error('게시글 작성 오류:', error);
     alert('게시글 작성에 실패했습니다.');
   } else {
-    // 3. 초기화
+    // 업로드 후 초기화
     setNewPostTitle('');
     setNewPostContent('');
     setSelectedFiles([]);
     setPreviewUrls([]);
+    router.push(`/posts/${data[0].id}`); // 해당 게시글 페이지로 이동
   }
 };
 
  
- const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
+ const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => { // 사용자 파일 선택 또는 취소 시 발동
+  if (!e.target.files) return; // 파일이 없다면 취소
 
-  const files = Array.from(e.target.files);
+  const files = Array.from(e.target.files); // 여기서 진짜 배열 객체로 변환해줌
 
   // 파일은 5장 까지 업로드 가능
   if (selectedFiles.length + files.length > 5) {
@@ -165,11 +168,11 @@ export default function WritePostPage() {
 
 
 const handleImageUpload = async (file: File): Promise<string | null> => {
-  const filePath = `user-${profile?.id}/${Date.now()}-${file.name}`;
+  const filePath = `user-${profile?.id}/${Date.now()}-${file.name}`; // 파일 저장 경로
 
   const { data, error } = await supabase.storage
-    .from('board-image')
-    .upload(filePath, file);
+    .from('board-image') // 저장할 스토리지 이름
+    .upload(filePath, file); // 업로드
 
   if (error) {
     console.error('이미지 업로드 오류:', error.message);
@@ -178,12 +181,12 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
   }
 
   const { data: urlData } = supabase.storage
-    .from('board-image')
-    .getPublicUrl(filePath);
+    .from('board-image') // 다시 스토리지의  해당 버킷에서
+    .getPublicUrl(filePath); // 공개 URL을 가져옴 이걸 데이터베이스에 저장할 것 
 
-  return urlData.publicUrl ?? null;
+  return urlData.publicUrl ?? null; // 없다면 빈값으로 설정
 };
-  const removeImage = (index: number) => {
+  const removeImage = (index: number) => { // 업로드 전 이미지 삭제 부분
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
@@ -252,7 +255,7 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
                   </div>
                 </div>
 
-            {/* 미리보기 그리드 */}
+            {/* 이미지 미리보기 */}
               <div
                 style={{
                 display: 'flex',
@@ -310,10 +313,10 @@ const handleImageUpload = async (file: File): Promise<string | null> => {
         </button>
       </form>
 
-      {/* 내 게시글 목록 (PostList 컴포넌트를 사용하여 렌더링) */}
+      {/* 내 게시글 목록 (PostList 컴포넌트를 사용하여 표시) */}
       <div style={{ borderTop: '1px solid #eee', paddingTop: '20px' }}>
         <h2 style={{ fontSize: '22px', marginBottom: '20px', color: '#333' }}>나의 게시글 목록</h2>
-        {/* PostList 컴포넌트에 게시글과 프로필 정보를 prop으로 전달 */}
+        {/* PostList 컴포넌트에 게시글과 프로필 정보를 전달 */}
         <PostList posts={posts} profile={profile} />
       </div>
     </div>

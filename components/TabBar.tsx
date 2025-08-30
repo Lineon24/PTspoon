@@ -1,11 +1,12 @@
+// 하단바 출력 부분입니다. 넣고 싶으면 밑의 변수에 정적, 동적에 따라서 넣어주세요.
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { Home, Newspaper, MessageSquare, SquarePen } from "lucide-react";
-
-const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map','/review_write'];
-const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/,/^\/restaurants\/[^/]+\/review_write$/];
+// 특정 페이지들만 하단바를 출력을 위해 출력할 페이지들 적는 부분
+const staticPaths = ['/', '/login', '/signup', '/posts', '/posts/write', '/chat', '/restaurants', '/map']; 
+const dynamicPatterns = [/^\/posts\/[^/]+$/, /^\/restaurants\/[^/]+$/]; 
 
 const navItems = [
   {href: "/", label: "홈", icon: <Home size={20} />},
@@ -23,7 +24,7 @@ export default function TabBar() {
   const pathname = usePathname();
   const showTabBar =
   staticPaths.includes(pathname) ||
-  dynamicPatterns.some((pattern) => pattern.test(pathname));
+  dynamicPatterns.some((pattern) => pattern.test(pathname)); // 하단바 추가할 페이지 기록
 
   if (!showTabBar) return null;
 
@@ -47,14 +48,14 @@ export default function TabBar() {
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      {navItems.map((item) => {
+      {navItems.map((item) => { // 위에 적었던 네이게이션 배열들 모두 출력
         const isActive = pathname === item.href;
 
         const navBtnStyle = {
           display: 'flex',
           flexDirection: 'column' as const,
           alignItems: 'center',
-          color: isActive ? '#3268f8' : '#888', // ✔ 선택된 항목은 파란색, 나머지는 회색
+          color: isActive ? '#3268f8' : '#888', // 접속된 사이트일 경우 해당 버튼은 파란색, 나머지는 회색
           fontWeight: 700,
           fontSize: 15,
           textDecoration: 'none',

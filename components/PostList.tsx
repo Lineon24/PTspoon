@@ -1,4 +1,4 @@
-// app/posts/components/PostList.tsx
+// 게시글 출력 부분 컴포넌트 입니다.
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -45,7 +45,7 @@ export default function PostList({ posts, profile }: PostListProps) {
   const router = useRouter();
   const pathname = usePathname();
   const postShow = pathname === '/posts';
-  // 1. 모든 게시글의 댓글 목록 불러오기 (한 번에 다 가져옴)
+  //  모든 게시글의 댓글 목록 불러오기 (한 번에 다 가져옴)
   useEffect(() => {
     const fetchAllComments = async () => {
       const { data, error } = await supabase
@@ -70,7 +70,7 @@ export default function PostList({ posts, profile }: PostListProps) {
 
     fetchAllComments();
 
-    // 2. 실시간 댓글 구독
+    // 실시간 댓글 구독
     const commentsChannel = supabase
       .channel('public:comments_for_post_list') // 채널 이름 변경 (충돌 방지)
       .on(
@@ -89,21 +89,37 @@ export default function PostList({ posts, profile }: PostListProps) {
     return () => {
       supabase.removeChannel(commentsChannel);
     };
-  }, []); // 의존성 배열 비움: 컴포넌트 마운트 시 한 번만 실행
+  }, []); // 의존성 배열 비움을 비워 컴포넌트 마운트 시 한 번만 실행
 
-const deletePost = async (postId: string) => {
+const deletePost = async (post: Post) => {
   const confirmDelete = window.confirm('정말로 이 게시글을 삭제하시겠습니까?');
   if (!confirmDelete) return;
 
-  const { error } = await supabase.from('posts').delete().eq('id', postId);
-  if (error) {
+  const { error:dbError } = await supabase.from('posts').delete().eq('id', post.id); // 데이터베이스의 내용 제거 부분
+
+  const imageUrls = post.image_urls; // 저장된 파일 경로 변수에 넣기
+  const filePaths = imageUrls.map(url => {
+    // 공용 URL을 스토리지 URL로 변경
+    return url.split(`/board-image/`)[1];
+  });
+  const { data, error:storageError } = await supabase.storage
+  .from('board-image') // 이미지가 있는 게시글 버킷을 선택
+  .remove(filePaths); // 제거할 파일 경로의 배열
+
+  if (dbError) {
     alert('게시글 삭제에 실패했습니다.');
-    console.error('삭제 오류:', error);
+    console.error('삭제 오류:', dbError);
+    return;
+  }
+  if (storageError) {
+    alert('게시글 삭제에 실패했습니다.');
+    console.error('삭제 오류:', storageError );
     return;
   }
 
+
   alert('게시글이 삭제되었습니다.');
-  // 삭제 후 화면에서도 제거
+  // 삭제 후 화면 리로드하기 
   window.location.reload(); 
 };
   if (posts.length === 0) {
@@ -112,7 +128,7 @@ const deletePost = async (postId: string) => {
 
   return (
     <>
-      {posts.map((post) => (
+      {posts.map((post) => ( // 데이터 베이스에 있는 모든 포스터 출력 부분
         <div key={post.id} style={{
           border: '1px solid #e0e0e0', borderRadius: '10px', padding: '18px', marginBottom: '25px',
           background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)',
@@ -124,9 +140,9 @@ const deletePost = async (postId: string) => {
             marginBottom: '8px',
           }}>
           <h3 style={{ fontSize: '18px', margin: '0 0 8px 0', color: '#222' }}>{post.title}</h3>
-            {profile?.id === post.user_id && (
+            {profile?.id === post.user_id && ( // 사용자 id와 게시글 작성자 id가 같으면 게시글 삭제
           <button
-            onClick={() => deletePost(post.id)}
+            onClick={() => deletePost(post)} 
             style={{
               border: 'none',
               background: 'transparent',
@@ -151,6 +167,7 @@ const deletePost = async (postId: string) => {
               maxWidth: '540px', // 최대 너비 설정 (선택 사항)
               margin: '12px 0', // 게시글 내용과 이미지 사이 간격
             }}>
+              <div onClick={(e) => e.stopPropagation()}> {/*이미지 좌우 클릭 시 사이트 이동 막기*/}
               <Carousel
                 showArrows={true} // 좌우 화살표 표시
                 showStatus={false} // 현재 이미지 번호/총 이미지 번호 표시 (선택 사항)
@@ -173,6 +190,7 @@ const deletePost = async (postId: string) => {
                   </div>
                 ))}
                 </Carousel>
+                </div>
               </div>
               )}
           <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>

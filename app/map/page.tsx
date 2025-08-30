@@ -79,6 +79,7 @@ export default function MapPage() {
           clickable: true,
           image: new window.kakao.maps.MarkerImage("/map/icon1.png", new window.kakao.maps.Size(38, 40)),
         })
+
         marker.setMap(map)
 
         window.kakao.maps.event.addListener(marker, "click", () => {
