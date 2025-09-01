@@ -403,7 +403,7 @@ export default function MapPage() {
 
         <button
           onClick={moveToPresetPosition}
-          className= "absolute bottom-25 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+          className= "absolute bottom-25 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8] [padding-bottom:env(safe-area-inset-bottom)]">
             <img 
               src="/image/ptu_logo.png" // 이미지 파일 경로 (public 폴더 기준)
               alt="평택대" 
@@ -412,7 +412,7 @@ export default function MapPage() {
         </button>
         <button
           onClick={moveToMyPosition}
-          className="absolute bottom-10 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+          className="absolute bottom-10 right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8] [padding-bottom:env(safe-area-inset-bottom)]">
           <LocateFixed size={32}/>
         </button>
 
