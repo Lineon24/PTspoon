@@ -121,7 +121,7 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
           </button>
       </div>
       </div>
-      <div className="flex-grow overflow-auto grid pb-2">
+      <div className="flex-grow overflow-auto grid h-[55dvh] pb-2">
       {/*음식 종류,맛 종류를 누르면 해당 요소가 나오도록*/}
       {activeTab==="foodType"?<FoodTypeSelector_ver3 selectedFoodTypes={selectedFoodTypes} onToggleFoodType={toggleFoodType} />
       :<TasteTypeSelector_ver3 selectedTasteTypes={selectedTasteTypes} onToggleTasteType={toggleTaste} />}    
