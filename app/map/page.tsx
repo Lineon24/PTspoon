@@ -28,6 +28,7 @@ interface Restaurant {
   food_type: string[];
   taste_types: string[];
   image_url: string;
+  distanceText?:string; //거리 표시용
 }
 const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png';
 // 맛집 리스트 아이템
@@ -45,6 +46,9 @@ const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
+  <div className="text-sm text-gray-500">
+    {restaurant.distanceText || "--"} {/*거리 표시용*/}
+  </div>
   </div>
 )
 
@@ -55,12 +59,70 @@ export default function MapPage() {
   const [inputValue, setInputValue] = useState("")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const router = useRouter()
-
   const mapRef = useRef<any>(null)
   const markersRef = useRef<{ id: string; marker: any; position: { lat: number; lng: number } }[]>([])
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
   const KAKAO_MAP_KEY = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY as string
+  //내 위치 마커 참조
+  const currentLocationMarker=useRef<any>(null);
+
+  //위도,경도 거리계산(m)
+  const getDistanceInMeters=(lat1:number,lng1:number,lat2:number,lng2:number)=>{
+    const R=6371000; //지구 반지름
+    const toRad=(deg:number)=>(deg * Math.PI)/180;
+    const dLat=toRad(lat2 - lat1);
+    const dLng=toRad(lng2 - lng1);
+    const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) ** 2;
+    const c= 2* Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    return R * c;
+  }
+  //거리 포맷
+  const formatDistance=(distance:number)=> distance <1000 ? `${Math.round(distance)} m` : `${(distance/1000).toFixed(1)} km`;
+
+  //내 위치 기준으로 식당 거리 업데이트
+  const updateRestaurantDistances=(userLat:number, userLng:number)=>{
+    const updated=restaurants.map(r=>{
+      const markerobj= markersRef.current.find(m=>m.id === r.restaurant_id);
+      if(!markerobj) return {...r,distanceText:"거리 계산 불가"};
+      
+      const dist=getDistanceInMeters(userLat,userLng,markerobj.position.lat, markerobj.position.lng);
+      return {...r , distanceText:formatDistance(dist)};
+    });
+    setRestaurants(updated);
+  };
+  //실시간 위치 추적
+  const watchUserPosition=()=>{
+    if(!navigator.geolocation || !mapRef.current) return;
+
+    const watchId=navigator.geolocation.watchPosition(
+      (pos)=>{
+        const lat=pos.coords.latitude;
+        const lng=pos.coords.longitude;
+        const currentPos=new window.kakao.maps.LatLng(lat,lng);
+
+        //마커가 없으면 생성, 있으면 갱신
+        if(!currentLocationMarker.current){
+          currentLocationMarker.current=new window.kakao.maps.Marker({
+            map:mapRef.current,
+            position:currentPos,
+            title:"현재 위치",
+            image:new window.kakao.maps.MarkerImage("/map/mypin.png",new window.kakao.maps.Size(20,20))
+          });
+          mapRef.current.panTo(currentPos);
+        }
+        else{
+          currentLocationMarker.current.setPosition(currentPos);
+        }
+        updateRestaurantDistances(lat,lng);
+      },
+      (err)=>console.warn("위치 추적 오류:",err),
+      {enableHighAccuracy:true,maximumAge:10000,timeout:5000}
+    );
+    return watchId;
+  };
+
+  
 
   // 주소 → 좌표 변환
   const geocodeAddress = (address: string): Promise<{ lat: number; lng: number }> => {
@@ -107,6 +169,7 @@ export default function MapPage() {
   }
 
   // 선택된 맛집 최상단 이동
+  {/*}
   useEffect(() => {
     if (!selectedRestaurantId) return
     setRestaurants((prev) => {
@@ -117,12 +180,13 @@ export default function MapPage() {
       newArr.unshift(selected)
       return newArr
     })
-  }, [selectedRestaurantId])
+  }, [selectedRestaurantId])*/}
 
   // 리스트에서 클릭
   const onClickRestaurant = (id: string) => {
     if (selectedRestaurantId === id) {
       router.push(`/restaurants/${id}`)
+      return;
     } else {
       const markerObj = markersRef.current.find(m => m.id === id)
       if (markerObj && mapRef.current) {
@@ -202,34 +266,52 @@ export default function MapPage() {
     setIsSheetOpen(false)
   }
   // 내 위치 버튼
-  const moveToMyPosition = () => {
-  if (!mapRef.current) {
-    alert("지도가 아직 로드되지 않았습니다.");
-    return;
-  }
+ const moveToMyPosition = () => {
+  if (!mapRef.current) return;
 
-  // 내 위치 받기
-  if (navigator.geolocation) {
+  if (currentLocationMarker.current) {
+    // 이미 위치 마커가 있으면 그 위치로 이동
+    const pos = currentLocationMarker.current.getPosition();
+    mapRef.current.panTo(pos);
+  } else if (navigator.geolocation) {
+    // 위치 마커 없으면 현재 위치 받아서 생성 후 이동
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const currentPos = new window.kakao.maps.LatLng(lat, lng);
-        
-        // panTo를 사용해 지도를 부드럽게 현재 위치로 이동
+
+        // 마커 생성
+        currentLocationMarker.current = new window.kakao.maps.Marker({
+          map: mapRef.current,
+          position: currentPos,
+          title: "현재 위치",
+          image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
+        });
+
         mapRef.current.panTo(currentPos);
+
+        updateRestaurantDistances(lat,lng);
+        watchUserPosition();
       },
       (err) => {
-        // 위치 정보 얻기를 실패했을 때 실행됩니다.
         alert("위치 정보를 가져오는 데 실패했습니다.");
         console.warn(`ERROR(${err.code}): ${err.message}`);
       }
     );
   } else {
-    // Geolocation을 지원하지 않는 브라우저일 경우 실행됩니다.
     alert("이 브라우저에서는 위치 정보가 지원되지 않습니다.");
   }
 };
+
+
+  useEffect(()=>{
+    const watchId=watchUserPosition();
+    return () =>{
+      if(watchId !== undefined) navigator.geolocation.clearWatch(watchId);
+    }
+  },[restaurants]);
+
 
   // -----------------------
   // ✅ 이름 검색
