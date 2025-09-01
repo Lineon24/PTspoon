@@ -401,20 +401,24 @@ export default function MapPage() {
       <div className="relative w-full max-w-[540px] mx-auto h-[calc(95vh-90px)]">
         <div id="map" ref={mapContainerRef} className="absolute inset-0" />
 
-        <button
-          onClick={moveToPresetPosition}
-          className= "absolute bottom-[calc(env(safe-area-inset-bottom)+100px)] right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
-            <img 
-              src="/image/ptu_logo.png" // 이미지 파일 경로 (public 폴더 기준)
-              alt="평택대" 
-              className="w-8 h-8" // 이미지 크기 조절 (Tailwind CSS)
-            />
-        </button>
-        <button
-          onClick={moveToMyPosition}
-          className="absolute bottom-[calc(env(safe-area-inset-bottom)+40px)] right-3 z-10 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
-          <LocateFixed size={32}/>
-        </button>
+        <div
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+120px)] z-20 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3"
+        >
+          <button
+            onClick={moveToPresetPosition}
+            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+          >
+            <img
+              src="/image/ptu_logo.png"
+              alt="평택대"
+              className="w-8 h-8"/>
+          </button>
+          <button
+            onClick={moveToMyPosition}
+            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+            <LocateFixed size={32} />
+          </button>
+        </div>
 
         {/* 하단 시트 */}
         <div
