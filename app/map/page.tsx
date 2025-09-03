@@ -100,22 +100,24 @@ export default function MapPage() {
   };
   //실시간 위치 추적
 const watchUserPosition = () => {
-  if (!navigator.geolocation || !mapRef.current) return;
+  // `window` 객체에 `kakao`가 존재하고 `mapRef`가 현재 값을 가지고 있는지 확인
+  if (!('kakao' in window) || !mapRef.current) return;
 
-  // 디바운싱을 위한 변수
-  let debounceTimeoutId = null;
+  // 디바운싱을 위한 변수. setTimeout이 반환하는 타입을 명확히 지정합니다.
+  // 브라우저 환경에서는 number, Node.js 환경에서는 NodeJS.Timeout 타입이 될 수 있습니다.
+  let debounceTimeoutId: number | NodeJS.Timeout | null = null;
 
   const watchId = navigator.geolocation.watchPosition(
-    (pos) => {
+    (pos: GeolocationPosition) => {
       // 이미 타이머가 설정되어 있으면 초기화
-      if (debounceTimeoutId) {
+      if (debounceTimeoutId !== null) {
         clearTimeout(debounceTimeoutId);
       }
       
       // 0.5초(500ms) 후에 실제 로직 실행
       debounceTimeoutId = setTimeout(() => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+        const lat: number = pos.coords.latitude;
+        const lng: number = pos.coords.longitude;
         const currentPos = new window.kakao.maps.LatLng(lat, lng);
 
         if (!currentLocationMarker.current) {
@@ -132,11 +134,15 @@ const watchUserPosition = () => {
         updateRestaurantDistances(lat, lng);
       }, 500); // 500ms(0.5초)마다 업데이트
     },
-    (err) => console.warn("위치 추적 오류:", err),
+    (err: GeolocationPositionError) => {
+      console.warn("위치 추적 오류:", err);
+    },
     { enableHighAccuracy: false, maximumAge: 10000, timeout: 15000 }
   );
+
   return watchId;
 };
+
 
   
 
