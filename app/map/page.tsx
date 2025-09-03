@@ -99,35 +99,44 @@ export default function MapPage() {
     )
   };
   //실시간 위치 추적
-  const watchUserPosition=()=>{
-    if(!navigator.geolocation || !mapRef.current) return;
+const watchUserPosition = () => {
+  if (!navigator.geolocation || !mapRef.current) return;
 
-    const watchId=navigator.geolocation.watchPosition(
-      (pos)=>{
-        const lat=pos.coords.latitude;
-        const lng=pos.coords.longitude;
-        const currentPos=new window.kakao.maps.LatLng(lat,lng);
+  // 디바운싱을 위한 변수
+  let debounceTimeoutId = null;
 
-        //마커가 없으면 생성, 있으면 갱신
-        if(!currentLocationMarker.current){
-          currentLocationMarker.current=new window.kakao.maps.Marker({
-            map:mapRef.current,
-            position:currentPos,
-            title:"현재 위치",
-            image:new window.kakao.maps.MarkerImage("/map/mypin.png",new window.kakao.maps.Size(20,20))
+  const watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      // 이미 타이머가 설정되어 있으면 초기화
+      if (debounceTimeoutId) {
+        clearTimeout(debounceTimeoutId);
+      }
+      
+      // 0.5초(500ms) 후에 실제 로직 실행
+      debounceTimeoutId = setTimeout(() => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const currentPos = new window.kakao.maps.LatLng(lat, lng);
+
+        if (!currentLocationMarker.current) {
+          currentLocationMarker.current = new window.kakao.maps.Marker({
+            map: mapRef.current,
+            position: currentPos,
+            title: "현재 위치",
+            image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
           });
           mapRef.current.panTo(currentPos);
-        }
-        else{
+        } else {
           currentLocationMarker.current.setPosition(currentPos);
         }
-        updateRestaurantDistances(lat,lng);
-      },
-      (err)=>console.warn("위치 추적 오류:",err),
-      {enableHighAccuracy:false,maximumAge:10000,timeout:15000}
-    );
-    return watchId;
-  };
+        updateRestaurantDistances(lat, lng);
+      }, 500); // 500ms(0.5초)마다 업데이트
+    },
+    (err) => console.warn("위치 추적 오류:", err),
+    { enableHighAccuracy: false, maximumAge: 10000, timeout: 15000 }
+  );
+  return watchId;
+};
 
   
 
