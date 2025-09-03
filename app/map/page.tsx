@@ -99,35 +99,50 @@ export default function MapPage() {
     )
   };
   //실시간 위치 추적
-  const watchUserPosition=()=>{
-    if(!navigator.geolocation || !mapRef.current) return;
+const watchUserPosition = () => {
+  // `window` 객체에 `kakao`가 존재하고 `mapRef`가 현재 값을 가지고 있는지 확인
+  if (!('kakao' in window) || !mapRef.current) return;
 
-    const watchId=navigator.geolocation.watchPosition(
-      (pos)=>{
-        const lat=pos.coords.latitude;
-        const lng=pos.coords.longitude;
-        const currentPos=new window.kakao.maps.LatLng(lat,lng);
+  // 디바운싱을 위한 변수. setTimeout이 반환하는 타입을 명확히 지정합니다.
+  // 브라우저 환경에서는 number, Node.js 환경에서는 NodeJS.Timeout 타입이 될 수 있습니다.
+  let debounceTimeoutId: number | NodeJS.Timeout | null = null;
 
-        //마커가 없으면 생성, 있으면 갱신
-        if(!currentLocationMarker.current){
-          currentLocationMarker.current=new window.kakao.maps.Marker({
-            map:mapRef.current,
-            position:currentPos,
-            title:"현재 위치",
-            image:new window.kakao.maps.MarkerImage("/map/mypin.png",new window.kakao.maps.Size(20,20))
+  const watchId = navigator.geolocation.watchPosition(
+    (pos: GeolocationPosition) => {
+      // 이미 타이머가 설정되어 있으면 초기화
+      if (debounceTimeoutId !== null) {
+        clearTimeout(debounceTimeoutId);
+      }
+      
+      // 0.5초(500ms) 후에 실제 로직 실행
+      debounceTimeoutId = setTimeout(() => {
+        const lat: number = pos.coords.latitude;
+        const lng: number = pos.coords.longitude;
+        const currentPos = new window.kakao.maps.LatLng(lat, lng);
+
+        if (!currentLocationMarker.current) {
+          currentLocationMarker.current = new window.kakao.maps.Marker({
+            map: mapRef.current,
+            position: currentPos,
+            title: "현재 위치",
+            image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
           });
           mapRef.current.panTo(currentPos);
-        }
-        else{
+        } else {
           currentLocationMarker.current.setPosition(currentPos);
         }
-        updateRestaurantDistances(lat,lng);
-      },
-      (err)=>console.warn("위치 추적 오류:",err),
-      {enableHighAccuracy:true,maximumAge:10000,timeout:5000}
-    );
-    return watchId;
-  };
+        updateRestaurantDistances(lat, lng);
+      }, 500); // 500ms(0.5초)마다 업데이트
+    },
+    (err: GeolocationPositionError) => {
+      console.warn("위치 추적 오류:", err);
+    },
+    { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+  );
+
+  return watchId;
+};
+
 
   
 
@@ -216,21 +231,6 @@ export default function MapPage() {
         })
         mapRef.current = map
 
-        // 현재 위치
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const lat = pos.coords.latitude, lng = pos.coords.longitude
-            const current = new window.kakao.maps.LatLng(lat, lng)
-            map.setCenter(current)
-            new window.kakao.maps.Marker({
-              map,
-              position: current,
-              zIndex: 100,
-              title: "현재 위치",
-              image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20)),
-            })
-          })
-        }
 
         // DB 불러오기
         const { data, error } = await supabase.from("restaurant").select("*")
@@ -286,14 +286,6 @@ export default function MapPage() {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const currentPos = new window.kakao.maps.LatLng(lat, lng);
-
-        // 마커 생성
-        currentLocationMarker.current = new window.kakao.maps.Marker({
-          map: mapRef.current,
-          position: currentPos,
-          title: "현재 위치",
-          image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
-        });
 
         mapRef.current.panTo(currentPos);
 
@@ -490,11 +482,13 @@ export default function MapPage() {
         <div id="map" ref={mapContainerRef} className="absolute inset-0" />
 
         <div
-          className="fixed bottom-[calc(env(safe-area-inset-bottom)+120px)] z-20 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+120px)] z-10 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3"
+          style={{ pointerEvents: 'none' }}
         >
           <button
             onClick={moveToPresetPosition}
-            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            style={{ pointerEvents: 'auto' }}
           >
             <img
               src="/image/ptu_logo.png"
@@ -503,7 +497,9 @@ export default function MapPage() {
           </button>
           <button
             onClick={moveToMyPosition}
-            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+            className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            style={{ pointerEvents: 'auto' }}
+            >
             <LocateFixed size={32} />
           </button>
         </div>
