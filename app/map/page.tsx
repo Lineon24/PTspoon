@@ -89,7 +89,6 @@ export default function MapPage() {
       const dist=getDistanceInMeters(userLat,userLng,markerobj.position.lat, markerobj.position.lng);
       return {...r , distanceText:formatDistance(dist)};
     });
-    setRestaurants(updated);
   };
   //실시간 위치 추적
   const watchUserPosition=()=>{
@@ -169,7 +168,6 @@ export default function MapPage() {
   }
 
   // 선택된 맛집 최상단 이동
-  {/*}
   useEffect(() => {
     if (!selectedRestaurantId) return
     setRestaurants((prev) => {
@@ -180,7 +178,7 @@ export default function MapPage() {
       newArr.unshift(selected)
       return newArr
     })
-  }, [selectedRestaurantId])*/}
+  }, [selectedRestaurantId])
 
   // 리스트에서 클릭
   const onClickRestaurant = (id: string) => {
