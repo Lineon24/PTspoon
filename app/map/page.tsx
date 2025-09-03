@@ -46,7 +46,7 @@ const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
     <p>{restaurant.address}</p>
     <p>{restaurant.phone}</p>
   </div>
-  <div className="text-sm text-gray-500">
+  <div className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-md text-xs ml-auto">
     {restaurant.distanceText || "--"} {/*거리 표시용*/}
   </div>
   </div>
@@ -82,13 +82,21 @@ export default function MapPage() {
 
   //내 위치 기준으로 식당 거리 업데이트
   const updateRestaurantDistances=(userLat:number, userLng:number)=>{
-    const updated=restaurants.map(r=>{
-      const markerobj= markersRef.current.find(m=>m.id === r.restaurant_id);
-      if(!markerobj) return {...r,distanceText:"거리 계산 불가"};
-      
-      const dist=getDistanceInMeters(userLat,userLng,markerobj.position.lat, markerobj.position.lng);
-      return {...r , distanceText:formatDistance(dist)};
-    });
+    setRestaurants(prev=>
+      prev.map(r=>{
+        const markerObj=markersRef.current.find(m=>m.id === r.restaurant_id);
+        if(!markerObj){
+          return {...r,distanceText:"거리 계산 불가"};
+        }
+        const dist=getDistanceInMeters(
+          userLat,
+          userLng,
+          markerObj.position.lat,
+          markerObj.position.lng,
+        );
+        return{...r,distanceText:formatDistance(dist)};
+      })
+    )
   };
   //실시간 위치 추적
   const watchUserPosition=()=>{
