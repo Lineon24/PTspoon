@@ -121,7 +121,10 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
           </button>
       </div>
       </div>
-      <div className="flex-grow overflow-auto grid pb-2">
+      <div className={cn(
+          "flex-grow overflow-auto grid h-[85dvh] pb-2", // 조건 검색 버튼 부분 때문에 맛의 종류와 특징 버튼이 가려지는 문제 해결 부분
+          {"h-[60dvh]" : totalSelections > 0 },)}
+          >
       {/*음식 종류,맛 종류를 누르면 해당 요소가 나오도록*/}
       {activeTab==="foodType"?<FoodTypeSelector_ver3 selectedFoodTypes={selectedFoodTypes} onToggleFoodType={toggleFoodType} />
       :<TasteTypeSelector_ver3 selectedTasteTypes={selectedTasteTypes} onToggleTasteType={toggleTaste} />}    
