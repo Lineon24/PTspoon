@@ -302,14 +302,6 @@ const watchUserPosition = () => {
         const lng = pos.coords.longitude;
         const currentPos = new window.kakao.maps.LatLng(lat, lng);
 
-        // 마커 생성
-        currentLocationMarker.current = new window.kakao.maps.Marker({
-          map: mapRef.current,
-          position: currentPos,
-          title: "현재 위치",
-          image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
-        });
-
         mapRef.current.panTo(currentPos);
 
         updateRestaurantDistances(lat,lng);
