@@ -505,11 +505,13 @@ const watchUserPosition = () => {
         <div id="map" ref={mapContainerRef} className="absolute inset-0" />
 
         <div
-          className="fixed bottom-[calc(env(safe-area-inset-bottom)+120px)] z-20 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+120px)] z-10 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3"
+          style={{ pointerEvents: 'none' }}
         >
           <button
             onClick={moveToPresetPosition}
-            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            style={{ pointerEvents: 'auto' }}
           >
             <img
               src="/image/ptu_logo.png"
@@ -518,7 +520,9 @@ const watchUserPosition = () => {
           </button>
           <button
             onClick={moveToMyPosition}
-            className="z-20 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]">
+            className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]"
+            style={{ pointerEvents: 'auto' }}
+            >
             <LocateFixed size={32} />
           </button>
         </div>
