@@ -231,21 +231,6 @@ const watchUserPosition = () => {
         })
         mapRef.current = map
 
-        // 현재 위치
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const lat = pos.coords.latitude, lng = pos.coords.longitude
-            const current = new window.kakao.maps.LatLng(lat, lng)
-            map.setCenter(current)
-            new window.kakao.maps.Marker({
-              map,
-              position: current,
-              zIndex: 100,
-              title: "현재 위치",
-              image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20)),
-            })
-          })
-        }
 
         // DB 불러오기
         const { data, error } = await supabase.from("restaurant").select("*")
