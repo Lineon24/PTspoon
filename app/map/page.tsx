@@ -124,7 +124,7 @@ export default function MapPage() {
         updateRestaurantDistances(lat,lng);
       },
       (err)=>console.warn("위치 추적 오류:",err),
-      {enableHighAccuracy:true,maximumAge:10000,timeout:5000}
+      {enableHighAccuracy:fasle,maximumAge:10000,timeout:15000}
     );
     return watchId;
   };
