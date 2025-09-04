@@ -94,7 +94,7 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
   const totalSelections = selectedFoodTypes.length + selectedTasteTypes.length;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       {/*탭 전환 버튼*/}
       <div className="flex flex-col">
       <div className="flex w-full bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-6">
@@ -122,8 +122,8 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
       </div>
       </div>
       <div className={cn(
-          "flex-grow overflow-auto grid h-[85dvh] pb-2", // 조건 검색 버튼 부분 때문에 맛의 종류와 특징 버튼이 가려지는 문제 해결 부분
-          {"h-[60dvh]" : totalSelections > 0 },)}
+          "flex-grow overflow-auto h-[85dvh] pb-20", // 조건 검색 버튼 부분 때문에 맛의 종류와 특징 버튼이 가려지는 문제 해결 부분
+          {"h-[45dvh] pb-80" : totalSelections > 0 })}
           >
       {/*음식 종류,맛 종류를 누르면 해당 요소가 나오도록*/}
       {activeTab==="foodType"?<FoodTypeSelector_ver3 selectedFoodTypes={selectedFoodTypes} onToggleFoodType={toggleFoodType} />
@@ -131,24 +131,23 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
       </div>  
       {/* 검색 버튼, 맛 종류 혹은 음식 특징이 선택되면 나타남 */}
       {totalSelections > 0 && ( 
-
         <div
           className={cn(
             // 공통 스타일
             "w-full z-50 border-t dark:border-gray-800 bg-white dark:bg-gray-900",
             // 조건 검색 버튼이 밑으로 가야할떄
             {
-              "fixed bottom-16 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // side가 false일때 기본값 중앙에 옴
+              "fixed bottom-14 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // side가 false일때 기본값 중앙에 옴
             },
             // 시트내의 조건 버튼 (sideTF가 true일 때)
             {
-              "static bottom-0 mx-auto py-3": sideTF //  sideTF가 true면 컨테이너에 따라서 배치
+              "static bottom-0 mx-auto py-1": sideTF //  sideTF가 true면 컨테이너에 따라서 배치
             }
           )}
         >
             <div className="flex justify-between items-center gap-4 pb-2 px-1 py-4">
               {/*선택된 조건 리스트(표시용 이후 하단의 코드는 로컬 스토리지에 영향을 주지 않음)*/}
-              <div className="mb-2 flex flex-wrap gap-1 ">
+              <div className="grow mb-2 flex flex-wrap gap-1 max-h-20 overflow-y-auto ">
                 {selectedFoodTypes.map((tag)=>(
                   <FilterTag key={tag} label={tag} onRemove={()=>toggleFoodType(tag)}/>
                 ))}

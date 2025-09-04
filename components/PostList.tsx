@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import CommentSection from '@/components/CommentSection'; // CommentSection 컴포넌트 임포트
 import { Carousel } from 'react-responsive-carousel';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 
 // Post 인터페이스 (PostPage와 동일하게 정의)
@@ -44,8 +44,7 @@ interface PostListProps {
 export default function PostList({ posts, profile, onPostDeleted }: PostListProps) {
   const [commentsByPostId, setCommentsByPostId] = useState<{ [postId: string]: Comment[] }>({});
   const router = useRouter();
-  const pathname = usePathname();
-  const postShow = pathname === '/posts';
+
   //  모든 게시글의 댓글 목록 불러오기 (한 번에 다 가져옴)
   useEffect(() => {
     const fetchAllComments = async () => {
@@ -169,9 +168,9 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
   return (
     <>
       {posts.map((post) => ( // 데이터 베이스에 있는 모든 포스터 출력 부분
-        <div key={post.id} style={{
+        <div key={post.id} onDoubleClick={ () => router.push(`/posts/${post.id}`) } style={{
           border: '1px solid #e0e0e0', borderRadius: '10px', padding: '18px', marginBottom: '25px',
-          background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)',
+          background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)', cursor: 'pointer',
         }}>
           <div style={{
             display: 'flex',
@@ -196,8 +195,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
               ×
           </button>
         )}</div>
-          <div onClick={ postShow ? () => router.push(`/posts/${post.id}`) : undefined }
-            style={{cursor: postShow ? 'pointer' : 'default',}}>
+          <div onDoubleClick={ () => router.push(`/posts/${post.id}`) }>
           <p style={{ fontSize: '13px', color: '#888', margin: '0 0 12px 0' }}>
             작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
           </p>
@@ -207,7 +205,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
               maxWidth: '540px', // 최대 너비 설정 (선택 사항)
               margin: '12px 0', // 게시글 내용과 이미지 사이 간격
             }}>
-              <div onClick={(e) => e.stopPropagation()}> {/*이미지 좌우 클릭 시 사이트 이동 막기*/}
+              <div onDoubleClick={(e) => e.stopPropagation()}> {/*이미지 좌우 클릭 시 사이트 이동 막기*/}
               <Carousel
                 showArrows={true} // 좌우 화살표 표시
                 showStatus={false} // 현재 이미지 번호/총 이미지 번호 표시 (선택 사항)
@@ -218,10 +216,10 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
               >
                 {/*이미지 목록 출력 근데 posts 페이지일 때는 사진 확대 안됌*/}
                 {post.image_urls.map((url, idx) => (
-                  <div key={idx} onClick={ postShow ? undefined : () => window.open(url, '_blank')}> 
+                  <div key={idx} > 
                     <img src={url} alt={`post-${post.id}-img-${idx}`}
                       style={{
-                        maxHeight: '400px', // 이미지 최대 높이 (컨테이너에 맞게 조절)
+                        maxHeight: 'auto', // 이미지 최대 높이 (컨테이너에 맞게 조절)
                         objectFit: 'contain', // 이미지가 잘리지 않고 전체 보이도록
                         width: 'auto', // 높이에 맞춰 너비 자동 조절
                         cursor: 'pointer',
@@ -236,11 +234,12 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
           <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>
           </div>
           {/* CommentSection 컴포넌트 사용 */}
-          <CommentSection
+          <div onDoubleClick={(e) => e.stopPropagation()} style={{ cursor: 'default' }}>
+          <CommentSection 
             postId={post.id}
             comments={commentsByPostId[post.id] || []}
             profile={profile}
-          />
+          /></div>
         </div>
       ))}
     </>
