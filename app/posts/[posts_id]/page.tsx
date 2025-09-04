@@ -381,7 +381,7 @@ return (
                   )}
 
                   {/* 댓글 입력 폼 */}
-                  <form onSubmit={handleSubmitComment} style={{ display: 'flex', margin: '5px 1px 15px 4px' }}>
+                  <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', margin: '5px 0px 15px 3px' }}>
                     <input
                       type="text"
                       placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
@@ -393,7 +393,7 @@ return (
                     <button
                       type="submit"
                       disabled={!profile}
-                      style={{ marginRight: '3px', padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+                      style={{ marginRight: '3px', padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
                     >
                       <SendHorizontal size={20} />
                     </button>
