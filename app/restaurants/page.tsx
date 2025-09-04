@@ -7,7 +7,6 @@ import {
   SheetTitle,
   SheetFooter,
   SheetTrigger,
-  SheetClose,
 } from "@/components/ui/sheet";
 import { useState, useEffect, Suspense, useRef } from "react"; // Suspense 임포트
 import { supabase } from "@/lib/supabaseClient";
@@ -17,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { SearchAutocomplete } from "@/components/SearchBar";
 import { FilterTag } from "@/components/filter-tag";
-import { SearchLogicToggle } from "@/components/search-logic-toggle";
 import HeaderWithBack from '@/components/HeaderWithBack';
 
 
@@ -244,7 +242,7 @@ function RestaurantsPageContent() {
               <SlidersHorizontal className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent className="w-full sm:max-w-[540px] flex flex-col">
+          <SheetContent className="w-full h-full sm:max-w-[540px] flex flex-col">
             <SheetHeader>
               <SheetTitle>필터링</SheetTitle>
             </SheetHeader>
