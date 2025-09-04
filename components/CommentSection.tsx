@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { SendHorizontal } from 'lucide-react';
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
@@ -30,7 +30,9 @@ interface CommentSectionProps {
 export default function CommentSection({ postId, comments, profile }: CommentSectionProps) { 
   const [newCommentContent, setNewCommentContent] = useState<string>('');
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false); // 댓글 열림 상태 기본값은 닫힌 상태
+  const params = useParams();
+  const commentOpenTF = !!params.posts_id; 
+  const [isOpen, setIsOpen] = useState(commentOpenTF); // 댓글 열림 상태 기본값은 닫힌 상태
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault(); // 폼 제출 시 새로고침 방지
@@ -78,7 +80,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
 
   return (
     <div style={{ borderTop: '1px solid #eee', marginTop: '10px', paddingTop: '13px'}}>
-      <h2 style={{ fontSize: '16px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0}) {/*댓글 수 정보 표현*/}
+      <h2 style={{ fontSize: '16px', marginLeft: '5px', marginBottom: '0px', color: '#555'}}>댓글 ({comments.length || 0}) {/*댓글 수 정보 표현*/}
         <button
           onClick={() => setIsOpen(prev => !prev)} // 댓글 창 접기 기능
           style={{
@@ -113,7 +115,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
       ) : (
           comments.map((comment) => (
             <div key={comment.id} style={{
-              background: '#f9f9f9', borderRadius: '8px', padding: '12px', marginBottom: '8px',
+              background: '#f9f9f9', borderRadius: '8px', padding: '12px', margin: '2px 3px 8px 3px',
               border: '1px solid #f0f0f0'
           }}>
             <div style={{
@@ -147,7 +149,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
       )}
 
       {/* 댓글 입력 폼 */}
-      <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', marginTop: '15px' }}>
+      <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', marginTop: '15px', margin: '15px 2px 15px 3px'}}>
         <input
           type="text"
           placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
@@ -159,7 +161,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ marginRight: '3px', padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
         >
           <SendHorizontal size={20}/> {/*전송 아이콘*/}
         </button>
