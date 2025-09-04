@@ -95,10 +95,10 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
       <div style={{ color: iconColor, marginRight: '10px' }}><IconComponent/></div>
       ): null}
 
-      <h1 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+      <h1 style={{ fontSize: '15px', fontWeight: 'bold', margin: '0' }}>
         {title}
       </h1>
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
 
           {buttonCustomName != null ? (
             <div>
@@ -110,11 +110,11 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
                 border: 'none',
                 borderRadius: 9,
                 fontWeight: 600,
-                fontSize: 15,
-                padding: '7px 18px',
+                fontSize: 14,
+                padding: '6px 15px',
                 cursor: 'pointer',
                 alignItems: 'center', // 세로 중앙 정렬
-                gap: '2px', // 아이콘과 텍스트 사이 간격
+                gap: '0px', // 아이콘과 텍스트 사이 간격
               }}
               onClick={() => router.push(`${buttonCustomPath}`)}
             >
@@ -126,7 +126,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
           ) : (
           user ? ( // 로그인 여부에 따라 로그인 버튼 혹은 로그아웃 버튼이 보임
             <>
-              <span style={{ fontWeight: 600, color: '#414de4', fontSize: 15 }}>
+              <span style={{ fontWeight: 600, color: '#414de4', fontSize: 14 }}>
                 {profile ? `${profile.nickname} 님` : user.name}
               </span>
               <button
@@ -134,11 +134,11 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
                   background: '#eef2fa',
                   border: 'none',
                   borderRadius: 9,
-                  fontSize: 14,
+                  fontSize: 12,
                   padding: '5px 14px',
                   color: '#3878ff',
                   cursor: 'pointer',
-                  marginLeft: 6
+                  marginLeft: 0
                 }}
                 onClick={handleLogout}
               >
@@ -153,8 +153,8 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
                 border: 'none',
                 borderRadius: 9,
                 fontWeight: 600,
-                fontSize: 15,
-                padding: '7px 18px',
+                fontSize: 12,
+                padding: '5px 14px',
                 cursor: 'pointer'
               }}
               onClick={() => router.push('/login')}
