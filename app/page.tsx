@@ -72,7 +72,7 @@ export default function FilterPage() {
       </div>
 
       {/* 검색 필터 UI 영역 */}
-      <div className="flex-grow overflow-y-auto pb-40 scrollbar-hide">
+      <div className="flex-grow pb-20 ">
         {/* SearchFilter_ver3 컴포넌트에 handleSearch 함수와 loading 상태 전달 */}
         <SearchFilter_ver3 onSearch={handleSearch} loading={loading} sideTF={false}/>
       </div>

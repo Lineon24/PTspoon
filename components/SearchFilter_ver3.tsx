@@ -122,8 +122,8 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
       </div>
       </div>
       <div className={cn(
-          "flex-grow overflow-auto grid h-[85dvh] pb-2", // 조건 검색 버튼 부분 때문에 맛의 종류와 특징 버튼이 가려지는 문제 해결 부분
-          {"h-[60dvh]" : totalSelections > 0 },)}
+          "flex-grow overflow-auto grid h-[100dvh] pb-300", // 조건 검색 버튼 부분 때문에 맛의 종류와 특징 버튼이 가려지는 문제 해결 부분
+          {"h-[55dvh]" : totalSelections > 0 },)}
           >
       {/*음식 종류,맛 종류를 누르면 해당 요소가 나오도록*/}
       {activeTab==="foodType"?<FoodTypeSelector_ver3 selectedFoodTypes={selectedFoodTypes} onToggleFoodType={toggleFoodType} />
@@ -138,11 +138,11 @@ export function SearchFilter_ver3({ onSearch, loading = false, sideTF = false }:
             "w-full z-50 border-t dark:border-gray-800 bg-white dark:bg-gray-900",
             // 조건 검색 버튼이 밑으로 가야할떄
             {
-              "fixed bottom-16 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // side가 false일때 기본값 중앙에 옴
+              "fixed bottom-14 left-1/2 -translate-x-1/2 max-w-[540px] px-4 py-1": !sideTF, // side가 false일때 기본값 중앙에 옴
             },
             // 시트내의 조건 버튼 (sideTF가 true일 때)
             {
-              "static bottom-0 mx-auto py-3": sideTF //  sideTF가 true면 컨테이너에 따라서 배치
+              "static bottom-0 mx-auto py-1": sideTF //  sideTF가 true면 컨테이너에 따라서 배치
             }
           )}
         >

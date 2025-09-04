@@ -248,7 +248,7 @@ function RestaurantsPageContent() {
             <SheetHeader>
               <SheetTitle>필터링</SheetTitle>
             </SheetHeader>
-            <div className="flex-grow overflow-y-auto my-4">
+            <div className="flex-grow my-0">
 
               <SearchFilter_ver3 onSearch={(params)=>{
                 handleSearch(params);
