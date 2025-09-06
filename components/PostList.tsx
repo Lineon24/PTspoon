@@ -169,7 +169,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
     <>
       {posts.map((post) => ( // 데이터 베이스에 있는 모든 포스터 출력 부분
         <div key={post.id} onDoubleClick={ () => router.push(`/posts/${post.id}`) } style={{
-          border: '1px solid #e0e0e0', borderRadius: '10px', padding: '18px', marginBottom: '25px',
+          border: '1px solid #e0e0e0', borderRadius: '10px', padding: '8px', marginBottom: '25px',
           background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)', cursor: 'pointer',
         }}>
           <div style={{
@@ -178,7 +178,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
             alignItems: 'center',
             marginBottom: '8px',
           }}>
-          <h3 style={{ fontSize: '18px', margin: '0 0 8px 0', color: '#222' }}>{post.title}</h3>
+          <h3 style={{ fontSize: '18px', margin: '5px 0 5px 8px', color: '#222' }}>{post.title}</h3>
             {profile?.id === post.user_id && ( // 사용자 id와 게시글 작성자 id가 같으면 게시글 삭제
           <button
             onClick={() => deletePost(post)} 
@@ -196,7 +196,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
           </button>
         )}</div>
           <div onDoubleClick={ () => router.push(`/posts/${post.id}`) }>
-          <p style={{ fontSize: '13px', color: '#888', margin: '0 0 12px 0' }}>
+          <p style={{ fontSize: '13px', color: '#888', margin: '0 0 12px 8px' }}>
             작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
           </p>
           {post.image_urls && post.image_urls.length > 0 && (
@@ -231,7 +231,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
                 </div>
               </div>
               )}
-          <p style={{ fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>
+          <p style={{ marginLeft: '5px', fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>
           </div>
           {/* CommentSection 컴포넌트 사용 */}
           <div onDoubleClick={(e) => e.stopPropagation()} style={{ cursor: 'default' }}>

@@ -285,13 +285,13 @@ return (
     width: '100vw',
     margin: '0 auto',
     minHeight: '100svh',
-    padding: '0 10px', 
+    
   }}>
     <HeaderWithBack title={'게시글'} backTF={true} />
 
     {/* --- 게시글 제목 --- */}
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-      <div style={{ fontSize: '25px', fontWeight: 'bold', margin: '20px 0 5px 2px', color: '#222' }}>{post.title}</div>
+      <div style={{ fontSize: '25px', fontWeight: 'bold', margin: '20px 0 5px 8px', color: '#222' }}>{post.title}</div>
       {profile?.id === post.user_id && (
         <button onClick={deletePost} style={{ border: 'none', background: 'transparent', fontSize: '25px', color: '#999', cursor: 'pointer', marginLeft: '10px' }} title="게시글 삭제">
           ×
@@ -300,14 +300,14 @@ return (
     </div>
 
     <div>
-      <p style={{ fontSize: '15px', color: '#888', margin: '0 0 10px 5px' }}>
+      <p style={{ fontSize: '15px', color: '#888', margin: '0 0 10px 7px' }}>
         작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
       </p>
 
       {/* 이미지가 있을 경우만 보임 (이미지와 이미지 댓글)*/}
       {post.image_urls && post.image_urls.length > 0 && (
         <div style={{border: '1px solid #cccccc', borderRadius: '0px 0px 8px 8px' ,}}>
-          <div style={{ width: '100%', maxWidth: '540px', margin: '0px 0px 4px 0px' }}>
+          <div style={{ width: '100%', margin: '0px 0px 0px 0px' }}>
             <Carousel showArrows={true} showStatus={false} showIndicators={false} infiniteLoop={true} dynamicHeight={true} showThumbs={false}
               onChange={(idx) => setimage_idx(idx)}>
               {post.image_urls.map((url, idx) => (
@@ -381,7 +381,7 @@ return (
                   )}
 
                   {/* 댓글 입력 폼 */}
-                  <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', margin: '5px 0px 15px 3px' }}>
+                  <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', margin: '5px 3px 15px 5px' }}>
                     <input
                       type="text"
                       placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
@@ -405,7 +405,7 @@ return (
         </div>
       )}
 
-      <p style={{ paddingTop: '20px', fontSize: '20px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap',  marginTop: '20px' }}>
+      <p style={{ paddingLeft:'8px', paddingBottom:'20px', paddingTop: '20px', fontSize: '20px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap',  marginTop: '20px' }}>
         {post.content}
       </p>
       <CommentSection
