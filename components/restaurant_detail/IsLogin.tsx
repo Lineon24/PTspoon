@@ -61,11 +61,11 @@ export function IsLogin({profile,restaurant_id}:logininfo){
     }
     return(
         <Button 
-          className= "w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300 transition-colors"
+          className= "w-[90%] px-4 py-4 mx-5 my-4 bg-blue-500 text-white rounded-lg hover:bg-blue-300 transition-colors"
           onClick={handleUser}
         >
           <span className="flex items-center justify-center">
-            리뷰 쓰기 페이지로
+            리뷰 작성
           </span>
         </Button>
     )
