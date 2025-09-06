@@ -49,24 +49,6 @@ function ReviewWrite() {
       {/* 상단 헤더 (뒤로가기 버튼, 제목) */}
       <HeaderWithBack title="리뷰 쓰기" backTF={true} />
       <div className="p-4">
-      {/* 맛 선택 영역 */}
-      <div className="mb-8 bg-white rounded-xl shadow-sm p-5">
-        <h3 className="mb-3 text-[16px] font-semibold text-gray-700">
-          드신 음식의 맛은 어떠셨나요?
-        </h3>
-
-        {/* 맛 선택 UI 컴포넌트 */}
-        <TasteTypeSelect
-          selectedTasteTypes={selectedTasteTypes}
-          onToggleTasteType={toggleTaste}
-        />
-
-        {/* 선택된 맛 출력 */}
-        <div className="mt-2 text-sm text-gray-700">
-          선택된 맛: {selectedTasteTypes.join(",") || "없음"}
-        </div>
-      </div>
-
       {/* 메뉴 선택 영역 */}
       <div className="mb-8 bg-white rounded-xl shadow-sm p-5">
         <h3 className="mb-3 text-[16px] font-semibold text-gray-700">
@@ -83,6 +65,24 @@ function ReviewWrite() {
         {/* 선택된 메뉴 출력 */}
         <div className="mt-2 text-sm text-gray-700">
           선택된 메뉴: {selectedMenu || "없음"}
+        </div>
+      </div>
+
+      {/* 맛 선택 영역 */}
+      <div className="mb-8 bg-white rounded-xl shadow-sm p-5">
+        <h3 className="mb-3 text-[16px] font-semibold text-gray-700">
+          드신 음식의 맛은 어떠셨나요?
+        </h3>
+
+        {/* 맛 선택 UI 컴포넌트 */}
+        <TasteTypeSelect
+          selectedTasteTypes={selectedTasteTypes}
+          onToggleTasteType={toggleTaste}
+        />
+
+        {/* 선택된 맛 출력 */}
+        <div className="mt-2 text-sm text-gray-700">
+          선택된 맛: {selectedTasteTypes.join(",") || "없음"}
         </div>
       </div>
 
