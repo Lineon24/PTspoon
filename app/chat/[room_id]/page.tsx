@@ -1,9 +1,11 @@
 'use client';
+import { TagAutoSearch } from '@/components/TagAutoSearch';
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, useParams } from 'next/navigation'; 
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { RestaurantMessage } from '@/components/tag_restaurant';
+import { SendHorizontal } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -23,6 +25,10 @@ interface Chat_rooms {
   room_name: string;
 }
 
+function getTagKeyword(text:string):string{
+  const match=text.match(/#(\S+)$/);
+  return match?match[1]:'';
+}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -51,7 +57,6 @@ export default function ChatPage() {
 
   const previewUrl = imageFile ? URL.createObjectURL(imageFile) : null;
 
-
   // 로그인/프로필 불러오기
   useEffect(() => {
     supabase.auth.getUser().then(async (res) => {
@@ -70,22 +75,22 @@ export default function ChatPage() {
   }, [router]);
 
   useEffect(() => {
-  if (!room_id) return;
-  const fetchChatRoom = async () => {
-    const { data, error } = await supabase
-      .from('chat_rooms')
-      .select('id, room_name')
-      .eq('id', Number(room_id))
-      .single();
-    if (error) {
-      console.error('방 이름 불러오기 실패:', error);
-      setChatRoom(null);
-    } else {
-      setChatRoom(data);
-    }
-  };
-  fetchChatRoom();
-}, [room_id]);
+    if (!room_id) return;
+    const fetchChatRoom = async () => {
+      const { data, error } = await supabase
+        .from('chat_rooms')
+        .select('id, room_name')
+        .eq('id', Number(room_id))
+        .single();
+      if (error) {
+        console.error('방 이름 불러오기 실패:', error);
+        setChatRoom(null);
+      } else {
+        setChatRoom(data);
+      }
+    };
+    fetchChatRoom();
+  }, [room_id]);
 
   // 메시지 최초 불러오기
   useEffect(() => {
@@ -110,7 +115,6 @@ export default function ChatPage() {
       bottomRef.current?.scrollIntoView({ behavior: 'auto' });
       setIsAtBottom(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   // 새 메시지 도착 시, 스크롤이 맨 아래일 때만 자동 스크롤
@@ -124,7 +128,6 @@ export default function ChatPage() {
   const handleScroll = () => {
     const el = chatListRef.current;
     if (!el) return;
-    // 10px 오차 허용
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 10;
     setIsAtBottom(atBottom);
   };
@@ -132,30 +135,29 @@ export default function ChatPage() {
   // 실시간 구독
   useEffect(() => {
     const channel = supabase
-      .channel(`public:messages-${room_id}`)
+      .channel('public:messages')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages', filter: `room_id=eq.${room_id}`},
+        { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);}
+          setMessages((prev) => [...prev, payload.new as Message]);
+        }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [room_id]);
+  }, []);
 
-  // ✅ 메시지 전송 (최종 수정 반영)
+  // ✅ 메시지 전송
   const sendMessage = async () => {
     if (!profile || (!input.trim() && !imageFile)) return;
 
     let imageUrl: string | null = null;
 
     if (imageFile) {
-      // 파일 확장자만 추출
       const ext = imageFile.name.split(".").pop();
-      // 안전한 파일명 생성 (UUID나 timestamp 기반)
       const safeFileName = `${Date.now()}.${ext}`;
       const filePath = `${profile.id}/${safeFileName}`;
 
@@ -177,7 +179,7 @@ export default function ChatPage() {
     await supabase.from("messages").insert([
       {
         user_id: profile.id,
-        room_id: room_id,
+        room_id,
         username: profile.nickname,
         content: input,
         msg_image: imageUrl,
@@ -190,34 +192,34 @@ export default function ChatPage() {
 
   if (loading) return (
     <main>
-    <HeaderWithBack title={chatRoom?.room_name ?? '채팅방' } backTF= {true} /> {/* 상단 고정 헤더 */}
-    <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
+      <HeaderWithBack title={chatRoom?.room_name ?? '채팅방'} backTF={true} />
+      <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
     </main>
   );
 
-  // 없는 채팅방 접속금지
   if (chatRoom == null) return (
     <main>
-    <HeaderWithBack title='채팅방' backTF= {true} /> {/* 상단 고정 헤더 */}
-    <div style={{ margin: 60, textAlign: 'center' }}>해당 채팅방은 없는 채팅방 입니다.</div>
+      <HeaderWithBack title='채팅방' backTF={true} />
+      <div style={{ margin: 60, textAlign: 'center' }}>해당 채팅방은 없는 채팅방 입니다.</div>
     </main>
   );
   if (!profile) return null;
 
   return (
     <main
-        style={{
+      style={{
         maxWidth: 540,
-        width: '100vw', 
+        width: '100%',
         margin: '0 auto',
-        minHeight: '100svh', 
+        minHeight: '100svh',
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <HeaderWithBack title={chatRoom?.room_name ?? '채팅방' } backTF= {true} /> {/* 상단 고정 헤더 */}
+      <HeaderWithBack title={chatRoom?.room_name ?? '채팅방'} backTF={true} />
+      
       {/* 메시지 리스트 */}
       <div
         ref={chatListRef}
@@ -233,79 +235,75 @@ export default function ChatPage() {
           flexDirection: 'column',
         }}
       >
+        {messages.map(msg =>
+          <div
+            key={msg.id}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: msg.user_id === profile.id ? 'flex-end' : 'flex-start',
+              marginBottom: 10,
+            }}
+          >
+            {/* 닉네임 */}
+            <span
+              style={{
+                fontSize: 12,
+                color: msg.user_id === profile.id ? '#3171e3' : '#6c7a89',
+                fontWeight: 600,
+                marginBottom: 3,
+                paddingLeft: 5,
+                paddingRight: 5,
+              }}
+            >
+              {msg.username}
+            </span>
 
-{messages.map(msg =>
-  <div
-    key={msg.id}
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: msg.user_id === profile.id ? 'flex-end' : 'flex-start',
-      marginBottom: 10,
-    }}
-  >
-    {/* 닉네임 */}
-    <span
-      style={{
-        fontSize: 12,
-        color: msg.user_id === profile.id ? '#3171e3' : '#6c7a89',
-        fontWeight: 600,
-        marginBottom: 3,
-        paddingLeft: 5,
-        paddingRight: 5,
-      }}
-    >
-      {msg.username}
-    </span>
+            {/* 메시지 박스 */}
+            <div
+              style={{
+                position: 'relative',
+                padding: '8px 13px',
+                borderRadius: 13,
+                background: msg.user_id === profile.id ? '#e6f0ff' : '#fff',
+                fontWeight: 500,
+                color: '#1d1d1f',
+                maxWidth: '86%',
+                wordBreak: 'break-word',
+                boxShadow: msg.user_id === profile.id
+                  ? '0 2px 7px #e5f0ff55'
+                  : '0 0.5px 2px #e0eaf75d',
+              }}
+            >
+              {msg.content && (
+                msg.content.startsWith('#')
+                  ? <RestaurantMessage tag={msg.content.slice(1)} />
+                  : <span style={{ fontSize: 15 }}>{msg.content}</span>
+              )}
 
-    {/* 메시지 박스 */}
-    <div
-      style={{
-        position: 'relative',
-        padding: '8px 13px',
-        borderRadius: 13,
-        background: msg.user_id === profile.id ? '#e6f0ff' : '#fff',
-        fontWeight: 500,
-        color: '#1d1d1f',
-        maxWidth: '86%',
-        wordBreak: 'break-word',
-        boxShadow: msg.user_id === profile.id
-          ? '0 2px 7px #e5f0ff55'
-          : '0 0.5px 2px #e0eaf75d',
-      }}
-    >
-      {/* 메시지 본문 */}
-      {msg.content && (
-        msg.content.startsWith('#')
-          ? <RestaurantMessage tag={msg.content.slice(1)} />
-          : <span style={{ fontSize: 15 }}>{msg.content}</span>
-      )}
-
-      {/* 이미지 */}
-      {msg.msg_image && (
-        <img
-          src={msg.msg_image}
-          alt="msg-img"
-          style={{ marginTop: 8, maxWidth: '100%', borderRadius: 8 }}
-        />
-      )}
-      <div ref={bottomRef} > </div>
-    </div>
-  </div>
-)}
-<div ref={bottomRef} />
-</div>
+              {msg.msg_image && (
+                <img
+                  src={msg.msg_image}
+                  alt="msg-img"
+                  style={{ marginTop: 8, maxWidth: '100%', borderRadius: 8 }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
 
       {/* 입력창 */}
       <div
         style={{
           width: '100%',
-          padding: '10px 9px',
+          padding: '8px 6px',
           background: '#fff',
           borderTop: '1.5px solid #e6eaf2',
           display: 'flex',
           flexDirection: 'column',
-          gap: 7,
+          gap: 6,
           position: 'fixed',
           maxWidth: 540,
           margin: '0 auto',
@@ -313,13 +311,13 @@ export default function ChatPage() {
           zIndex: 3
         }}
       >
-        {/* 이미지 미리보기 - 입력창 위쪽 */}
+        {/* 이미지 미리보기 */}
         {previewUrl && (
-          <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
             <img
               src={previewUrl}
               alt="preview"
-              style={{ maxHeight: 80, borderRadius: 8 }}
+              style={{ maxHeight: 70, borderRadius: 8 }}
             />
             <button
               onClick={handleRemoveImage}
@@ -327,7 +325,7 @@ export default function ChatPage() {
                 background: 'transparent',
                 border: 'none',
                 color: '#ff4d4f',
-                fontSize: 14,
+                fontSize: 13,
                 cursor: 'pointer'
               }}
             >
@@ -337,7 +335,12 @@ export default function ChatPage() {
         )}
 
         {/* 입력 영역 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          flexWrap: 'nowrap'
+        }}>
           {/* 이미지 업로드 버튼 */}
           <input
             type="file"
@@ -350,27 +353,23 @@ export default function ChatPage() {
           <label
             htmlFor="image-upload"
             style={{
+              flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 36,
-              height: 36,
+              width: 28,
+              height: 28,
               borderRadius: '50%',
               backgroundColor: '#007bff',
               boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
               cursor: 'pointer',
-              transition: 'background-color 0.2s ease',
             }}
           >
-            {/* 이미지 전송 버튼 + */}
             <span style={{
-              fontSize: 24,
+              fontSize: 18,
               color: 'white',
               fontWeight: 'bold',
               lineHeight: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
             }}>+</span>
           </label>
 
@@ -383,25 +382,26 @@ export default function ChatPage() {
               flex: 1,
               borderRadius: 8,
               border: '1.2px solid #d2e0f4',
-              fontSize: 15,
-              padding: '11px 13px'
+              fontSize: 14,
+              padding: '7px 9px',
+              minWidth: 0
             }}
           />
           <button
             onClick={sendMessage}
             style={{
+              flexShrink: 0,
               background: '#2e7fff',
               color: '#fff',
               border: 'none',
               borderRadius: 8,
-              padding: '0 20px',
-              fontWeight: 700,
-              fontSize: 15,
-              minHeight: 40,
-              minWidth: 54
+              padding: '0 10px',
+              fontWeight: 600,
+              fontSize: 13,
+              minHeight: 32
             }}
           >
-            전송
+            <SendHorizontal size={18} />
           </button>
         </div>
       </div>

@@ -145,7 +145,7 @@ const ChatRoomListPage = () => {
   return (
     <div
       style={{
-        padding: 20,
+        padding: 16,
         maxWidth: 540,
         margin: '0 auto',
         width: '100%',
@@ -155,27 +155,29 @@ const ChatRoomListPage = () => {
     >
       <HeaderWithBack title="전체 채팅방 목록" backTF={false} />
 
-      {/* 슬라이드 토글 버튼 + 채팅방 만들기 버튼 한 줄에 배치 */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-        gap: 8,
-      }}>
-        <div style={{ display: 'flex', gap: 8 }}>
+      {/* 버튼 줄 */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+          gap: 6,
+        }}
+      >
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
             onClick={() => setViewMode('all')}
             style={{
               backgroundColor: viewMode === 'all' ? '#3478ff' : '#eee',
               color: viewMode === 'all' ? 'white' : '#333',
               border: 'none',
-              padding: '8px 16px',
-              borderRadius: 20,
+              padding: '6px 10px',
+              borderRadius: 16,
               cursor: 'pointer',
               fontWeight: 'bold',
-              fontSize: 15,
-              transition: 'background 0.2s',
+              fontSize: 12,
             }}
           >
             전체 채팅방
@@ -186,12 +188,11 @@ const ChatRoomListPage = () => {
               backgroundColor: viewMode === 'mine' ? '#3478ff' : '#eee',
               color: viewMode === 'mine' ? 'white' : '#333',
               border: 'none',
-              padding: '8px 16px',
-              borderRadius: 20,
+              padding: '6px 10px',
+              borderRadius: 16,
               cursor: 'pointer',
               fontWeight: 'bold',
-              fontSize: 15,
-              transition: 'background 0.2s',
+              fontSize: 12,
             }}
           >
             참여한 방
@@ -203,33 +204,21 @@ const ChatRoomListPage = () => {
             backgroundColor: '#3478ff',
             color: 'white',
             border: 'none',
-            padding: '10px 15px',
-            borderRadius: 8,
+            padding: '6px 10px',
+            borderRadius: 6,
             cursor: 'pointer',
-            fontSize: 14,
-            display: 'block'
+            fontSize: 12,
           }}
         >
           내 채팅방 만들기
         </button>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 20,
-        }}
-      >
-
-      </div>
-
-      {/* rooms 목록 필터링 */}
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      {/* rooms 목록 */}
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {(viewMode === 'all'
           ? rooms
-          : rooms.filter(room => myRoomIds.includes(room.id))
+          : rooms.filter((room) => myRoomIds.includes(room.id))
         ).map((room) => {
           const isHovered = hoveredRoomId === room.id;
           return (
@@ -239,34 +228,33 @@ const ChatRoomListPage = () => {
               onMouseLeave={() => setHoveredRoomId(null)}
               style={{
                 position: 'relative',
-                padding: 14,
+                padding: 12,
                 border: `1px solid #ddd`,
                 borderRadius: 10,
-                marginBottom: 12,
+                marginBottom: 10,
                 display: 'flex',
+                flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: 12,
+                gap: 10,
                 backgroundColor:
                   isHovered
                     ? '#f0f0f0'
                     : user?.id === room.creator_id
-                      ? '#eafff8ff'
-                      : 'white',
-                cursor: isHovered ? 'pointer' : 'default',
-                transition: 'border-color 0.3s',
+                    ? '#eafff8ff'
+                    : 'white',
+                cursor: 'pointer',
               }}
             >
               <img
                 src={room.room_image || DEFAULT_IMAGE_URL}
                 alt={`${room.room_name} 대표 이미지`}
                 style={{
-                  width: 48,
-                  height: 48,
+                  width: 44,
+                  height: 44,
                   borderRadius: 8,
                   objectFit: 'cover',
                   flexShrink: 0,
                   border: `1px solid #ddd`,
-                  transition: 'border-color 0.3s',
                 }}
               />
 
@@ -276,25 +264,27 @@ const ChatRoomListPage = () => {
                   textDecoration: 'none',
                   color: '#333',
                   flexGrow: 1,
+                  minWidth: 0,
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: 16 }}>{room.room_name}</span>
+                  <span style={{ fontWeight: 'bold', fontSize: 15, wordBreak: 'break-word' }}>
+                    {room.room_name}
+                  </span>
                   {room.room_description && (
-                    <span style={{ fontSize: 13, color: '#777', marginTop: 4 }}>
+                    <span style={{ fontSize: 12, color: '#777', marginTop: 3, wordBreak: 'break-word' }}>
                       {room.room_description}
                     </span>
                   )}
-                  {/* 최근 메시지 내용/이미지 관련 코드 삭제 */}
                 </div>
               </Link>
 
               <div
                 style={{
                   position: 'absolute',
-                  bottom: 8,
-                  right: 8,
-                  fontSize: 12,
+                  bottom: 6,
+                  right: 6,
+                  fontSize: 11,
                   color: '#999',
                   userSelect: 'none',
                   whiteSpace: 'nowrap',
@@ -308,17 +298,16 @@ const ChatRoomListPage = () => {
                   onClick={() => handleDeleteRoom(room.id, room.creator_id)}
                   style={{
                     position: 'absolute',
-                    top: 8,
-                    right: 8,
+                    top: 6,
+                    right: 6,
                     backgroundColor: 'transparent',
                     color: 'gray',
                     border: '1px solid gray',
                     padding: '2px 6px',
                     borderRadius: '50%',
-                    fontSize: 14,
+                    fontSize: 12,
                     cursor: 'pointer',
                     lineHeight: 1,
-                    userSelect: 'none',
                   }}
                   aria-label="삭제"
                   title="삭제"
