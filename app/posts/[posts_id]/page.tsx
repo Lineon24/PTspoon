@@ -319,7 +319,7 @@ return (
           </div>
 
           {/* 이미지 댓글 섹션 */}
-          <div>
+          <div style={{padding:'1px'}}>
             <div style={{ marginTop: '0px', paddingTop: '0px', paddingBottom: '4px'}}>
               <div style={{
                 paddingTop: '0px',
@@ -408,11 +408,13 @@ return (
       <p style={{ paddingLeft:'8px', paddingBottom:'20px', paddingTop: '20px', fontSize: '20px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap',  marginTop: '20px' }}>
         {post.content}
       </p>
-      <CommentSection
+      <div style={{padding: '8px'}}>
+      <CommentSection 
         postId={post.id}
         comments={comments}
         profile={profile}
       />
+      </div>
     </div>
   </div>
 );
