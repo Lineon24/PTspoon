@@ -115,7 +115,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
       ) : (
           comments.map((comment) => (
             <div key={comment.id} style={{
-              background: '#f9f9f9', borderRadius: '8px', padding: '12px', margin: '2px 3px 8px 3px',
+              background: '#f9f9f9', borderRadius: '8px', padding: '8px', margin: '2px 3px 8px 3px',
               border: '1px solid #f0f0f0'
           }}>
             <div style={{
@@ -136,7 +136,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
               fontSize: '20px',
               color: '#999',
               cursor: 'pointer',
-              marginLeft: '10px',
+              marginLeft: '1px',
               }}
             title="댓글 삭제"
               >
@@ -149,19 +149,19 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
       )}
 
       {/* 댓글 입력 폼 */}
-      <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', marginTop: '15px', margin: '15px 2px 15px 3px'}}>
+      <form onSubmit={handleSubmitComment} style={{ width: '100%', display: 'flex', gap: '8px', marginTop: '15px', margin: '15px 0'}}>
         <input
           type="text"
           placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
           value={newCommentContent}
           onChange={(e) => setNewCommentContent(e.target.value)}
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ flexGrow: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: 14, background: profile ? '#fff' : '#f0f0f0' }}
+          style={{ flexGrow: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: 14, background: profile ? '#fff' : '#f0f0f0', boxSizing: 'border-box' }}
         />
         <button
           type="submit"
           disabled={!profile} // 로그인 안 되어 있으면 비활성화
-          style={{ marginRight: '3px', padding: '5px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed' }}
+          style={{ padding: '10px 15px', borderRadius: '8px', border: 'none', background: profile ? '#414de4' : '#ccc', color: 'white', fontSize: '10px', fontWeight: 'bold', cursor: profile ? 'pointer' : 'not-allowed', boxSizing: 'border-box' }}
         >
           <SendHorizontal size={20}/> {/*전송 아이콘*/}
         </button>
