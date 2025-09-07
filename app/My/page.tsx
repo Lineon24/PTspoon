@@ -297,7 +297,7 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full max-w-[540px] mx-auto flex flex-col h-[calc(100vh-128px)]"> {/* 메인 컨테이너 */}
-      <HeaderWithBack title={``} backTF={true} /> {/* 뒤로가기 헤더 */}
+      <HeaderWithBack title={`내 정보`} backTF={true} /> {/* 뒤로가기 헤더 */}
       <section className="bg-blue-100 p-10 text-center"> {/* 프로필 영역 */}
         <div className="flex justify-center gap-2 text-xl">
           {["😀", "🐮", "🐱", "🐸", "🐻"].map((emoji) => ( // 이모지 나열
