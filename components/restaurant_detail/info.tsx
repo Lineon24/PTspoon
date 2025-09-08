@@ -20,6 +20,7 @@ interface Restaurant {
 export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isLarge, setIsLarge] = useState(false);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -46,6 +47,9 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     }
   }, [restaurantId])
 
+  const handleImageClick = () => {
+    setIsLarge(!isLarge); // isLarge 상태를 반전시킴 (true -> false, false -> true)
+  };
   if (loading) {
     return <div className="p-4 text-gray-500">로딩 중...</div>
   }
@@ -59,15 +63,19 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
       <img
         src={restaurant.image_url}
         alt="레스토랑 이미지"
+        onClick={handleImageClick}
         loading="lazy"
         style={{
-          maxWidth: 540,
-          width:'100%',
-          maxHeight:'350px',
-          objectFit:'cover',
-          borderRadius:'8px',
-          display:'block',
-        }}/>
+          maxWidth: isLarge ? '100vh' : 540, // isLarge가 true면 사진을 누르면 화면 확대
+          maxHeight: isLarge ? '100vh' : '300px', // isLarge가 true면 사진을 누르면 화면 확대
+          width: '100%',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          display: 'block',
+          transition: 'all 0.3s ease', // 부드러운 애니메이션 효과
+          cursor: 'pointer',
+        }}
+      />
     </div>
     {/* 식당 이름 */}
     <div className="text-center">
