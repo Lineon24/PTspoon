@@ -360,7 +360,7 @@ export default function ChatPage() {
               width: 28,
               height: 28,
               borderRadius: '50%',
-              backgroundColor: '#007bff',
+              backgroundColor: '#2e7fff',
               boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
               cursor: 'pointer',
             }}
@@ -394,11 +394,11 @@ export default function ChatPage() {
               background: '#2e7fff',
               color: '#fff',
               border: 'none',
-              borderRadius: 8,
-              padding: '0 10px',
+              borderRadius: 50,
+              padding: '0 9px',
               fontWeight: 600,
               fontSize: 13,
-              minHeight: 32
+              minHeight: 36
             }}
           >
             <SendHorizontal size={18} />
