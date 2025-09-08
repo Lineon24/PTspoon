@@ -54,15 +54,16 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     return <div className="p-4 text-red-500">레스토랑 정보를 불러올 수 없습니다.</div>
   }
   return (
-  <section className="p-4 mb-6 space-y-4">
-    <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">
+  <section className="p-0 mb-6 space-y-4">
+    <div className="relative overflow-hidden rounded-lg mb-6">
       <img
         src={restaurant.image_url}
         alt="레스토랑 이미지"
         loading="lazy"
         style={{
+          maxWidth: 540,
           width:'100%',
-          height:'100%',
+          maxHeight:'350px',
           objectFit:'cover',
           borderRadius:'8px',
           display:'block',

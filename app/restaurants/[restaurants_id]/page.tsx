@@ -66,12 +66,12 @@ function RestaurantDetail(){
   };
 
   return(
-    <div className="max-w-md mx-auto pb-10">
+    <div className="max-w-[540px] mx-auto pb-10">
       {/* 상단 헤더 */}
       <HeaderWithBack title="식당 상세" backTF={true}/>
 
       {/* 식당 기본 정보 */}
-      <div className='p-4'>
+      <div className='pt-1'>
         <RestaurantInfo restaurantId={restaurantId}/>
       </div>
 
@@ -106,7 +106,7 @@ function RestaurantDetail(){
       )}
 
       {/* 콘텐츠 영역 */}
-      <div className="p-4">
+      <div className="p-0 pt-5">
         {contentType === "review" 
           ? <RestaurantReviewList profile={profile} restaurant_id={restaurantId}/> 
           : <Menu_list restaurantId={restaurantId}/>
