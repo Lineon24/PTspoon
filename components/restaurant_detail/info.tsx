@@ -21,7 +21,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [loading, setLoading] = useState(true)
   const [isLarge, setIsLarge] = useState(false);
-
+  const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png';
   useEffect(() => {
     const fetchRestaurant = async () => {
       setLoading(true)
@@ -61,7 +61,7 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   <section className="p-0 mb-6 space-y-4">
     <div className="relative overflow-hidden rounded-lg mb-6">
       <img
-        src={restaurant.image_url}
+        src={restaurant.image_url || DEFAULT_IMAGE_URL}
         alt="레스토랑 이미지"
         onClick={handleImageClick}
         loading="lazy"
