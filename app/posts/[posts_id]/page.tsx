@@ -290,10 +290,10 @@ return (
     <HeaderWithBack title={'게시글'} backTF={true} />
 
     {/* --- 게시글 제목 --- */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+    <div style={{ display: 'flex', maxWidth:'530px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
       <div style={{ fontSize: '25px', fontWeight: 'bold', margin: '20px 0 5px 8px', color: '#222' }}>{post.title}</div>
       {profile?.id === post.user_id && (
-        <button onClick={deletePost} style={{ border: 'none', background: 'transparent', fontSize: '25px', color: '#999', cursor: 'pointer', marginLeft: '10px' }} title="게시글 삭제">
+        <button onClick={deletePost} style={{ border: 'none', background: 'transparent', fontSize: '45px', color: '#999', cursor: 'pointer', marginLeft: '10px' }} title="게시글 삭제">
           ×
         </button>
       )}

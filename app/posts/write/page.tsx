@@ -216,9 +216,9 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
       <form onSubmit={handleSubmitPost} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px', padding: '20px', background: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
         <input
           type="text" placeholder="게시글 제목을 입력하세요" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)}
-          maxLength={50} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: 16 }}
+          maxLength={40} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: 16 }}
         />
-        <div style={{ textAlign: 'right', fontSize: 12, color: '#888' }}>{newPostTitle.length}/50 </div>
+        <div style={{ textAlign: 'right', fontSize: 12, color: '#888' }}>{newPostTitle.length}/40 </div>
         <textarea 
           placeholder="게시글 내용을 입력하세요" value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} rows={7}
           maxLength={3000} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', resize: 'vertical', fontSize: 15, lineHeight: 1.5 }}

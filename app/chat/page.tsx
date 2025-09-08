@@ -272,7 +272,7 @@ const ChatRoomListPage = () => {
                     {room.room_name}
                   </span>
                   {room.room_description && (
-                    <span style={{ fontSize: 12, color: '#777', marginTop: 3, wordBreak: 'break-word' }}>
+                    <span style={{ fontSize: 12, color: '#777', marginTop: 3, marginBottom: '7px',wordBreak: 'break-word' }}>
                       {room.room_description}
                     </span>
                   )}
