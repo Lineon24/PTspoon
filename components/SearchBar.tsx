@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -15,6 +15,7 @@ interface SearchAutocompleteProps {
 export function SearchAutocomplete({ value, onChange,onEnter }: SearchAutocompleteProps) {
   // 자동완성 결과 목록 상태 (식당 이름 배열)
   const [results, setResults] = useState<string[]>([]);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   // value(입력값)가 변경될 때마다 자동완성 결과를 불러오는 useEffect
   useEffect(() => {
@@ -43,10 +44,19 @@ export function SearchAutocomplete({ value, onChange,onEnter }: SearchAutocomple
         setResults([]);
       }
     }, 300);
-
     // 컴포넌트가 업데이트되거나 언마운트 될 때 이전 타이머를 취소해 중복 호출 방지
     return () => clearTimeout(delay);
   }, [value]); // value가 바뀔 때마다 실행
+
+  useEffect(()=>{
+    const handleClickOutside=(e:MouseEvent)=>{
+      if(wrapperRef.current && !wrapperRef.current.contains(e.target as Node)){
+        setResults([]);
+      }
+    };
+    document.addEventListener("mousedown",handleClickOutside);
+    return ()=>document.removeEventListener("mousedown",handleClickOutside);
+  },[]);
 
   return (
     <div className="relative">
