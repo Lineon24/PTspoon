@@ -14,14 +14,13 @@ interface SearchAutocompleteProps {
 export function SearchAutocomplete({ value, onChange, onEnter }: SearchAutocompleteProps) {
   const [results, setResults] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const preventQuery = useRef(false); // 클릭 시 쿼리 방지
+  const [isClosedByClick, setIsClosedByClick] = useState(false); // 외부 클릭 상태
+  const containerRef = useRef<HTMLDivElement>(null);
+  const queryTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  // 검색어 변경 시 자동완성 쿼리
   useEffect(() => {
-    if (preventQuery.current) {
-      console.log("쿼리 방지 활성, useEffect 종료");
-      preventQuery.current = false;
-      return;
-    }
+    if (isClosedByClick) return; // 외부 클릭 후 쿼리 막기
 
     if (!value.trim()) {
       setResults([]);
@@ -31,18 +30,22 @@ export function SearchAutocomplete({ value, onChange, onEnter }: SearchAutocompl
 
     let active = true;
 
-    const delay = setTimeout(async () => {
+    if (queryTimeout.current) clearTimeout(queryTimeout.current);
+
+    queryTimeout.current = setTimeout(async () => {
       const { data, error } = await supabase
         .from("restaurant")
         .select("restaurant_name")
         .ilike("restaurant_name", `%${value.trim()}%`)
         .limit(5);
 
-      if (!error && data && active) {
+      if (!active) return;
+
+      if (!error && data) {
         const uniqueNames = [...new Set(data.map((r) => r.restaurant_name))];
         setResults(uniqueNames);
-        setShowResults(true);
-      } else if (active) {
+        setShowResults(uniqueNames.length > 0);
+      } else {
         setResults([]);
         setShowResults(false);
       }
@@ -50,31 +53,50 @@ export function SearchAutocomplete({ value, onChange, onEnter }: SearchAutocompl
 
     return () => {
       active = false;
-      clearTimeout(delay);
+      if (queryTimeout.current) clearTimeout(queryTimeout.current);
     };
-  }, [value]);
+  }, [value, isClosedByClick]);
 
-  const handleClick = (name: string) => {
-    preventQuery.current = true; // 클릭 시 쿼리 방지
+  // 외부 클릭 처리
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+        setIsClosedByClick(true); // 외부 클릭 상태로 변경
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // input에 입력하면 외부 클릭 플래그 해제
+  const handleInputChange = (val: string) => {
+    setIsClosedByClick(false); // 다시 쿼리 가능
+    onChange(val);
+  };
+
+  const handleClickItem = (name: string) => {
     onChange(name);
-    setShowResults(false); // 목록 닫기
+    setShowResults(false);
+    setIsClosedByClick(true); // 클릭 후 쿼리 막기
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-
       <Input
         placeholder="지역, 음식 또는 식당명 검색"
         className="pl-10 h-12 rounded-full shadow-lg border-transparent"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleInputChange(e.target.value)}
         autoComplete="off"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
             if (onEnter) onEnter();
             setShowResults(false);
+            setIsClosedByClick(true); // 엔터 후 쿼리 막기
           }
         }}
       />
@@ -85,7 +107,7 @@ export function SearchAutocomplete({ value, onChange, onEnter }: SearchAutocompl
             <li
               key={name}
               className="p-2 cursor-pointer hover:bg-gray-200"
-              onClick={() => handleClick(name)}
+              onClick={() => handleClickItem(name)}
             >
               {name}
             </li>

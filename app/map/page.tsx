@@ -150,21 +150,29 @@ export default function MapPage() {
         cursor: "pointer",
         textAlign: "center",
         userSelect: "none",
+        position:"relaive",
       })
 
       const box = document.createElement("div")
       Object.assign(box.style, {
-        display: "none",
-        background: "#fff",
-        padding: "6px",
-        borderRadius: "8px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        marginTop: "4px",
-        maxWidth: "200px",
-        fontSize: "14px",
-        color: "#333",
-        transition: "all 0.2s ease",
-      })
+  display: "none",
+  position: "absolute", // 버튼 기준으로 절대 위치
+  top: "calc(100% + 4px)", // 버튼 아래로 위치
+  left: "50%",
+  transform: "translateX(-50%)", // 버튼 중앙 기준 정렬
+  background: "#fff",
+  padding: "6px",
+  borderRadius: "8px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+  maxWidth: "200px",
+  fontSize: "14px",
+  color: "#333",
+  transition: "all 0.2s ease",
+  wordBreak: "break-word",
+  overflowWrap: "break-word",
+  overflowY: "auto",
+  maxHeight: "300px",
+});
 
       groupRestaurants.forEach(r => {
         const item = document.createElement("div")
@@ -172,7 +180,7 @@ export default function MapPage() {
         Object.assign(item.style, {
           padding: "4px 6px",
           borderRadius: "4px",
-          cursor: "pointer"
+          cursor: "pointer",
         })
         item.onmouseover = () => item.style.background = "#f0f8ff"
         item.onmouseout = () => item.style.background = "transparent"
@@ -194,7 +202,8 @@ export default function MapPage() {
       }
 
       const container = document.createElement("div")
-      container.style.display = "flex"
+      container.style.position="relative";
+      container.style.display = "inline-block"
       container.style.flexDirection = "column"
       container.style.alignItems = "center"
       container.appendChild(button)
