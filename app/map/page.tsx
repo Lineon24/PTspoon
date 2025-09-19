@@ -257,6 +257,32 @@ export default function MapPage() {
 
         markerGroupsRef.current.push({ position: { lat, lng }, restaurants: groupRestaurants, overlay })
       }
+
+      const container = document.createElement("div")
+      container.style.position="relative";
+      container.style.display = "inline-block"
+      container.style.flexDirection = "column"
+      container.style.alignItems = "center"
+      container.appendChild(button)
+      container.appendChild(box)
+
+      const overlay = new window.kakao.maps.CustomOverlay({
+        position: new window.kakao.maps.LatLng(lat, lng),
+        content: container,
+        yAnchor: 1,
+        clickable: true,
+        zIndex: 30,
+      })
+      overlay.setMap(map)
+
+      // 지도 클릭 시 박스 닫기 + 버튼 원복
+      window.kakao.maps.event.addListener(map, "click", () => {
+        box.style.display = "none"
+        button.innerText = `+${groupRestaurants.length}`
+        button.style.background = "#ffff"
+      })
+
+      markerGroupsRef.current.push({ position: { lat, lng }, restaurants: groupRestaurants, overlay })
     }
   }
 
