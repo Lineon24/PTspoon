@@ -13,9 +13,9 @@ interface Profile { // 프로필에서 사용할 테이블 속성들
 const iconList = [UtensilsCrossed, SquarePen]; // 아이콘 리스트들 상단바에 추가할 아이콘은 여기에 추가
 
 {/*매개변수로 타이틀, 아이콘 모양 번호(iconList 인덱스), 아이콘 색깔, 이전 버튼 추가 설정를 받음 */}
-export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, buttonCustomName, buttonCustomPath, buttonCustomicon, buttonCustomiconColor}: 
+export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, buttonCustomName, buttonCustomPath, buttonCustomicon, buttonCustomiconColor, image}: 
   { title: string; iconIndex?: number; backTF: boolean; iconColor?: string | 'black'; 
-    buttonCustomName?: string; buttonCustomPath?: string; buttonCustomicon?: number; buttonCustomiconColor?: string | 'black';
+    buttonCustomName?: string; buttonCustomPath?: string; buttonCustomicon?: number; buttonCustomiconColor?: string | 'black', image? :string;
   }) {
   const IconComponent = iconIndex !== undefined ? iconList[iconIndex] : null; // 아이콘 인덱스에 아무값도 안넣었다면 널 값을 넣음
   const ButtonIconComponent = buttonCustomicon !== undefined ? iconList[buttonCustomicon] : null; // 아이콘 인덱스에 아무값도 안넣었다면 널 값을 넣음
@@ -91,6 +91,18 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
         ←
       </button>
       ): null}
+      {image != null ? (
+        <img 
+            src={image} 
+            alt={title} 
+            style={{ 
+            height: '32px', 
+            marginRight: '10px', 
+            objectFit: 'contain' 
+            }} 
+        />
+      ): null}
+
       {IconComponent != null ? ( // 인자값으로 아이콘 인덱스 값을 받으면 아이콘 출력
       <div style={{ color: iconColor, marginRight: '10px' }}><IconComponent/></div>
       ): null}

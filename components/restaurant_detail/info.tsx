@@ -20,7 +20,8 @@ interface Restaurant {
 export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [loading, setLoading] = useState(true)
-
+  const [isLarge, setIsLarge] = useState(false);
+  const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png';
   useEffect(() => {
     const fetchRestaurant = async () => {
       setLoading(true)
@@ -46,6 +47,9 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     }
   }, [restaurantId])
 
+  const handleImageClick = () => {
+    setIsLarge(!isLarge); // isLarge 상태를 반전시킴 (true -> false, false -> true)
+  };
   if (loading) {
     return <div className="p-4 text-gray-500">로딩 중...</div>
   }
@@ -54,19 +58,24 @@ export default function RestaurantInfo({ restaurantId }: RestaurantInfoProps) {
     return <div className="p-4 text-red-500">레스토랑 정보를 불러올 수 없습니다.</div>
   }
   return (
-  <section className="p-4 mb-6 space-y-4">
-    <div className="relative aspect-video w-full overflow-hidden rounded-lg mb-6">
+  <section className="p-0 mb-6 space-y-4">
+    <div className="relative overflow-hidden rounded-lg mb-6">
       <img
-        src={restaurant.image_url}
+        src={restaurant.image_url || DEFAULT_IMAGE_URL}
         alt="레스토랑 이미지"
+        onClick={handleImageClick}
         loading="lazy"
         style={{
-          width:'100%',
-          height:'100%',
-          objectFit:'cover',
-          borderRadius:'8px',
-          display:'block',
-        }}/>
+          maxWidth: isLarge ? '100vh' : 540, // isLarge가 true면 사진을 누르면 화면 확대
+          maxHeight: isLarge ? '100vh' : '300px', // isLarge가 true면 사진을 누르면 화면 확대
+          width: '100%',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          display: 'block',
+          transition: 'all 0.3s ease', // 부드러운 애니메이션 효과
+          cursor: 'pointer',
+        }}
+      />
     </div>
     {/* 식당 이름 */}
     <div className="text-center">

@@ -9,6 +9,7 @@ interface Restaurant_menu{
     menu:string;
     price:string;
     description:string;
+    image_url:string;
 }
 
 //너는 레스토랑 id받아오는 새끼
@@ -30,7 +31,7 @@ export default function Menu_list({restaurantId}:RestaurantInfoProps){
 
             const{data,error}=await supabase
             .from('menu') //menu 테이블에서
-            .select('id,menu,price,description') //값을 찾기
+            .select('id,menu,price,description,image_url') //값을 찾기
             .eq('restaurant_id',restaurantId) //물론 레스토랑 id가 일치할때만
         if (error){
             console.error('메뉴 조회 실패',error) //만약 에러나면 콘솔에 로그 남기고
@@ -59,11 +60,22 @@ export default function Menu_list({restaurantId}:RestaurantInfoProps){
     return(
       <div className="mb-6">
         <div className="grid gap-3">
-          {menu.map((item:any, index:number)=> (
-            <div key={index} className="p-3 bg-gray-50 rounded-lg">
-              <span className="font-medium">{item.menu}</span>
-              <div className="text-xs text-gray-500">{item.description}</div>
-              <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
+          {menu.map((item: any, index: number) => (
+            // Flexbox를 사용하여 가로 정렬
+            <div key={index} className="flex p-3 bg-gray-50 rounded-lg space-x-4 items-center">
+              {item.image_url && item.image_url.length > 0 && (
+                <img
+                  src={item.image_url}
+                  alt={`${item.menu} 대표 이미지`}
+                  className="w-30 h-30 object-cover rounded-lg border border-gray-200"
+                />
+               )}
+              {/* Flexbox 아이템으로 설정하여 남은 공간을 채움 */}
+              <div className="flex-1">
+                <span className="font-medium">{item.menu}</span>
+                <div className="text-xs text-gray-500">{item.description}</div>
+                <span className="test-blue-600 font-bold">{item.price.toLocaleString()}원</span>
+              </div>
             </div>
           ))}
         </div>

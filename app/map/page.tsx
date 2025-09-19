@@ -127,9 +127,14 @@ export default function MapPage() {
     if (groupRestaurants.length === 1) {
       // 단일 마커
       const marker = new window.kakao.maps.Marker({
-        position: new window.kakao.maps.LatLng(lat, lng),
-        clickable: true
-      })
+    position: new window.kakao.maps.LatLng(lat, lng),
+    clickable: true,
+    // 🔥 이 부분을 추가하세요.
+    image: new window.kakao.maps.MarkerImage(
+        '/map/mappin.png', // 원하는 이미지 파일 경로
+        new window.kakao.maps.Size(30, 30) // 이미지 크기 (가로, 세로)
+    ),
+    })
       marker.setMap(map)
       window.kakao.maps.event.addListener(marker, "click", () => {
         setSelectedRestaurantId(groupRestaurants[0].restaurant_id)
@@ -142,15 +147,19 @@ export default function MapPage() {
       const button = document.createElement("div")
       button.innerText = `+${groupRestaurants.length}`
       Object.assign(button.style, {
-        padding: "6px 10px",
-        background: "#3268f8",
-        color: "#fff",
-        borderRadius: "20px",
+        padding: "6px 8px",
+        background: "#ffff",
+        color: "black",
+        borderRadius: "10px",
+        border: "2px solid #2F69E4",
         fontWeight: "bold",
+        fontSize: "13px",
         cursor: "pointer",
         textAlign: "center",
         userSelect: "none",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         position:"relaive",
+        minWidth: "36px",
       })
 
       const box = document.createElement("div")
@@ -160,7 +169,7 @@ export default function MapPage() {
   top: "calc(100% + 4px)", // 버튼 아래로 위치
   left: "50%",
   transform: "translateX(-50%)", // 버튼 중앙 기준 정렬
-  background: "#fff",
+  background: "#ffff",
   padding: "6px",
   borderRadius: "8px",
   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -199,6 +208,7 @@ export default function MapPage() {
         const isOpen = box.style.display !== "none"
         box.style.display = isOpen ? "none" : "block"
         button.innerText = isOpen ? `+${groupRestaurants.length}` : "X"
+        button.style.background = isOpen ? "#ffff" : "#D5E0F9"
       }
 
       const container = document.createElement("div")
@@ -213,7 +223,8 @@ export default function MapPage() {
         position: new window.kakao.maps.LatLng(lat, lng),
         content: container,
         yAnchor: 1,
-        clickable: true
+        clickable: true,
+        zIndex: 30,
       })
       overlay.setMap(map)
 
@@ -262,7 +273,12 @@ export default function MapPage() {
           const lng=pos.coords.longitude
           const currentPos=new window.kakao.maps.LatLng(lat,lng)
           if(!currentLocationMarker.current){
-            currentLocationMarker.current=new window.kakao.maps.Marker({map:mapRef.current,position:currentPos,title:"현재 위치"})
+            currentLocationMarker.current = new window.kakao.maps.Marker({
+            map: mapRef.current,
+            position: currentPos,
+            title: "현재 위치",
+            image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
+          });
             mapRef.current.panTo(currentPos)
           }else currentLocationMarker.current.setPosition(currentPos)
           updateDistancesByGroup(lat,lng)
@@ -312,13 +328,107 @@ const onClickRestaurant = (id: string) => {
   setIsSheetOpen(true);
 }
 
+useEffect(() => {
+  if (!mapRef.current || !window.kakao?.maps) return;
+
+  // 모든 마커와 오버레이를 순회
+  markerGroupsRef.current.forEach(({ restaurants, marker, overlay }) => {
+    // 그룹 내 첫 번째 레스토랑 ID를 기준으로 선택 여부 판단
+    const id = restaurants[0].restaurant_id;
+    const isSelected = id === selectedRestaurantId;
+
+    if (marker) {
+      const imageUrl = isSelected ? "/map/mappinExpand.png" : "/map/mappin.png";
+      const imageSize = isSelected
+        ? new window.kakao.maps.Size(48, 60) // 선택된 마커는 더 큰 사이즈
+        : new window.kakao.maps.Size(30, 30); // 선택되지 않은 마커는 기본 사이즈
+
+      const markerImage = new window.kakao.maps.MarkerImage(imageUrl, imageSize);
+      marker.setImage(markerImage);
+      marker.setZIndex(isSelected ? 10 : 1);
+    }
+  });
+}, [selectedRestaurantId]);
 
   // 평택대 버튼
   const moveToPresetPosition=()=>{if(mapRef.current) {mapRef.current.panTo(new window.kakao.maps.LatLng(36.9954,127.1345)); setIsSheetOpen(false)}}
 
   // 내 위치 버튼
   const moveToMyPosition=()=>{if(mapRef.current) {if(currentLocationMarker.current){mapRef.current.panTo(currentLocationMarker.current.getPosition())}else navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude; const lng=pos.coords.longitude; const currentPos=new window.kakao.maps.LatLng(lat,lng); mapRef.current.panTo(currentPos); updateDistancesByGroup(lat,lng); watchUserPosition()})}}
+  // -----------------------
+// ✅ 필터 검색
+// -----------------------
+const handleFilterSearch = async (params: {
+  selectedFoodTypes: string[];
+  selectedTasteTypes: string[];
+  tasteSearchLogic: "AND" | "OR";
+}) => {
+  try {
+    let query = supabase.from("restaurant_profiles").select("restaurant_id");
 
+    if (params.selectedFoodTypes.length > 0) {
+      query = query.overlaps("type", params.selectedFoodTypes);
+    }
+    if (params.selectedTasteTypes.length > 0) {
+      if (params.tasteSearchLogic === "AND") {
+        params.selectedTasteTypes.forEach((taste) => {
+          query = query.contains("taste", [taste]);
+        });
+      } else {
+        query = query.overlaps("taste", params.selectedTasteTypes);
+      }
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (data && data.length > 0 && mapRef.current) {
+      const ids = data.map((d) => d.restaurant_id);
+      const { data: restaurantsData, error: rErr } = await supabase
+        .from("restaurant")
+        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste), image_url")
+        .in("restaurant_id", ids);
+      if (rErr) throw rErr;
+
+      if (restaurantsData) {
+        const cleaned: Restaurant[] = restaurantsData.map((item: any) => {
+          const profiles = Array.isArray(item.restaurant_profiles)
+            ? item.restaurant_profiles
+            : item.restaurant_profiles
+            ? [item.restaurant_profiles]
+            : [];
+          const typeSet = new Set<string>();
+          const tasteSet = new Set<string>();
+          profiles.forEach((p: any) => {
+            (p.type || []).forEach((t: string) => typeSet.add(t));
+            (p.taste || []).forEach((t: string) => tasteSet.add(t));
+          });
+          return {
+            restaurant_id: item.restaurant_id,
+            restaurant_name: item.restaurant_name,
+            address: item.address,
+            phone: item.phone,
+            food_type: Array.from(typeSet),
+            taste_types: Array.from(tasteSet),
+            image_url: item.image_url,
+          };
+        });
+
+        setRestaurants(cleaned);
+        await createGroupedMarkers(mapRef.current, cleaned);
+
+        if (cleaned.length > 0) {
+          setSelectedRestaurantId(cleaned[0].restaurant_id);
+          setIsSheetOpen(true);
+        }
+      }
+    }
+
+    setIsFilterOpen(false);
+  } catch (err) {
+    console.error("필터 검색 오류", err);
+  }
+};  
   // -----------------------
   // JSX
   // -----------------------
@@ -337,7 +447,7 @@ const onClickRestaurant = (id: string) => {
         </SheetTrigger>
         <SheetContent className="w-full sm:max-w-[540px] flex flex-col">
           <SheetTitle className="sr-only">검색 필터</SheetTitle>
-          <SearchFilter_ver3 onSearch={()=>{}} loading={false} sideTF={true}/>
+          <SearchFilter_ver3 onSearch={handleFilterSearch} loading={false} sideTF={true}/>
         </SheetContent>
       </Sheet>
     </div>
