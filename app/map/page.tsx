@@ -11,6 +11,7 @@ import { SearchFilter_ver3 } from "@/components/SearchFilter_ver3";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 
+
 // kakao 전역 선언
 declare global { interface Window { kakao: any } }
 
@@ -206,6 +207,7 @@ export default function MapPage() {
         groupRestaurants.forEach(r => {
           const item = document.createElement("div")
           item.innerText = r.restaurant_name
+          item.dataset.id=r.restaurant_id; //id 저장
           Object.assign(item.style, {
             padding: "4px 6px",
             borderRadius: "4px",
@@ -356,9 +358,32 @@ export default function MapPage() {
     if (group && mapRef.current) {
       mapRef.current.panTo(new window.kakao.maps.LatLng(group.position.lat, group.position.lng));
     }
+    //다중 그룹이면 BOX열기
+    if(group?.overlay){
+      const container=group.overlay.getContent() as HTMLElement;
+      const button=container.querySelector("div") as HTMLElement; //+N 버튼
+      const divs=container.children;
+      const box=divs[1] as HTMLElement;
+
+      if(box && button){
+        box.style.display="block";
+        button.innerText="X";
+        button.style.background="#D5E0F9";
+
+        //기존 하이라이트 제거
+        Array.from(box.children).forEach(el=>
+          el.classList.remove("highlighted-restaurant")
+        );
+        //클릭한 식당 하이라이트
+        const targetItem=box.querySelector(`[data-id="${id}"]`);
+        if(targetItem){
+          targetItem.classList.add("highlighted-restaurant");
+        }
+      }
+    }
     setSelectedRestaurantId(id);
     setIsSheetOpen(true);
-  }
+  };
 
   // -----------------------
   // 마커 강조 (선택 시 이미지 변경)
