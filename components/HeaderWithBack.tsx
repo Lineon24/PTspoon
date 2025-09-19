@@ -96,7 +96,7 @@ export default function HeaderWithBack({ title, iconIndex, iconColor, backTF, bu
             src={image} 
             alt={title} 
             style={{ 
-            height: '24px', 
+            height: '32px', 
             marginRight: '10px', 
             objectFit: 'contain' 
             }} 
