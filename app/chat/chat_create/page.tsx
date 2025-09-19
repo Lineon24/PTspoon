@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import HeaderWithBack from '@/components/HeaderWithBack';
 
-const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png'; // public 폴더에 있는 기본 이미지 경로
+const DEFAULT_IMAGE_URL = '/image/logo_bg.jpg'; // public 폴더에 있는 기본 이미지 경로
 
 const CreateRoomPage = () => {
   const [roomName, setRoomName] = useState('');

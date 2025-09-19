@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback } from "react"; // React 훅 �
 import { supabase } from "@/lib/supabaseClient"; // Supabase 클라이언트 임포트
 import { useRouter } from "next/navigation"; // Next.js 라우터 훅
 import HeaderWithBack from "@/components/HeaderWithBack"; // 뒤로가기 헤더 컴포넌트
+import Image from "next/image";
+
+const DEFAULT_IMAGE_URL = '/image/logo_bgx.png';
 
 // ===== 타입 정의 ===== //
 interface Post { // 게시글 타입 정의
@@ -341,10 +344,17 @@ export default function ProfilePage() {
   return (
     <div className="w-full max-w-[540px] mx-auto flex flex-col h-[calc(100vh-128px)]"> {/* 전체 컨테이너 */}
       <HeaderWithBack title={`내 정보`} backTF={true} /> {/* 헤더 */}
-      <section className="bg-blue-100 p-10 text-center"> {/* 이모지 배너 */}
-        <div className="flex justify-center gap-2 text-xl">
-          {["😀", "🐮", "🐱", "🐸", "🐻"].map((emoji) => (
-            <span key={emoji}>{emoji}</span>
+      <section className="bg-blue-100 p-10 text-center"> {/* 이미지 배너 */}
+        <div className="flex justify-center gap-4">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <Image
+              key={idx}
+              src={DEFAULT_IMAGE_URL}
+              alt="profile banner"
+              width={96}   // 크기 원하는 대로 조절
+              height={96}
+              className="rounded-lg"
+            />
           ))}
         </div>
       </section>
