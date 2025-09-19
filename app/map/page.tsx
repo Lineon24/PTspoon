@@ -296,15 +296,22 @@ export default function MapPage() {
     })
   },[selectedRestaurantId])
 
-  // 리스트 클릭
-  const onClickRestaurant=(id:string)=>{
-    const group=markerGroupsRef.current.find(g=>g.restaurants.some(r=>r.restaurant_id===id))
-    if(group && mapRef.current){
-      mapRef.current.panTo(new window.kakao.maps.LatLng(group.position.lat,group.position.lng))
-    }
-    setSelectedRestaurantId(id)
-    setIsSheetOpen(true)
+// 기존 onClickRestaurant 함수 바로 위에 router는 이미 선언되어 있다고 가정
+const onClickRestaurant = (id: string) => {
+  // 🔥 여기를 추가 — 이미 선택된 아이템을 다시 클릭하면 상세 페이지로 이동
+  if (selectedRestaurantId === id) {
+    router.push(`/restaurants/${id}`);
+    return;
   }
+
+  const group = markerGroupsRef.current.find(g => g.restaurants.some(r => r.restaurant_id === id));
+  if (group && mapRef.current) {
+    mapRef.current.panTo(new window.kakao.maps.LatLng(group.position.lat, group.position.lng));
+  }
+  setSelectedRestaurantId(id);
+  setIsSheetOpen(true);
+}
+
 
   // 평택대 버튼
   const moveToPresetPosition=()=>{if(mapRef.current) {mapRef.current.panTo(new window.kakao.maps.LatLng(36.9954,127.1345)); setIsSheetOpen(false)}}
