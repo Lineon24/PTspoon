@@ -154,6 +154,11 @@ const ChatRoomListPage = () => {
       }}
     >
       <HeaderWithBack title="전체 채팅방 목록" backTF={false} />
+        <div className="fixed bottom-[70px] z-10 flex flex-col items-end w-full max-w-[540px] mx-auto p-7 gap-3" style={{pointerEvents:'none'}}>
+        <button onClick={() => router.push('/chat/ai')} className="z-100 h-14 w-14 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]" style={{pointerEvents:'auto'}}>
+          <img src="/image/logo_bgx.png" alt="평택대" className="w-10 h-10"/>
+        </button>
+      </div>
 
       {/* 버튼 줄 */}
       <div
