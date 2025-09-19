@@ -127,9 +127,14 @@ export default function MapPage() {
     if (groupRestaurants.length === 1) {
       // 단일 마커
       const marker = new window.kakao.maps.Marker({
-        position: new window.kakao.maps.LatLng(lat, lng),
-        clickable: true
-      })
+    position: new window.kakao.maps.LatLng(lat, lng),
+    clickable: true,
+    // 🔥 이 부분을 추가하세요.
+    image: new window.kakao.maps.MarkerImage(
+        '/map/mappin.png', // 원하는 이미지 파일 경로
+        new window.kakao.maps.Size(30, 30) // 이미지 크기 (가로, 세로)
+    ),
+    })
       marker.setMap(map)
       window.kakao.maps.event.addListener(marker, "click", () => {
         setSelectedRestaurantId(groupRestaurants[0].restaurant_id)
@@ -142,15 +147,19 @@ export default function MapPage() {
       const button = document.createElement("div")
       button.innerText = `+${groupRestaurants.length}`
       Object.assign(button.style, {
-        padding: "6px 10px",
-        background: "#3268f8",
-        color: "#fff",
-        borderRadius: "20px",
+        padding: "6px 8px",
+        background: "#ffff",
+        color: "black",
+        borderRadius: "10px",
+        border: "2px solid #2F69E4",
         fontWeight: "bold",
+        fontSize: "13px",
         cursor: "pointer",
         textAlign: "center",
         userSelect: "none",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         position:"relaive",
+        minWidth: "36px",
       })
 
       const box = document.createElement("div")
@@ -160,7 +169,7 @@ export default function MapPage() {
   top: "calc(100% + 4px)", // 버튼 아래로 위치
   left: "50%",
   transform: "translateX(-50%)", // 버튼 중앙 기준 정렬
-  background: "#fff",
+  background: "#ffff",
   padding: "6px",
   borderRadius: "8px",
   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -199,6 +208,7 @@ export default function MapPage() {
         const isOpen = box.style.display !== "none"
         box.style.display = isOpen ? "none" : "block"
         button.innerText = isOpen ? `+${groupRestaurants.length}` : "X"
+        button.style.background = isOpen ? "#ffff" : "#D5E0F9"
       }
 
       const container = document.createElement("div")
@@ -213,7 +223,8 @@ export default function MapPage() {
         position: new window.kakao.maps.LatLng(lat, lng),
         content: container,
         yAnchor: 1,
-        clickable: true
+        clickable: true,
+        zIndex: 30,
       })
       overlay.setMap(map)
 
@@ -262,7 +273,12 @@ export default function MapPage() {
           const lng=pos.coords.longitude
           const currentPos=new window.kakao.maps.LatLng(lat,lng)
           if(!currentLocationMarker.current){
-            currentLocationMarker.current=new window.kakao.maps.Marker({map:mapRef.current,position:currentPos,title:"현재 위치"})
+            currentLocationMarker.current = new window.kakao.maps.Marker({
+            map: mapRef.current,
+            position: currentPos,
+            title: "현재 위치",
+            image: new window.kakao.maps.MarkerImage("/map/mypin.png", new window.kakao.maps.Size(20, 20))
+          });
             mapRef.current.panTo(currentPos)
           }else currentLocationMarker.current.setPosition(currentPos)
           updateDistancesByGroup(lat,lng)
@@ -312,6 +328,27 @@ const onClickRestaurant = (id: string) => {
   setIsSheetOpen(true);
 }
 
+useEffect(() => {
+  if (!mapRef.current || !window.kakao?.maps) return;
+
+  // 모든 마커와 오버레이를 순회
+  markerGroupsRef.current.forEach(({ restaurants, marker, overlay }) => {
+    // 그룹 내 첫 번째 레스토랑 ID를 기준으로 선택 여부 판단
+    const id = restaurants[0].restaurant_id;
+    const isSelected = id === selectedRestaurantId;
+
+    if (marker) {
+      const imageUrl = isSelected ? "/map/mappinExpand.png" : "/map/mappin.png";
+      const imageSize = isSelected
+        ? new window.kakao.maps.Size(48, 60) // 선택된 마커는 더 큰 사이즈
+        : new window.kakao.maps.Size(30, 30); // 선택되지 않은 마커는 기본 사이즈
+
+      const markerImage = new window.kakao.maps.MarkerImage(imageUrl, imageSize);
+      marker.setImage(markerImage);
+      marker.setZIndex(isSelected ? 10 : 1);
+    }
+  });
+}, [selectedRestaurantId]);
 
   // 평택대 버튼
   const moveToPresetPosition=()=>{if(mapRef.current) {mapRef.current.panTo(new window.kakao.maps.LatLng(36.9954,127.1345)); setIsSheetOpen(false)}}
