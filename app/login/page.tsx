@@ -77,7 +77,7 @@ export default function LoginPage() {
       background: '#f7f8fa',
       minHeight: '100vh'
     }}>
-      <HeaderWithBack title="피티스푼" image="/image/PTspoonlogo.png" backTF= {true} /> {/* 상단 고정 헤더 */}
+      <HeaderWithBack title="피티스푼" image="/image/logo_bgx.png" backTF= {true} /> {/* 상단 고정 헤더 */}
       <h2 style={{ marginBottom:20, marginTop:20 }}>로그인</h2>
       <form onSubmit={handleLogin}>
         <input

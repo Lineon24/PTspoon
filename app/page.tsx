@@ -39,7 +39,7 @@ export default function FilterPage() {
     <div className="w-full max-w-[540px] mx-auto py-6 px-4 flex flex-col h-[calc(100vh-128px)] ">
       
       {/* 상단 버튼 영역 */}
-      <HeaderWithBack title="피티스푼" image="/image/PTspoonlogo.png" backTF= {false} /> {/* 상단 고정 헤더 */}
+      <HeaderWithBack title="피티스푼" image="/image/logo_bgx.png"  backTF= {false} /> {/* 상단 고정 헤더 */}
       <div>
         {/* 내 주변 맛집 지도로 찾기 버튼 */}
         <Link href="/map" passHref>

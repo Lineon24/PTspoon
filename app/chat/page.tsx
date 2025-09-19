@@ -15,7 +15,7 @@ interface ChatRoom {
   room_description?: string;
 }
 
-const DEFAULT_IMAGE_URL = '/image/free-icon-food-5134814.png'; // public 폴더에 있는 이미지 경로
+const DEFAULT_IMAGE_URL = '/image/logo_bg.jpg'; // public 폴더에 있는 이미지 경로
 
 const ChatRoomListPage = () => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
