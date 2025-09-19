@@ -318,7 +318,80 @@ const onClickRestaurant = (id: string) => {
 
   // 내 위치 버튼
   const moveToMyPosition=()=>{if(mapRef.current) {if(currentLocationMarker.current){mapRef.current.panTo(currentLocationMarker.current.getPosition())}else navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude; const lng=pos.coords.longitude; const currentPos=new window.kakao.maps.LatLng(lat,lng); mapRef.current.panTo(currentPos); updateDistancesByGroup(lat,lng); watchUserPosition()})}}
+  // -----------------------
+// ✅ 필터 검색
+// -----------------------
+const handleFilterSearch = async (params: {
+  selectedFoodTypes: string[];
+  selectedTasteTypes: string[];
+  tasteSearchLogic: "AND" | "OR";
+}) => {
+  try {
+    let query = supabase.from("restaurant_profiles").select("restaurant_id");
 
+    if (params.selectedFoodTypes.length > 0) {
+      query = query.overlaps("type", params.selectedFoodTypes);
+    }
+    if (params.selectedTasteTypes.length > 0) {
+      if (params.tasteSearchLogic === "AND") {
+        params.selectedTasteTypes.forEach((taste) => {
+          query = query.contains("taste", [taste]);
+        });
+      } else {
+        query = query.overlaps("taste", params.selectedTasteTypes);
+      }
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (data && data.length > 0 && mapRef.current) {
+      const ids = data.map((d) => d.restaurant_id);
+      const { data: restaurantsData, error: rErr } = await supabase
+        .from("restaurant")
+        .select("restaurant_id, restaurant_name, address, phone, restaurant_profiles(type, taste), image_url")
+        .in("restaurant_id", ids);
+      if (rErr) throw rErr;
+
+      if (restaurantsData) {
+        const cleaned: Restaurant[] = restaurantsData.map((item: any) => {
+          const profiles = Array.isArray(item.restaurant_profiles)
+            ? item.restaurant_profiles
+            : item.restaurant_profiles
+            ? [item.restaurant_profiles]
+            : [];
+          const typeSet = new Set<string>();
+          const tasteSet = new Set<string>();
+          profiles.forEach((p: any) => {
+            (p.type || []).forEach((t: string) => typeSet.add(t));
+            (p.taste || []).forEach((t: string) => tasteSet.add(t));
+          });
+          return {
+            restaurant_id: item.restaurant_id,
+            restaurant_name: item.restaurant_name,
+            address: item.address,
+            phone: item.phone,
+            food_type: Array.from(typeSet),
+            taste_types: Array.from(tasteSet),
+            image_url: item.image_url,
+          };
+        });
+
+        setRestaurants(cleaned);
+        await createGroupedMarkers(mapRef.current, cleaned);
+
+        if (cleaned.length > 0) {
+          setSelectedRestaurantId(cleaned[0].restaurant_id);
+          setIsSheetOpen(true);
+        }
+      }
+    }
+
+    setIsFilterOpen(false);
+  } catch (err) {
+    console.error("필터 검색 오류", err);
+  }
+};  
   // -----------------------
   // JSX
   // -----------------------
@@ -337,7 +410,7 @@ const onClickRestaurant = (id: string) => {
         </SheetTrigger>
         <SheetContent className="w-full sm:max-w-[540px] flex flex-col">
           <SheetTitle className="sr-only">검색 필터</SheetTitle>
-          <SearchFilter_ver3 onSearch={()=>{}} loading={false} sideTF={true}/>
+          <SearchFilter_ver3 onSearch={handleFilterSearch} loading={false} sideTF={true}/>
         </SheetContent>
       </Sheet>
     </div>
