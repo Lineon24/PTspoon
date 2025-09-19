@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "맛집 찾기",
-  description: "맛집 찾기",
+  title: "피티스푼",
+  description: "평택대 주변 맞집을 공유하는 사이트",
 };
 
 
