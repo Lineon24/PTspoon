@@ -167,7 +167,7 @@ export default function MapPage() {
         button.innerText = `+${groupRestaurants.length}`
         Object.assign(button.style, {
           padding: "6px 8px",
-          background: "#ffff",
+          background: "#ffffff",
           color: "black",
           borderRadius: "10px",
           border: "2px solid #2F69E4",
@@ -188,7 +188,7 @@ export default function MapPage() {
           top: "calc(100% + 4px)",
           left: "50%",
           transform: "translateX(-50%)",
-          background: "#ffff",
+          background: "#ffffff",
           padding: "6px",
           borderRadius: "8px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
@@ -218,6 +218,7 @@ export default function MapPage() {
             setIsSheetOpen(true)
             box.style.display = "none"
             button.innerText = `+${groupRestaurants.length}`
+            button.style.background = "#ffffff"
           }
           box.appendChild(item)
         })
@@ -228,7 +229,7 @@ export default function MapPage() {
           const isOpen = box.style.display !== "none"
           box.style.display = isOpen ? "none" : "block"
           button.innerText = isOpen ? `+${groupRestaurants.length}` : "X"
-          button.style.background = isOpen ? "#ffff" : "#D5E0F9"
+          button.style.background = isOpen ? "#ffffff" : "#D5E0F9"
         }
 
         const container = document.createElement("div")
@@ -252,7 +253,7 @@ export default function MapPage() {
         window.kakao.maps.event.addListener(map, "click", () => {
           box.style.display = "none"
           button.innerText = `+${groupRestaurants.length}`
-          button.style.background = "#ffff"
+          button.style.background = "#ffffff"
         })
 
         markerGroupsRef.current.push({ position: { lat, lng }, restaurants: groupRestaurants, overlay })
