@@ -232,6 +232,7 @@ export default function MapPage() {
       window.kakao.maps.event.addListener(map, "click", () => {
         box.style.display = "none"
         button.innerText = `+${groupRestaurants.length}`
+        button.style.background = "#ffff"
       })
 
       markerGroupsRef.current.push({ position: { lat, lng }, restaurants: groupRestaurants, overlay })
