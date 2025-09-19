@@ -1,88 +1,101 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { streamText, tool, ModelMessage } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { convertToModelMessages, streamText, UIMessage } from "ai";
 import { supabase } from "@/lib/supabaseClient";
-import { z } from "zod";
 
-export const runtime = "edge";
+let profiles: any[] = [];
+let restaurantInfos: any[] = [];
+let menus: any[] = [];
+let isDataLoaded = false;
 
-const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// --- 전체 데이터 로드 ---
+async function loadAllData() {
+  if (isDataLoaded) return;
 
-// --- zod schema ---
-const searchParamsSchema = z.object({
-  intent: z.enum([
-    "search_by_taste_and_type",
-    "search_by_restaurant_name",
-    "search_by_menu_name",
-    "general_conversation",
-  ] as const),
-  type: z.enum(["한식", "중식", "양식", "일식", "카페", "치킨"]).optional(),
-  taste: z
-    .enum([
-      "매콤한맛","짠맛","담백한맛","얼큰한맛","달콤한맛","이국적인맛",
-      "고소한맛","새콤한맛","시원한맛","진한맛","바삭한맛","쫄깃한맛",
-      "부드러운맛","향긋한맛","개운한맛","감칠맛",
-    ])
-    .optional(),
-  name: z.string().optional(),
-  menu: z.string().optional(),
-});
+  // restaurant_profiles
+  const profilesRes = await supabase.from("restaurant_profiles").select("restaurant_id, type, taste");
+  profiles = profilesRes.data || [];
 
+  // restaurants
+  const restaurantsRes = await supabase.from("restaurant").select("restaurant_id, restaurant_name, address, phone");
+  restaurantInfos = restaurantsRes.data || [];
+
+  // menu
+  const menuRes = await supabase.from("menu").select("*");
+  menus = menuRes.data || [];
+
+  isDataLoaded = true;
+}
+
+// --- DB 필터링 ---
+function filterProfiles(params: { type?: string; taste?: string }) {
+  return profiles.filter(p => {
+    if (params.type && !p.type.includes(params.type)) return false;
+    if (params.taste && !p.taste.includes(params.taste)) return false;
+    return true;
+  });
+}
+
+// --- API POST ---
 export async function POST(req: Request) {
-  const { messages }: { messages: ModelMessage[] } = await req.json();
+  const { messages }: { messages: UIMessage[] } = await req.json();
+  await loadAllData();
 
-  const result = await streamText({
-    model: openai("gpt-4o-mini"),
-    system: "너는 평택대학교 마스코트 '피투'이며, 맛집 전문가야.",
-    messages,
-    tools: {
-      searchRestaurants: tool({
-        description: "사용자의 요청에 따라 DB에서 식당을 검색한다.",
-        schema: searchParamsSchema,   // ✅ parameters → schema
-        handler: async (params: z.infer<typeof searchParamsSchema>) => {
-          const { intent, type, taste, name, menu } = params;
-          let restaurants: any[] = [];
+  const lastPart = messages[messages.length - 1]?.parts?.[0];
+  let userText = "";
+  if (lastPart && lastPart.type === "text") userText = lastPart.text;
 
-          switch (intent) {
-            case "search_by_taste_and_type":
-              const { data: d1 } = await supabase.rpc("search_restaurants", {
-                p_type: type ?? null,
-                p_taste: taste ?? null,
-              });
-              restaurants = d1 ?? [];
-              break;
-            case "search_by_restaurant_name":
-              const { data: d2 } = await supabase.rpc(
-                "search_by_restaurant_name",
-                { p_name: name ?? null }
-              );
-              restaurants = d2 ?? [];
-              break;
-            case "search_by_menu_name":
-              const { data: d3 } = await supabase.rpc("search_by_menu_name", {
-                p_menu: menu ?? null,
-              });
-              restaurants = d3 ?? [];
-              break;
-          }
+  // --- 키워드 분석 ---
+  const typeKeywords = ["한식","중식","양식","일식","치킨","카페"];
+  const tasteKeywords = ["매콤","달콤","짠","고소","담백","얼큰","이국적","시원","진한","바삭","쫄깃","부드러운","향긋","감칠","새콤","개운"];
 
-          if (restaurants.length === 0) return "검색된 결과가 없습니다피!";
+  const type = typeKeywords.find(t => userText.includes(t));
+  const tasteKeyword = tasteKeywords.find(t => userText.includes(t));
 
-          return restaurants
-            .map(
-              (r) =>
-                `가게 이름: ${r.restaurant_name}, 주소: ${r.address}, 종류: ${r.type?.join(
-                  ", "
-                )}, 맛 특징: ${r.taste?.join(", ")}, 메뉴: ${r.menu
-                  ?.map((m: any) => `${m.menu} (${m.price})`)
-                  .join(", ")}`
-            )
-            .join("\n\n");
-        },
-      }),
-    },
+  const filteredProfiles = filterProfiles({ type, taste: tasteKeyword });
+
+  // --- 추천 텍스트 생성 (HTML 하이퍼링크 포함) ---
+  let recommendationText = "";
+  if (!filteredProfiles.length) {
+    recommendationText = "검색된 DB 결과가 없습니다. 일반 지식을 참고해 안내드릴게요.";
+  } else {
+    recommendationText = filteredProfiles
+      .map(p => {
+        const info = restaurantInfos.find(r => r.restaurant_id === p.restaurant_id);
+        if (!info) return "";
+        const menuStr = menus
+          .filter(m => m.restaurant_id === p.restaurant_id)
+          .map(m => `${m.menu} (${m.price})`)
+          .join(", ");
+        const link = `https://restaurant-find-one.vercel.app/restaurants/${p.restaurant_id}`;
+        return `가게: <a href="${link}" target="_blank" rel="noopener noreferrer">${info.restaurant_name}</a>
+주소: ${info.address}
+전화: ${info.phone}
+종류: ${p.type.join(", ")}
+맛: ${p.taste.join(", ")}
+메뉴: ${menuStr}`;
+      })
+      .filter(Boolean)
+      .join("<br><br>");
+  }
+
+  // --- GPT 메시지 ---
+  const responseMessage: UIMessage = {
+    id: crypto.randomUUID(),
+    role: "assistant",
+    parts: [{ type: "text", text: recommendationText }],
+  };
+
+  const result = streamText({
+    model: openai("gpt-4.1-mini"),
+    system: `
+      너는 평택대학교 마스코트 '피투'야. 친근하고 귀여운 말투로 대답을 해줘.
+      사용자가 식당이나 메뉴를 명확하게 추천해달라고 요청할 때만 추천을 해줘 그외에는 일상적인 대화를 하면 돼.
+      DB에서 찾은 정보가 있다면, 최대 3개의 식당을 링크와 함께 안내해줘. 만약 3개 미만이 검색되면 있는 식당만 알려주면 돼.
+      만약 DB에 없는 내용이라면, DB를 언급하지 말고 그냥 일반적인 정보(예: "그 메뉴는 평택대 주변에 유명한 곳이 없어요.")로 친절하고 귀엽게 안내해줘. 절대 DB에 없는 정보를 있는 것처럼 꾸며내지 마.
+      "더 추천해줘"와 같은 추가 요청이 있을 때만 3개를 초과해서 추천해줘.
+    `,
+    messages: convertToModelMessages([...messages, responseMessage]),
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }

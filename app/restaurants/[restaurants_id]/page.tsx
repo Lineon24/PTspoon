@@ -64,7 +64,7 @@ function RestaurantDetail(){
   const openReview = () => {
     setContentType("review"); // 리뷰 화면으로 전환
   };
-
+if (restaurantId)
   return(
     <div className="max-w-[540px] mx-auto pb-10">
       {/* 상단 헤더 */}
