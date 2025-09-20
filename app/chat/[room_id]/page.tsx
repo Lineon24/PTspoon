@@ -1,5 +1,5 @@
 'use client';
-import { TagAutoSearch } from '@/components/TagAutoSearch';
+
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, useParams } from 'next/navigation'; 
@@ -25,10 +25,6 @@ interface Chat_rooms {
   room_name: string;
 }
 
-function getTagKeyword(text:string):string{
-  const match=text.match(/#(\S+)$/);
-  return match?match[1]:'';
-}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,7 +33,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const [chatRoom, setChatRoom] = useState<Chat_rooms | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [isAtBottom, setIsAtBottom] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const chatListRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -112,10 +108,9 @@ export default function ChatPage() {
   // 채팅방 진입 시 맨 아래로 스크롤
   useEffect(() => {
     if (messages.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-      setIsAtBottom(true);
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, []);
 
   // 새 메시지 도착 시, 스크롤이 맨 아래일 때만 자동 스크롤
   useEffect(() => {
@@ -128,7 +123,7 @@ export default function ChatPage() {
   const handleScroll = () => {
     const el = chatListRef.current;
     if (!el) return;
-    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 10;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 20;
     setIsAtBottom(atBottom);
   };
 
@@ -188,6 +183,7 @@ export default function ChatPage() {
 
     setInput("");
     setImageFile(null);
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading) return (
@@ -211,7 +207,7 @@ export default function ChatPage() {
         maxWidth: 540,
         width: '100%',
         margin: '0 auto',
-        minHeight: '100svh',
+        height: '100svh',
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
