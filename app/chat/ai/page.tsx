@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useEffect, useRef, useState, JSX } from 'react';
+import { useEffect, useRef, useState, JSX, useLayoutEffect} from 'react';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { SendHorizontal } from 'lucide-react';
 
@@ -60,7 +60,8 @@ export default function AiChatPage() {
   const [messages, setMessages] = useState<NormalizedMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [lastSentByUser, setLastSentByUser] = useState(false);
 
   // chatMessages -> messages 상태에 정규화
   useEffect(() => {
@@ -75,38 +76,43 @@ export default function AiChatPage() {
     setMessages(updated);
   }, [chatMessages]);
 
-  // 자동 스크롤
-  useEffect(() => {
-    if (isUserScrolling) return;
+const handleScroll = () => {
+  const el = containerRef.current;
+  if (!el) return;
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+  setIsAtBottom(atBottom);
+};
 
-    if (status !== 'ready') {
-      const iv = setInterval(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 250);
-      return () => clearInterval(iv);
-    } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, status, isUserScrolling]);
+// 메시지 업데이트 시 스크롤 처리
+useLayoutEffect(() => {
+  if (!messagesEndRef.current) return;
 
-  const handleScroll = () => {
-    const el = containerRef.current;
-    if (!el) return;
-    const { scrollTop, clientHeight, scrollHeight } = el;
-    setIsUserScrolling(scrollTop + clientHeight < scrollHeight - 20);
-  };
+  if (lastSentByUser) {
+    // 사용자 메시지는 항상 맨 아래로
+    setLastSentByUser(false);
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100); // 100ms 지연
+    return;
+  }
 
-  // 메시지 전송
-  const onSend = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!input.trim()) return;
+  // AI/외부 메시지는 맨 아래일 때만 스크롤
+  if (isAtBottom) {
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}, [messages, lastSentByUser, isAtBottom]);
 
-    const messageToSend = input;  // 보내는 메시지 저장
-    setInput(''); // 전송 즉시 입력창 비우기
-    await sendMessage({ text: messageToSend });
-    
-    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
-  };
+// 사용자 메시지 전송
+const onSend = async (e?: React.FormEvent) => {
+  if (e) e.preventDefault();
+  if (!input.trim()) return;
+
+  const messageToSend = input;
+  setInput('');
+
+  setLastSentByUser(true); // 사용자 메시지 전송 표시
+  await sendMessage({ text: messageToSend });
+};
 
   return (
     <main
@@ -114,7 +120,7 @@ export default function AiChatPage() {
         maxWidth: 540,
         width: '100%',
         margin: '0 auto',
-        minHeight: '90svh',
+        height: '100svh',
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
@@ -126,7 +132,7 @@ export default function AiChatPage() {
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        style={{ flex: 1, overflowY: 'auto', padding: 12 }}
+        style={{ flex: 1, overflowY: 'auto', padding: 12, minHeight: 0,}}
       >
         {messages.map((m, idx) => {
           const elements = linkify(m.text || '');
