@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useEffect, useRef, useState, JSX, useLayoutEffect} from 'react';
+import { useEffect, useRef, useState, JSX, useLayoutEffect } from 'react';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import { SendHorizontal } from 'lucide-react';
 
@@ -55,15 +55,28 @@ function getMessageText(msg: any): string {
 }
 
 export default function AiChatPage() {
-  const { messages: chatMessages, sendMessage, status } = useChat();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let id = localStorage.getItem('pitu_ai_user_id');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('pitu_ai_user_id', id);
+    }
+    setUserId(id);
+  }, []);
+  
+  const { messages: chatMessages, sendMessage, status, error, clearError } = useChat();
+
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<NormalizedMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [lastSentByUser, setLastSentByUser] = useState(false);
+  
+  const [countdown, setCountdown] = useState<number | null>(null);
 
-  // chatMessages -> messages 상태에 정규화
   useEffect(() => {
     if (!Array.isArray(chatMessages)) return;
 
@@ -76,43 +89,84 @@ export default function AiChatPage() {
     setMessages(updated);
   }, [chatMessages]);
 
-const handleScroll = () => {
-  const el = containerRef.current;
-  if (!el) return;
-  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-  setIsAtBottom(atBottom);
-};
+  const handleScroll = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    setIsAtBottom(atBottom);
+  };
 
-// 메시지 업데이트 시 스크롤 처리
-useLayoutEffect(() => {
-  if (!messagesEndRef.current) return;
+  useLayoutEffect(() => {
+    if (!messagesEndRef.current) return;
 
-  if (lastSentByUser) {
-    // 사용자 메시지는 항상 맨 아래로
-    setLastSentByUser(false);
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100); // 100ms 지연
-    return;
-  }
+    if (lastSentByUser) {
+      setLastSentByUser(false);
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+      return;
+    }
 
-  // AI/외부 메시지는 맨 아래일 때만 스크롤
-  if (isAtBottom) {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-}, [messages, lastSentByUser, isAtBottom]);
+    if (isAtBottom) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [messages, lastSentByUser, isAtBottom]);
 
-// 사용자 메시지 전송
-const onSend = async (e?: React.FormEvent) => {
-  if (e) e.preventDefault();
-  if (!input.trim()) return;
+  const onSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!input.trim() || !userId) return;
 
-  const messageToSend = input;
-  setInput('');
+    if (status === 'error') {
+      clearError();
+      return;
+    }
+    
+    const messageToSend = input;
+    setInput('');
 
-  setLastSentByUser(true); // 사용자 메시지 전송 표시
-  await sendMessage({ text: messageToSend });
-};
+    setLastSentByUser(true);
+    await sendMessage({ text: messageToSend, metadata: { userId } });
+  };
+
+  useEffect(() => { // 상태 api를 통해 남은 시간을 가져오는 로직
+    const checkRateLimitStatus = async () => {
+      if (status === 'error') {
+        try {
+          const res = await fetch(`/api/status?userId=${userId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.isBlocked) {
+              setCountdown(data.remainingTime);
+            } else {
+              setCountdown(0);
+            }
+          }
+        } catch (e) {
+          console.error("Failed to fetch rate limit status:", e);
+          setCountdown(0);
+        }
+      }
+    };
+    if (userId) {
+      checkRateLimitStatus();
+    }
+  }, [status, userId]);
+
+  useEffect(() => { // 카운트 담당 로직 겸 카운트다운 이상한 값 일시 수정
+    if (countdown === null || countdown <= 0) {
+      if (countdown === 0) {
+        setCountdown(null);
+        clearError();
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [countdown, clearError]);
 
   return (
     <main
@@ -132,7 +186,7 @@ const onSend = async (e?: React.FormEvent) => {
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        style={{ flex: 1, overflowY: 'auto', padding: 12, minHeight: 0,}}
+        style={{ flex: 1, overflowY: 'auto', padding: 12, minHeight: 0 }}
       >
         {messages.map((m, idx) => {
           const elements = linkify(m.text || '');
@@ -197,8 +251,14 @@ const onSend = async (e?: React.FormEvent) => {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            disabled={status !== 'ready'}
-            placeholder={status === 'ready' ? '메시지를 입력하세요...' : '피투가 열심히 생각 중이에요!'}
+            disabled={status !== 'ready' || countdown !== null}
+            placeholder={
+              countdown !== null && countdown > 0
+                ? `피투가 너무 많은 질문을 받았어요. ${countdown}초 후에 다시 시도해주세요.`
+                : status === 'ready'
+                  ? '메시지를 입력하세요...'
+                  : '피투가 열심히 생각 중이에요!'
+            }
             style={{
               flex: 1,
               borderRadius: 8,
@@ -209,12 +269,12 @@ const onSend = async (e?: React.FormEvent) => {
           />
           <button
             type="submit"
-            disabled={status !== 'ready' || !input.trim()}
+            disabled={status !== 'ready' || countdown !== null || !input.trim()}
             style={{
               padding: '8px 12px',
               borderRadius: 999,
               border: 'none',
-              background: status === 'ready' && input.trim() ? '#2e7fff' : '#ccc',
+              background: (status === 'ready' && countdown === null && input.trim()) ? '#2e7fff' : '#ccc',
               color: '#fff',
               cursor: 'pointer',
             }}

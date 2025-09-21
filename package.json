@@ -15,8 +15,11 @@
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
-    "@supabase/supabase-js": "^2.52.0",
-    "ai": "^5.0.47",
+    "@supabase/supabase-js": "^2.57.4",
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.4",
+    "@vercel/kv": "^3.0.0",
+    "ai": "^5.0.48",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.15",
@@ -26,7 +29,7 @@
     "react-dom": "^19.1.0",
     "react-responsive-carousel": "^3.2.23",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.1.9"
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
