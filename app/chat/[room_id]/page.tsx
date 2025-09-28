@@ -362,10 +362,11 @@ useEffect(() => {
             style={{
               flexShrink: 0,
               display: 'flex',
+              marginBottom: '3px',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 28,
-              height: 28,
+              width: 30,
+              height: 30,
               borderRadius: '50%',
               backgroundColor: '#2e7fff',
               boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
