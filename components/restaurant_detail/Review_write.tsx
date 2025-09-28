@@ -124,7 +124,7 @@ export default function Review_write({
         onChange={(e) => setNewReviewContent(e.target.value)}
         placeholder="식당 후기를 작성해주세요."
         rows={4}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-400"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#007bff]"
       />
 
       {/* 제출 버튼 */}
