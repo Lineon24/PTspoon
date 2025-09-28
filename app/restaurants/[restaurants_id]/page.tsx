@@ -16,9 +16,14 @@ interface Profile{
   id:string;
   nickname:string;
 }
+interface Restaurant {
+  restaurant_id: string;
+}
 
 function RestaurantDetail(){
   const params = useParams(); // URL에서 restaurants_id를 가져옴
+  const [restaurant_id, setRestaurant_id] = useState<Restaurant | null>(null);
+  const [loading, setLoading] = useState(true);
   const [contentType, setContentType] = useState<"menu"|"review"|null>("menu"); 
   // 현재 보여질 콘텐츠 타입 상태 ("menu" 또는 "review")
 
@@ -27,15 +32,26 @@ function RestaurantDetail(){
     ? params.restaurants_id[0] // 배열이면 첫번째 값 사용
     : params.restaurants_id;   // 문자열이면 그대로 사용
 
-  console.log("useParams params:", params);
-  console.log("restaurantId after normalization:", restaurantId);
-
   const [profile, setProfile] = useState<Profile|null>(null); // 사용자 프로필 상태
 
-  // 레스토랑 ID가 없으면 오류 메시지 출력
-  if(!restaurantId){
-    return <p>해당 레스토랑을 찾을 수 없습니다.</p>
-  }
+  useEffect(() => {
+    if (!restaurantId) return;
+    const fetchRestaurant_id = async () => {
+      const { data, error } = await supabase
+        .from('restaurant')
+        .select('restaurant_id')
+        .eq('restaurant_id', (restaurantId))
+        .single();
+      if (error) {
+        console.error('레스토랑 불러오기 실패:', error);
+        setRestaurant_id(null);
+      } else {
+        setRestaurant_id(data);
+      }
+      setLoading(false);
+    };
+    fetchRestaurant_id();
+  }, [restaurantId]);
 
   // 사용자 로그인 상태 및 프로필 정보 불러오기
   useEffect(()=>{
@@ -64,7 +80,21 @@ function RestaurantDetail(){
   const openReview = () => {
     setContentType("review"); // 리뷰 화면으로 전환
   };
-if (restaurantId)
+
+  if (loading) return (
+    <main>
+      <HeaderWithBack title='식당 상세' backTF={true} />
+      <div style={{ margin: 60, textAlign: 'center' }}>로딩중...</div>
+    </main>
+  );
+
+  if (restaurant_id == null) return (
+      <main>
+        <HeaderWithBack title='식당 상세' backTF={true} />
+        <div style={{ margin: 60, textAlign: 'center' }}>잘못된 페이지 접근 입니다..</div>
+      </main>
+  );
+  if (restaurantId)
   return(
     <div className="max-w-[540px] mx-auto pb-10">
       {/* 상단 헤더 */}
