@@ -39,6 +39,7 @@ export default function ChatPage() {
   const router = useRouter();
   const { room_id } = useParams();
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -185,6 +186,16 @@ export default function ChatPage() {
     setImageFile(null);
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+const autoResize = (el: HTMLTextAreaElement) => {
+  el.style.height = "auto"
+  el.style.height = el.scrollHeight + "px"
+}
+
+useEffect(() => {
+  if (textareaRef.current) {
+    autoResize(textareaRef.current)
+  }
+}, [input])
 
   if (loading) return (
     <main>
@@ -333,7 +344,7 @@ export default function ChatPage() {
         {/* 입력 영역 */}
         <div style={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           gap: 4,
           flexWrap: 'nowrap'
         }}>
@@ -369,18 +380,31 @@ export default function ChatPage() {
             }}>+</span>
           </label>
 
-          <input
+          <textarea
+            maxLength={300}
+            rows={1}
+            ref={textareaRef}
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMessage()}
+            onChange={e => {
+              setInput(e.target.value)
+              autoResize(e.target)
+            }}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                sendMessage()
+              }
+            }}
             placeholder="메시지를 입력하세요"
             style={{
               flex: 1,
               borderRadius: 8,
-              border: '1.2px solid #d2e0f4',
+              border: "1.2px solid #d2e0f4",
               fontSize: 14,
-              padding: '7px 9px',
-              minWidth: 0
+              padding: "7px 9px",
+              minWidth: 0,
+              resize: "none", // 사용자가 직접 드래그해서 늘리는 건 방지
+              overflow: "hidden", // 스크롤바 안 보이게
             }}
           />
           <button

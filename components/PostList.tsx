@@ -205,7 +205,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
               maxWidth: '540px', // 최대 너비 설정 (선택 사항)
               margin: '12px 0', // 게시글 내용과 이미지 사이 간격
             }}>
-              <div onDoubleClick={(e) => e.stopPropagation()}> {/*이미지 좌우 클릭 시 사이트 이동 막기*/}
+            {/*<div onDoubleClick={(e) => e.stopPropagation()}> {/*이미지 좌우 클릭 시 사이트 이동 막기*/}
               <Carousel
                 showArrows={true} // 좌우 화살표 표시
                 showStatus={false} // 현재 이미지 번호/총 이미지 번호 표시 (선택 사항)
@@ -228,7 +228,7 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
                   </div>
                 ))}
                 </Carousel>
-                </div>
+                {/*</div>  이미지 좌우 클릭 시 사이트 이동 막기*/}
               </div>
               )}
           <p style={{ marginLeft: '5px', fontSize: '15px', color: '#444', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{post.content}</p>

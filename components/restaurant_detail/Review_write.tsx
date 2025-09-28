@@ -120,6 +120,7 @@ export default function Review_write({
       {/* 리뷰 입력 */}
       <textarea
         value={newReviewContent}
+        maxLength={300}
         onChange={(e) => setNewReviewContent(e.target.value)}
         placeholder="식당 후기를 작성해주세요."
         rows={4}

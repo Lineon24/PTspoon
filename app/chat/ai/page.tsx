@@ -77,6 +77,12 @@ export default function AiChatPage() {
   
   const [countdown, setCountdown] = useState<number | null>(null);
 
+  const autoResize = (el: HTMLTextAreaElement) => {
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+  }
+
+
   useEffect(() => {
     if (!Array.isArray(chatMessages)) return;
 
@@ -247,36 +253,50 @@ export default function AiChatPage() {
           zIndex: 3,
         }}
       >
-        <form onSubmit={onSend} style={{ display: 'flex', gap: 8 }}>
-          <input
+        <form onSubmit={onSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end'}}>
+          <textarea
+            rows={1}
+            maxLength={300}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
             disabled={status !== 'ready' || countdown !== null}
+            onChange={(e) => {
+            setInput(e.target.value)
+            autoResize(e.target) // 높이 자동 조절
+            }}
             placeholder={
               countdown !== null && countdown > 0
                 ? `피투가 너무 많은 질문을 받았어요. ${countdown}초 후에 다시 시도해주세요.`
                 : status === 'ready'
-                  ? '메시지를 입력하세요...'
-                  : '피투가 열심히 생각 중이에요!'
-            }
+                ? '메시지를 입력하세요...'
+                : '피투가 열심히 생각 중이에요!'
+              }
             style={{
-              flex: 1,
-              borderRadius: 8,
-              border: '1px solid #d2e0f4',
-              padding: '8px 10px',
-              fontSize: 14,
+            flex: 1,
+            borderRadius: 8,
+            border: '1px solid #d2e0f4',
+            padding: '8px 10px',
+            fontSize: 14,
+            resize: 'none',    // 드래그로 크기 조절 막기
+            overflow: 'hidden' // 스크롤바 안 보이게
             }}
           />
           <button
             type="submit"
             disabled={status !== 'ready' || countdown !== null || !input.trim()}
             style={{
-              padding: '8px 12px',
-              borderRadius: 999,
-              border: 'none',
-              background: (status === 'ready' && countdown === null && input.trim()) ? '#2e7fff' : '#ccc',
+              width: 40,              
+              height: 40,             
+              borderRadius: "50%",    
+              border: "none",
+              background: (status === 'ready' && countdown === null && input.trim())
+               ? '#2e7fff'
+               : '#ccc',
               color: '#fff',
-              cursor: 'pointer',
+              cursor: "pointer",
+              flexShrink: 0,           
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <SendHorizontal size={18} />

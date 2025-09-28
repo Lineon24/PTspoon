@@ -384,6 +384,7 @@ return (
                   <form onSubmit={handleSubmitComment} style={{ display: 'flex', gap: '8px', margin: '5px 3px 15px 5px' }}>
                     <input
                       type="text"
+                      maxLength={200}
                       placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
                       value={newCommentContent}
                       onChange={(e) => setNewCommentContent(e.target.value)}

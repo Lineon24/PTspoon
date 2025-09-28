@@ -27,7 +27,6 @@ export default function AllPostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const router = useRouter();
 
   // 사용자 로그인 상태 및 프로필 정보 불러오기
   useEffect(() => {

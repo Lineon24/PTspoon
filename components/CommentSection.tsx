@@ -152,6 +152,7 @@ const deleteComment = async (commentId: string) => { // 댓글 삭제 부분
       <form onSubmit={handleSubmitComment} style={{ width: '100%', display: 'flex', gap: '8px', marginTop: '15px', margin: '15px 0'}}>
         <input
           type="text"
+          maxLength={200}
           placeholder={profile ? "댓글을 입력하세요..." : "로그인 후 댓글을 작성할 수 있습니다."}
           value={newCommentContent}
           onChange={(e) => setNewCommentContent(e.target.value)}
