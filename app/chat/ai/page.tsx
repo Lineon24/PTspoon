@@ -76,7 +76,7 @@ export default function AiChatPage() {
   const [lastSentByUser, setLastSentByUser] = useState(false);
   
   const [countdown, setCountdown] = useState<number | null>(null);
-
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const autoResize = (el: HTMLTextAreaElement) => {
   el.style.height = 'auto'
   el.style.height = el.scrollHeight + 'px'
@@ -120,13 +120,13 @@ export default function AiChatPage() {
 
   const onSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim() || !userId) return;
+    if (!input.trim() || !userId || !textareaRef.current) return;
 
     if (status === 'error') {
       clearError();
       return;
     }
-    
+    textareaRef.current.style.height = 'auto'; 
     const messageToSend = input;
     setInput('');
 
@@ -255,6 +255,7 @@ export default function AiChatPage() {
       >
         <form onSubmit={onSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end'}}>
           <textarea
+            ref={textareaRef}
             rows={1}
             maxLength={300}
             value={input}
@@ -262,6 +263,12 @@ export default function AiChatPage() {
             onChange={(e) => {
             setInput(e.target.value)
             autoResize(e.target) // 높이 자동 조절
+            }}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                onSend()
+              }
             }}
             placeholder={
               countdown !== null && countdown > 0
