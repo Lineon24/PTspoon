@@ -39,6 +39,7 @@ export default function ChatPage() {
   const params = useParams(); // { room_id } 대신 params 사용
   const imageInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const mainRef = useRef<HTMLElement>(null);  
 
   const room_id = Array.isArray(params.room_id) ? params.room_id[0] : params.room_id;
 
@@ -140,6 +141,33 @@ useEffect(() => {
   };
 }, [room_id, profile]);
 
+useEffect(() => {
+  const mainEl = mainRef.current;
+  if (!mainEl) return;
+
+  const handleResize = () => {
+    if (window.visualViewport) {
+      // visualViewport API로 실제 보이는 높이를 정확히 측정
+      mainEl.style.height = `${window.visualViewport.height}px`;
+    }
+  };
+
+  // 처음 로드될 때 높이 설정
+  handleResize();
+
+  // 브라우저 UI(주소창, 하단 바) 크기가 변할 때마다 높이를 다시 설정
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleResize);
+  }
+
+  // 컴포넌트가 사라질 때 이벤트 리스너 제거
+  return () => {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', handleResize);
+    }
+  };
+}, []);
+
   const sendMessage = async () => {
     if (!profile || !room_id || (!input.trim() && !imageFile)) return;
     const textToSend = input;
@@ -202,7 +230,7 @@ useEffect(() => {
         width: '100%',
         margin: '0 auto',
         paddingTop: '44px',
-        height: '100svh',
+        // height: '100svh',
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
