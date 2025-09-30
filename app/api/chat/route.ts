@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     parts: [{ type: "text", text: instructionText }],
   };
 
-  const limitedMessages = messages.slice(-4, -1);
+  const limitedMessages = messages.slice(-8, -1);
   
   const result = streamText({
     model: openai("gpt-4.1-mini"),

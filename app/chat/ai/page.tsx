@@ -72,15 +72,25 @@ export default function AiChatPage() {
   const [messages, setMessages] = useState<NormalizedMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true); // 초기값을 true로 설정
   const [lastSentByUser, setLastSentByUser] = useState(false);
   
   const [countdown, setCountdown] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  
+  // ⭐ 2. autoResize 함수를 스크롤까지 처리하는 개선된 버전으로 교체합니다.
   const autoResize = (el: HTMLTextAreaElement) => {
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
-  }
+    const chatContainer = containerRef.current;
+    if (!chatContainer) return;
+    const isScrolledToBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 5;
+
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+
+    if (isScrolledToBottom) {
+      setTimeout(() => { chatContainer.scrollTop = chatContainer.scrollHeight; }, 0);
+    }
+  };
 
 
   useEffect(() => {
@@ -107,14 +117,14 @@ export default function AiChatPage() {
 
     if (lastSentByUser) {
       setLastSentByUser(false);
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
+      // autoResize가 스크롤을 처리하므로 여기서는 즉시 이동으로 변경하거나,
+      // autoResize와 로직을 합칠 수 있습니다. 여기서는 유지합니다.
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
     if (isAtBottom) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, lastSentByUser, isAtBottom]);
 
@@ -131,7 +141,7 @@ export default function AiChatPage() {
     setInput('');
 
     setLastSentByUser(true);
-    await sendMessage({ text: messageToSend, metadata: { userId } });
+      await sendMessage({ text: messageToSend, metadata: { userId } });
   };
 
   useEffect(() => { // 상태 api를 통해 남은 시간을 가져오는 로직
@@ -166,19 +176,34 @@ export default function AiChatPage() {
       }
       return;
     }
-
     const timer = setInterval(() => {
       setCountdown((prev) => (prev ? prev - 1 : 0));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [countdown, clearError]);
+
+  const placeholderText =
+    countdown !== null && countdown > 0
+      ? `피투가 너무 많은 질문을 받았어요. ${countdown}초 후에 다시 시도해주세요.`
+      : status === 'ready'
+      ? '메시지를 입력하세요...'
+      : '피투가 열심히 생각 중이에요!';
+
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea && textarea.value === '' && placeholderText) {
+      textarea.value = placeholderText;
+      autoResize(textarea);
+      textarea.value = '';
+    }
+  }, [placeholderText]);
 
   return (
     <main
       style={{
         maxWidth: 540,
         width: '100%',
+        paddingTop: '44px',
         margin: '0 auto',
         height: '100svh',
         background: '#f5f8fb',
@@ -239,18 +264,14 @@ export default function AiChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* ⭐ 1. 입력창에서 position: fixed 관련 스타일을 모두 제거합니다. */}
       <div
         style={{
           width: '100%',
           padding: 8,
           background: '#fff',
           borderTop: '1.5px solid #e6eaf2',
-          position: 'fixed',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          maxWidth: 540,
-          zIndex: 3,
+          flexShrink: 0, // 입력창이 찌그러지는 것을 방지
         }}
       >
         <form onSubmit={onSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end'}}>
@@ -261,8 +282,8 @@ export default function AiChatPage() {
             value={input}
             disabled={status !== 'ready' || countdown !== null}
             onChange={(e) => {
-            setInput(e.target.value)
-            autoResize(e.target) // 높이 자동 조절
+              setInput(e.target.value)
+              autoResize(e.target) // 높이 자동 조절
             }}
             onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -270,37 +291,31 @@ export default function AiChatPage() {
                 onSend()
               }
             }}
-            placeholder={
-              countdown !== null && countdown > 0
-                ? `피투가 너무 많은 질문을 받았어요. ${countdown}초 후에 다시 시도해주세요.`
-                : status === 'ready'
-                ? '메시지를 입력하세요...'
-                : '피투가 열심히 생각 중이에요!'
-              }
+            placeholder={placeholderText} 
             style={{
-            flex: 1,
-            borderRadius: 8,
-            border: '1px solid #d2e0f4',
-            padding: '8px 10px',
-            fontSize: 14,
-            resize: 'none',    // 드래그로 크기 조절 막기
-            overflow: 'hidden' // 스크롤바 안 보이게
+              flex: 1,
+              borderRadius: 8,
+              border: '1px solid #d2e0f4',
+              padding: '8px 10px',
+              fontSize: 14,
+              resize: 'none',
+              overflow: 'hidden'
             }}
           />
           <button
             type="submit"
             disabled={status !== 'ready' || countdown !== null || !input.trim()}
             style={{
-              width: 40,              
-              height: 40,             
-              borderRadius: "50%",    
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
               border: "none",
               background: (status === 'ready' && countdown === null && input.trim())
-               ? '#2e7fff'
-               : '#ccc',
+                ? '#2e7fff'
+                : '#ccc',
               color: '#fff',
               cursor: "pointer",
-              flexShrink: 0,           
+              flexShrink: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
