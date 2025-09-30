@@ -205,7 +205,7 @@ export default function AiChatPage() {
         width: '100%',
         paddingTop: '44px',
         margin: '0 auto',
-        height: '100svh',
+        height: '100dvh',
         background: '#f5f8fb',
         fontFamily: 'Pretendard, Noto Sans KR, sans-serif',
         display: 'flex',
