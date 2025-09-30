@@ -210,7 +210,7 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
       <HeaderWithBack title="게시글 작성" backTF= {true} /> {/* 상단 고정 헤더 */}
-      <div style={{ height: '60px' }}></div>
+      <div style={{ height: '20px' }}></div>
 
       {/* 게시글 작성 폼 */}
       <form onSubmit={handleSubmitPost} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px', padding: '20px', background: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>

@@ -320,7 +320,7 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
-            <p className="text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString()}</p>
+            <p className="text-gray-500 mt-2 text-xs">{new Date(p.created_at).toLocaleDateString()}</p>
           </>
         )}
       />
@@ -342,9 +342,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="w-full max-w-[540px] mx-auto flex flex-col h-[calc(100vh-128px)]"> {/* 전체 컨테이너 */}
+    <div className="w-full max-w-[540px] mx-auto flex flex-col"> {/* 전체 컨테이너 */}
       <HeaderWithBack title={`내 정보`} backTF={true} /> {/* 헤더 */}
-      <section className="bg-blue-100 p-10 text-center"> {/* 이미지 배너 */}
+      <section className="bg-blue-100 p-3 text-center"> {/* 이미지 배너 */}
         <div className="flex justify-center gap-4">
           {Array.from({ length: 3 }).map((_, idx) => (
             <Image
