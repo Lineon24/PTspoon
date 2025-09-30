@@ -238,8 +238,8 @@ useEffect(() => {
               {msg.username}
             </span>
             <div style={{ padding: '8px 13px', borderRadius: 13, background: msg.user_id === profile.id ? '#e6f0ff' : '#fff', fontWeight: 500, color: '#1d1d1f', maxWidth: '86%', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+              {msg.msg_image && (<img src={msg.msg_image} alt="msg-img" style={{ marginTop: 8, marginBottom: 10, maxWidth: '100%', borderRadius: 8, display: 'block' }}/>)}
               {msg.content && (msg.content.startsWith('#') ? <RestaurantMessage tag={msg.content.slice(1)} /> : <span>{msg.content}</span>)}
-              {msg.msg_image && (<img src={msg.msg_image} alt="msg-img" style={{ marginTop: 8, maxWidth: '100%', borderRadius: 8, display: 'block' }}/>)}
             </div>
           </div>
         )}
