@@ -31,7 +31,7 @@ export default function RootLayout({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          minHeight: '100svh',
           margin: 0,
         }}
       >
