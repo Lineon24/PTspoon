@@ -132,7 +132,7 @@ export default function AiChatPage() {
   
   // 사용자가 스크롤을 위로 올려서 이전 내용을 보고 있는 경우(isAtBottom === false)에는 아무 동작도 하지 않습니다.
 
-}, [messages]);
+}, [messages, lastSentByUser]);
 
   const onSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

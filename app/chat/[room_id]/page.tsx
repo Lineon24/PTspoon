@@ -179,6 +179,11 @@ useEffect(() => {
 
     textareaRef.current?.focus();
   };
+  // 버튼 클릭 이벤트 처리
+  const handleSendClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
 
   // ⭐ 4. autoResize 함수를 스크롤까지 처리하는 개선된 버전으로 교체합니다.
   const autoResize = (el: HTMLTextAreaElement) => {
@@ -299,7 +304,7 @@ useEffect(() => {
             placeholder="메시지를 입력하세요"
             style={{ flex: 1, borderRadius: 8, border: "1.2px solid #d2e0f4", fontSize: 14, padding: "7px 9px", resize: "none", overflow: "hidden" }}
           />
-          <button onClick={sendMessage} style={{ flexShrink: 0, background: '#2e7fff', color: '#fff', border: 'none', borderRadius: 50, padding: '0 9px', fontWeight: 600, fontSize: 13, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={handleSendClick} style={{ flexShrink: 0, background: '#2e7fff', color: '#fff', border: 'none', borderRadius: 50, padding: '0 9px', fontWeight: 600, fontSize: 13, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SendHorizontal size={18} />
           </button>
         </div>
