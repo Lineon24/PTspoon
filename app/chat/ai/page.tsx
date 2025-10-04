@@ -116,16 +116,23 @@ export default function AiChatPage() {
   const chatContainer = containerRef.current;
   if (!chatContainer) return;
 
-  // 사용자가 방금 메시지를 보냈거나,
-  // 혹은 이미 맨 아래에 머물러 있었다면 스크롤을 맨 아래로 이동.
-  if (lastSentByUser || isAtBottom) {
+  // --- 조건 1: 내가 메시지를 보냈을 경우 ---
+  // lastSentByUser가 true이면, 스크롤 위치와 상관없이 무조건 맨 아래로 이동합니다.
+  if (lastSentByUser) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    if (lastSentByUser) {
-      setLastSentByUser(false);
-    }
+    setLastSentByUser(false); // 플래그는 다시 원상태로 돌려놓습니다.
+    return; // 내 메시지 전송 시의 로직은 여기서 끝냅니다.
   }
-}, [messages, lastSentByUser]); 
+
+  // --- 조건 2: 상대방(AI)의 메시지를 받았을 경우 ---
+  // isAtBottom이 true일 때만 (즉, 사용자가 이미 맨 아래에 있을 때만) 스크롤을 맨 아래로 이동시킵니다.
+  if (isAtBottom) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+  
+  // 사용자가 스크롤을 위로 올려서 이전 내용을 보고 있는 경우(isAtBottom === false)에는 아무 동작도 하지 않습니다.
+
+}, [messages]);
 
   const onSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

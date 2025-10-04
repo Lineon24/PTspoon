@@ -32,8 +32,8 @@ export default function ChatPage() {
   const [chatRoom, setChatRoom] = useState<Chat_rooms | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true); // 초기값을 true로 시작하면 좋습니다.
+  const [justSentMessage, setJustSentMessage] = useState(false);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
   const chatListRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const params = useParams(); // { room_id } 대신 params 사용
@@ -103,16 +103,24 @@ export default function ChatPage() {
     }
   }, [room_id]);
 
-    useEffect(() => {
+  useEffect(() => {
     const chatContainer = chatListRef.current;
     if (!chatContainer) return;
 
-    // isAtBottom 상태는 사용자가 일부러 스크롤을 올려 이전 내용을 보고 있는지 확인하는 값
-    // 사용자가 맨 아래에 있을 때만 새로운 메시지가 왔을 때 자동으로 스크롤을 내려준다.
+    // --- 조건 1: 내가 메시지를 보냈을 경우 ---
+    // justSentMessage가 true이면, 현재 스크롤 위치와 상관없이 무조건 맨 아래로 이동합니다.
+    if (justSentMessage) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      setJustSentMessage(false); // 신호를 사용했으니 다시 false로 바꿔줍니다.
+      return;
+    }
+
+    // --- 조건 2: 상대방의 메시지를 받았을 경우 ---
+    // isAtBottom이 true일 때만 (즉, 사용자가 이미 맨 아래에 있을 때만) 스크롤합니다.
     if (isAtBottom) {
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-  }, [messages]); 
+  }, [messages]);
 
   const handleScroll = () => {
     const el = chatListRef.current;
@@ -151,6 +159,7 @@ useEffect(() => {
     setInput("");
     setImageFile(null);
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    setJustSentMessage(true);
 
     setMessages(prev => [...prev, {
         id: Date.now(), user_id: profile.id, username: profile.nickname, content: textToSend,
@@ -167,6 +176,8 @@ useEffect(() => {
     await supabase.from("messages").insert([{
       user_id: profile.id, room_id, username: profile.nickname, content: input, msg_image: imageUrl,
     }]);
+
+    textareaRef.current?.focus();
   };
 
   // ⭐ 4. autoResize 함수를 스크롤까지 처리하는 개선된 버전으로 교체합니다.
@@ -247,7 +258,6 @@ useEffect(() => {
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* ⭐ 3. 입력창에서 position: fixed 관련 스타일을 모두 제거합니다. */}
