@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter, useParams } from 'next/navigation'; 
 import HeaderWithBack from '@/components/HeaderWithBack';
@@ -103,32 +103,23 @@ export default function ChatPage() {
     }
   }, [room_id]);
 
-  useEffect(() => {
-  const chatContainer = chatListRef.current;
-  if (!chatContainer) return;
+  useLayoutEffect(() => {
+    const chatContainer = chatListRef.current;
+    if (!chatContainer) return;
 
-  // 스크롤을 맨 아래로 내리는 함수
-  const scrollToBottom = () => {
-    // 렌더링이 완료될 시간을 주기 위해 setTimeout으로 잠시 지연시킵니다.
-    setTimeout(() => {
-      // setTimeout 콜백 안에서 ref가 유효한지 다시 한번 확인하는 것이 안전합니다.
-      if (chatListRef.current) {
-        chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
-      }
-    }, 100); // 0.1초의 지연
-  };
+    // --- 조건 1: 내가 메시지를 보냈을 경우 ---
+    // 내가 보낸 메시지는 스크롤 위치와 상관없이 항상 맨 아래로 이동시킵니다.
+    if (justSentMessage) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      setJustSentMessage(false);
+      return;
+    }
 
-  // --- 조건 1: 내가 메시지를 보냈을 경우 ---
-  if (justSentMessage) {
-    scrollToBottom();
-    setJustSentMessage(false);
-    return;
-  }
-
-  // --- 조건 2: 상대방의 메시지를 받았거나, 처음 입장했을 경우 ---
-  if (isAtBottom) {
-    scrollToBottom();
-  }
+    // --- 조건 2: 상대방 메시지를 받았거나, 처음 입장했을 경우 ---
+    // isAtBottom 상태를 통해 사용자가 이미 맨 아래에 있을 때만 스크롤을 내립니다.
+    if (isAtBottom) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
   }, [messages, justSentMessage]);
 
   const handleScroll = () => {
