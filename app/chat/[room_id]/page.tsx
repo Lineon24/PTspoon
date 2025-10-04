@@ -97,18 +97,22 @@ export default function ChatPage() {
         .eq('room_id', room_id)
         .order('created_at', { ascending: true });
       setMessages(data || []);
-      setTimeout(() => { bottomRef.current?.scrollIntoView(); }, 100);
     };
     if (room_id) {
       fetchMessages();
     }
   }, [room_id]);
 
-  useEffect(() => {
-    if (isAtBottom && messages.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    useEffect(() => {
+    const chatContainer = chatListRef.current;
+    if (!chatContainer) return;
+
+    // isAtBottom 상태는 사용자가 일부러 스크롤을 올려 이전 내용을 보고 있는지 확인하는 값
+    // 사용자가 맨 아래에 있을 때만 새로운 메시지가 왔을 때 자동으로 스크롤을 내려준다.
+    if (isAtBottom) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-  }, [messages]);
+  }, [messages]); 
 
   const handleScroll = () => {
     const el = chatListRef.current;
