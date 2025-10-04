@@ -304,7 +304,7 @@ useEffect(() => {
             placeholder="메시지를 입력하세요"
             style={{ flex: 1, borderRadius: 8, border: "1.2px solid #d2e0f4", fontSize: 14, padding: "7px 9px", resize: "none", overflow: "hidden" }}
           />
-          <button onClick={handleSendClick} style={{ flexShrink: 0, background: '#2e7fff', color: '#fff', border: 'none', borderRadius: 50, padding: '0 9px', fontWeight: 600, fontSize: 13, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onMouseDown={handleSendClick} style={{ flexShrink: 0, background: '#2e7fff', color: '#fff', border: 'none', borderRadius: 50, padding: '0 9px', fontWeight: 600, fontSize: 13, minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SendHorizontal size={18} />
           </button>
         </div>
