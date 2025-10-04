@@ -117,8 +117,6 @@ export default function AiChatPage() {
 
     if (lastSentByUser) {
       setLastSentByUser(false);
-      // autoResize가 스크롤을 처리하므로 여기서는 즉시 이동으로 변경하거나,
-      // autoResize와 로직을 합칠 수 있습니다. 여기서는 유지합니다.
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       return;
     }
