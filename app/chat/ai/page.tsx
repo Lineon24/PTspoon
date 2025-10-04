@@ -113,18 +113,19 @@ export default function AiChatPage() {
   };
 
   useLayoutEffect(() => {
-    if (!messagesEndRef.current) return;
+  const chatContainer = containerRef.current;
+  if (!chatContainer) return;
+
+  // 사용자가 방금 메시지를 보냈거나,
+  // 혹은 이미 맨 아래에 머물러 있었다면 스크롤을 맨 아래로 이동.
+  if (lastSentByUser || isAtBottom) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 
     if (lastSentByUser) {
       setLastSentByUser(false);
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      return;
     }
-
-    if (isAtBottom) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, lastSentByUser, isAtBottom]);
+  }
+}, [messages, lastSentByUser]); 
 
   const onSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
