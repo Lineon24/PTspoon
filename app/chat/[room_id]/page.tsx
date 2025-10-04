@@ -39,6 +39,7 @@ export default function ChatPage() {
   const params = useParams(); // { room_id } 대신 params 사용
   const imageInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const initialLoad = useRef(true);
 
   const room_id = Array.isArray(params.room_id) ? params.room_id[0] : params.room_id;
 
@@ -104,23 +105,29 @@ export default function ChatPage() {
   }, [room_id]);
 
   useLayoutEffect(() => {
-    const chatContainer = chatListRef.current;
-    if (!chatContainer) return;
+  const chatContainer = chatListRef.current;
+  if (!chatContainer) return;
 
-    // --- 조건 1: 내가 메시지를 보냈을 경우 ---
-    // 내가 보낸 메시지는 스크롤 위치와 상관없이 항상 맨 아래로 이동시킵니다.
-    if (justSentMessage) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-      setJustSentMessage(false);
-      return;
-    }
+  // --- 조건 1: 채팅방 입장 시 ---
+  // initialLoad 깃발이 true이고, 메시지가 로딩되었을 때 실행됩니다.
+  if (initialLoad.current && messages.length > 0) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    initialLoad.current = false; // 입장 처리가 끝났으므로 깃발을 내립니다.
+    return;
+  }
 
-    // --- 조건 2: 상대방 메시지를 받았거나, 처음 입장했을 경우 ---
-    // isAtBottom 상태를 통해 사용자가 이미 맨 아래에 있을 때만 스크롤을 내립니다.
-    if (isAtBottom) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  }, [messages, justSentMessage]);
+  // --- 조건 2: 내가 메시지를 보냈을 경우 (기존 로직 유지) ---
+  if (justSentMessage) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    setJustSentMessage(false);
+    return;
+  }
+
+  // --- 조건 3: 상대방의 메시지를 받았을 경우 (기존 로직 유지) ---
+  if (isAtBottom) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+}, [messages, justSentMessage]);
 
   const handleScroll = () => {
     const el = chatListRef.current;
@@ -128,7 +135,7 @@ export default function ChatPage() {
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 20;
     setIsAtBottom(atBottom);
   };
-
+  
 useEffect(() => {
   // profile이 로드되기 전에는 구독을 시작하지 않도록 return 처리
   if (!room_id || !profile) return;

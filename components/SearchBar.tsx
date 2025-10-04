@@ -86,7 +86,7 @@ export function SearchAutocomplete({ value, onChange, onEnter }: SearchAutocompl
     <div className="relative" ref={containerRef}>
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
       <Input
-        placeholder="찾고 싶은 식당명을 검색해보세요"
+        placeholder="찾고 싶은 식당 명을 검색해 보세요"
         className="pl-10 h-12 rounded-full shadow-lg border-transparent"
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
