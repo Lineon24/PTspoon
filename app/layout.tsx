@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "피티스푼",
   description: "평택대 주변 맞집을 공유하는 사이트",
-    icons: {
-    icon: '/favicon.ico', 
-  },
     manifest: "/manifest.json", 
 };
 
