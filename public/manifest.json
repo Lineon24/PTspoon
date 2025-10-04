@@ -4,11 +4,11 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/image/logo_bgx.png",
-      "sizes": "128x128",
+      "sizes": "any",
       "type": "image/png"
     }
   ]
