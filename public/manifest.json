@@ -9,7 +9,7 @@
     {
       "src": "/image/logo_bgx.png",
       "sizes": "128x128",
-      "type": "image/x-icon"
+      "type": "image/png"
     }
   ]
 }
