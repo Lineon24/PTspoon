@@ -34,7 +34,7 @@ const redis = Redis.fromEnv();
 export async function POST(req: NextRequest) {
   const { messages, data }: { messages: UIMessage[], data: any } = await req.json();
 
-  const MAX_REQUESTS = 5; // 제한 횟수
+  const MAX_REQUESTS = 20; // 제한 횟수
   const COUNT_EXPIRATION_SECONDS = 1800; // 제한 횟수 데이터베이스 유지시간
   const BLOCK_DURATION_SECONDS = 100; // 제한 시간
 
