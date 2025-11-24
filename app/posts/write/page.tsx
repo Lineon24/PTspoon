@@ -333,6 +333,12 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
         <h2 style={{ fontSize: '22px', marginBottom: '20px', color: '#333' }}>나의 게시글 목록</h2>
         {/* PostList 컴포넌트에 게시글과 프로필 정보를 전달 */}
         <PostList posts={posts} profile={profile} onPostDeleted={handlePostDeleted} />
+                {/* 로딩도 끝났고, 글도 0개일 때만 '게시글 없음' 표시 */}
+        {!loading && posts.length === 0 && (
+           <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+             아직 작성된 게시글이 없습니다. 
+           </div>
+        )}
       </div>
     </div>
   );
