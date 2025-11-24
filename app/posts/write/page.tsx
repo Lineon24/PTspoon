@@ -32,6 +32,7 @@ export default function WritePostPage() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. 사용자 로그인 및 프로필 불러오기 (동일)
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function WritePostPage() {
       alert('제목과 내용을 모두 입력해주세요.'); // 로그인 상태 포스트 제목, 포스트 내용이 모두 들어가 있어야 제출 가능
     return;
     }
-
+    setIsSubmitting(true);
   //  이미지 업로드
     let uploadedUrls: string[] = []; // 여러 장 받기에 배열로
       if (selectedFiles.length > 0) {
@@ -139,6 +140,7 @@ export default function WritePostPage() {
   if (error) {
     console.error('게시글 작성 오류:', error);
     alert('게시글 작성에 실패했습니다.');
+    setIsSubmitting(false);
   } else {
     // 업로드 후 초기화
     setNewPostTitle('');
@@ -320,9 +322,9 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
           </div>
         </div>
 
-        <button type="submit" style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: '#414de4', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s ease-in-out' }}
+        <button type="submit" disabled={isSubmitting} style={{ padding: '12px 25px', borderRadius: '8px', border: 'none', background: isSubmitting ? '#a0a0a0' : '#414de4', color: 'white', fontSize: 16, fontWeight: 'bold', cursor: isSubmitting ? 'not-allowed' : 'pointer', transition: 'background 0.2s ease-in-out' }}
         >
-          게시글 작성
+          {isSubmitting ? '작성 중...' : '게시글 작성'}
         </button>
       </form>
 
