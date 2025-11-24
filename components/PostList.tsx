@@ -161,10 +161,6 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
     }
   };
 
-  if (posts.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#777', fontSize: 16 }}>아직 게시글이 없습니다.</p>;
-  }
-
   return (
     <>
       {posts.map((post) => ( // 데이터 베이스에 있는 모든 포스터 출력 부분

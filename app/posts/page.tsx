@@ -21,21 +21,20 @@ interface Profile {
   nickname: string;
 }
 
-const POSTS_PER_PAGE = 10; // 안정성을 위해 10개로 증가
+const POSTS_PER_PAGE = 10;
 
 export default function AllPostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // UI 표시용 로딩 상태
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  // [핵심] 실시간으로 추가된 글의 개수를 세는 변수 (DB 요청 시 offset 보정용)
+  // [수정 1] 로직 제어용 '진짜' 잠금장치 (Ref는 리렌더링을 유발하지 않음)
+  const isFetching = useRef(false); 
   const newPostCount = useRef(0);
 
-  const { ref, inView } = useInView({
-    threshold: 0,
-  });
+  const { ref, inView } = useInView({ threshold: 0 });
 
   // 1. 프로필 가져오기
   useEffect(() => {
@@ -53,12 +52,14 @@ export default function AllPostsPage() {
     getUserProfile();
   }, []);
 
-  // 2. 게시글 불러오기 (중복 제거 & 정렬 로직 강화)
+  // 2. 게시글 불러오기 (의존성 제거하여 안정성 확보)
   const fetchPosts = useCallback(async (pageIndex: number) => {
-    if (pageIndex > 0 && loading) return; // 로딩 중 중복 실행 방지
-    setLoading(true);
+    // [수정 2] State 대신 Ref로 중복 실행 방지 (훨씬 빠르고 안전함)
+    if (isFetching.current) return;
+    
+    isFetching.current = true; // 문 잠그기
+    setLoading(true); // 화면에 로딩 표시
 
-    // [핵심 보정] 실시간으로 들어온 글 개수만큼 건너뛰고 가져와야 중복을 피함
     const offset = newPostCount.current;
     const from = pageIndex * POSTS_PER_PAGE + offset;
     const to = from + POSTS_PER_PAGE - 1;
@@ -74,67 +75,65 @@ export default function AllPostsPage() {
 
       if (data && data.length > 0) {
         setPosts((prev) => {
-          // [필살기] Map을 이용한 완벽한 중복 제거 및 정렬
-          const allPosts = [...prev, ...data];
+          // 중복 제거 및 정렬 로직 (Map 사용)
+          const allPosts = pageIndex === 0 ? data : [...prev, ...data]; // 0페이지면 덮어쓰기, 아니면 이어붙이기
           const uniqueMap = new Map();
           
-          allPosts.forEach(post => {
-            // ID를 키로 사용하여 무조건 하나만 남김 (기존 것 덮어쓰기)
-            uniqueMap.set(post.id, post);
-          });
+          // 기존 데이터가 있다면 맵에 넣기
+          if (pageIndex > 0) {
+              prev.forEach(p => uniqueMap.set(p.id, p));
+          }
+          // 새 데이터 맵에 넣기 (덮어쓰기)
+          data.forEach(p => uniqueMap.set(p.id, p));
 
-          // 다시 배열로 변환 후 날짜순 정렬 (순서 꼬임 방지)
-          const sortedPosts = Array.from(uniqueMap.values()).sort((a: any, b: any) => 
+          return Array.from(uniqueMap.values()).sort((a: any, b: any) => 
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-
-          return sortedPosts as Post[];
+          ) as Post[];
         });
 
         if (data.length < POSTS_PER_PAGE) setHasMore(false);
       } else {
+        // 데이터가 없으면
+        if (pageIndex === 0) setPosts([]); // 첫 페이지인데 없으면 빈 배열
         setHasMore(false);
       }
     } catch (error) {
       console.error('Fetch error:', error);
     } finally {
-      setLoading(false);
+      isFetching.current = false; // 문 열기
+      setLoading(false); // 로딩 표시 끄기
     }
-  }, [loading]); // 의존성
+  }, []); // [수정 3] 의존성 배열을 완전히 비워서 함수가 절대 변하지 않게 함
 
-  // 3. 초기 로딩
+  // 3. 초기 실행 (딱 한 번만 실행됨 보장)
   useEffect(() => {
     fetchPosts(0);
-  }, [fetchPosts]);
+  }, []); // fetchPosts가 변하지 않으므로 안전함
 
   // 4. 스크롤 감지
   useEffect(() => {
-    if (inView && !loading && hasMore) {
+    if (inView && !isFetching.current && hasMore) { // Ref로 체크
       const nextPage = page + 1;
       setPage(nextPage);
       fetchPosts(nextPage);
     }
-  }, [inView, loading, hasMore, page, fetchPosts]);
+  }, [inView, hasMore, page, fetchPosts]);
 
-  // 5. [실시간 구독] (여기도 중복 방지 로직 적용)
+  // 5. 실시간 구독
   useEffect(() => {
     const postsChannel = supabase
-      .channel('public:posts_realtime')
+      .channel('public:posts_realtime_fixed')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'posts' },
         (payload) => {
           const newPost = payload.new as Post;
-
-          // [핵심] 새 글이 들어오면 카운트를 올려서 나중에 fetch할 때 밀어버림
           newPostCount.current += 1;
-
+          
           setPosts((prev) => {
-            // 여기도 똑같이 중복 체크 + 정렬
             const allPosts = [newPost, ...prev];
             const uniqueMap = new Map();
             allPosts.forEach(p => uniqueMap.set(p.id, p));
-            
             return Array.from(uniqueMap.values()).sort((a: any, b: any) => 
               new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             ) as Post[];
@@ -146,12 +145,10 @@ export default function AllPostsPage() {
     return () => {
       supabase.removeChannel(postsChannel);
     };
-  }, []); // 빈 배열 유지
+  }, []);
 
-  // 삭제 핸들러
   const handlePostDeleted = (deletedPostId: string) => {
     setPosts(currentPosts => currentPosts.filter(post => post.id !== deletedPostId));
-    // 삭제 시 카운트 조정 (선택 사항이나 복잡도 줄이기 위해 생략 가능)
   };
 
   return (
@@ -163,13 +160,21 @@ export default function AllPostsPage() {
       <div style={{ paddingTop: '0px' }}>
         <PostList posts={posts} profile={profile} onPostDeleted={handlePostDeleted} />
         
+        {/* 로딩 중이거나 데이터가 더 있을 때 감지용 div 표시 */}
         {hasMore && (
           <div ref={ref} style={{ height: '20px', margin: '20px 0', textAlign: 'center', color: '#999' }}>
             {loading ? '로딩중...' : ''}
           </div>
         )}
         
-        {!hasMore && posts.length > 0 && (
+        {/* 로딩도 끝났고, 글도 0개일 때만 '게시글 없음' 표시 */}
+        {!loading && posts.length === 0 && (
+           <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+             아직 작성된 게시글이 없습니다. <br/> 첫 번째 글의 주인공이 되어보세요!
+           </div>
+        )}
+
+        {!loading && !hasMore && posts.length > 0 && (
           <div style={{ textAlign: 'center', padding: '20px', color: '#bbb' }}>
             모든 게시글을 다 봤어요! 🎉
           </div>
