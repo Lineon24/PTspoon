@@ -30,6 +30,7 @@ interface Comment {
   post_content?: string;
   post_images?: string[];
   isImageComment?: boolean;
+  image_id?: string;
 }
 
 
@@ -160,7 +161,7 @@ export default function ProfilePage() {
 
     const { data: imageCommentsData } = await supabase
       .from("image_comments")
-      .select("id, post_id, content, created_at, posts(title, content, image_urls)")
+      .select("id, post_id, content, created_at, posts(title, content, image_urls), image_id")
       .eq("user_id", currentUserId)
       .order("created_at", { ascending: false });
 
@@ -184,6 +185,7 @@ export default function ProfilePage() {
         post_content: c.posts?.content,
         post_images: c.posts?.image_urls,
         isImageComment: true,
+        image_id: c.image_id,
       })),
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     setMyComments(combinedComments);
@@ -354,9 +356,15 @@ export default function ProfilePage() {
                         ))}
                         </div>
                     )}
-
+                    <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid #ceccccff' }} />
                     {comments.slice(0, showCount).map((c) => (
-                        <p key={c.id} className="text-black text-sm break-words mt-1">- {c.content}</p>
+                        <p key={c.id} className="text-black text-sm break-words mt-2">
+                          {c.image_id !== null && c.image_id !== undefined && (
+                            <span className="text-blue-600 mr-2">
+                            {Number(c.image_id) + 1}번 이미지
+                            </span>
+                          )}
+                        {c.content}</p>
                     ))}
 
                     {comments.length > COMMENTS_PREVIEW_COUNT && (
