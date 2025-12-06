@@ -1,8 +1,14 @@
-# <img width="64" height="64" alt="Image" src="https://github.com/user-attachments/assets/21e03b94-3f37-4815-9375-3ba463f16acd" /> 피티스푼 (Pitispoon)
+# <img width="64" height="64" alt="Image" src="https://github.com/user-attachments/assets/21e03b94-3f37-4815-9375-3ba463f16acd" /> 피티스푼 (PTspoon)
 > **평택대학교 학생들을 위한 맛집 추천 및 로컬 커뮤니티 서비스**
 
 **피티스푼**은 학교 주변의 숨은 맛집을 찾고, 학우들과 실시간으로 소통할 수 있는 웹 플랫폼입니다.  
 사용자 취향 기반의 식당 추천부터 지도 탐색, 실시간 채팅, 그리고 AI 챗봇 '피투'까지 다양한 기능을 제공합니다.
+
+<br/>
+
+### **배포 주소:** [https://restaurant-find-one.vercel.app](https://restaurant-find-one.vercel.app)
+
+<br/>
 
 ## 🛠️ Tech Stack
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
