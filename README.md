@@ -9,6 +9,7 @@
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
 
 <br/>
 
@@ -55,7 +56,7 @@
           실시간 채팅 기능<br/>
           모든 게시글 관련 페이지<br/>
           로그인/회원가입 페이지<br/>
-          웹 크롤링<br/>
+          웹 크롤링 및 식당 데이터 추가<br/>
           <br/>
           🛡️ <b>Management</b><br/>
           알파 테스트 및 버그 수정<br/>
@@ -149,23 +150,48 @@
 | 지도 페이지(실시간 위치, 필터링 기능) | 
 | :---: | 
 | ![지도 페이지](https://github.com/user-attachments/assets/0065b8d9-f01e-4063-9f0a-8631bd5a1a5b) | 
-| 실시간 나의 위치로 주변 식당 정보와 필터링 기능을 사용할 수 있습니다.(br/>왼쪽 아래의 버튼으로 평택대와 내 위치로 이동가능합니다. | 
+| 실시간 나의 위치로 주변 식당 정보와 필터링 기능을 사용할 수 있습니다.<br/>왼쪽 아래의 버튼으로 평택대와 내 위치로 이동 가능합니다. | 
 
 
 <br/>
 
-### 4️⃣ 소통 (게시글 & 채팅)
-| 전체 게시글 보기 | 
-| :---: | :---: |
-| ![전체 게시글 페이지](https://github.com/user-attachments/assets/18f41463-73c0-4d53-9c89-09f85be364c8) | 
-| 실시간<br/>사진과 함께 정보를 나눕니다. | 
+### 4️⃣ 소통 (게시글)
+| 전체 게시글(실시간) | 
+| :---: |
+| ![게시글 페이지](https://github.com/user-attachments/assets/18f41463-73c0-4d53-9c89-09f85be364c8) | 
+| 게시글 페이지에서 게시글을 작성하거나 실시간으로 업로드되는 글을 볼 수 있습니다. | 
 
-
-### 4️⃣ AI & 사용자 관리
-| 피투 AI 챗봇 | 마이페이지 & 회원가입 |
-| :---: | :---: |
-| ![AI페이지](여기에_AI페이지_GIF_링크_붙여넣기) | ![마이페이지](여기에_마이페이지_GIF_링크_붙여넣기) |
-| 무엇을 먹을지 고민될 땐<br/>AI 챗봇 '피투'에게 물어보세요! | 내가 쓴 글과 댓글을 관리하고<br/>프로필을 설정할 수 있습니다. |
+| 게시글 상세 | 
+| :---: |
+| ![게시글 상세 페이지](https://github.com/user-attachments/assets/0dc8d826-b2f0-47b6-ac67-4b61ceaf86f6) | 
+| 게시글을 더블 클릭 시 댓글과 이미지 마다 댓글을 달 수 있습니다. | 
 
 <br/>
+
+### 5️⃣ 소통 (채팅)
+| 채팅방 목록 및 생성 | 
+| :---: |
+| ![채팅방 생성 페이지](https://github.com/user-attachments/assets/a5838817-0947-4fb6-9da6-82b859214afe) | 
+| 채팅방 페이지에서는 채팅방을 생성하거나 들어갈 수 있습니다. | 
+
+| 채팅방 페이지 | 
+| :---: |
+| ![채팅방 페이지](https://github.com/user-attachments/assets/105a6f96-ef9f-48b3-b80a-8f978324b43e) | 
+| 채팅방으로 실시간으로 대화하며 정보를 공유할 수 있습니다. | 
+
+<br/>
+
+### 6️⃣ 소통 (AI 피투)
+| AI 피투 채팅방 |
+| :---: | 
+| ![AI페이지](https://github.com/user-attachments/assets/2e849353-2db7-4fe8-88ec-8acc56b13449) | 
+| 무엇을 먹을지 고민될 땐<br/>AI 챗봇 '피투'에게 물어보세요! | 
+
+<br/>
+
+### 7️⃣ 내 정보
+| 내 정보 |
+| :---: | 
+| ![마페이지](https://github.com/user-attachments/assets/cee53767-4ac7-4889-9aa3-7a3b87dc389f) | 
+| 마이 페이지에서 내가 작성한 모든 글들을 확인 가능합니다. | 
 
