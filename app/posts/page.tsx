@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import PostList from '@/components/PostList';
 import { useInView } from 'react-intersection-observer'; 
+import { PostSearchAutocomplete } from '@/components/PostSearchBar';
 
 interface Post {
   id: string;
@@ -14,6 +15,7 @@ interface Post {
   title: string;
   content: string;
   image_urls: string[];
+  tag?: string[];
 }
 
 interface Profile {
@@ -23,12 +25,45 @@ interface Profile {
 
 const POSTS_PER_PAGE = 10;
 
+type TagOption= '전체' | '음식' | '행사' | '자유';
+
 export default function AllPostsPage() {
+  const [search, setSearch]= useState('');
+  const [isSearching, setIsSearching]= useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); // UI 표시용 로딩 상태
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [selectedTag, setSelectedTag]= useState<TagOption>('전체');
+
+  const applySearch= useCallback(()=> {
+    const q =search.trim();
+    const hasQuery = q.length > 0 ;
+    const hasTag= selectedTag !== '전체';
+    setIsSearching(hasQuery || hasTag);
+  },[search, selectedTag]);
+
+  const filteredPosts = useMemo(() => {
+    if (!isSearching) return posts;
+
+    const q = search.trim().toLowerCase();
+
+    return posts.filter((p) => {
+      // 1) 텍스트 조건 (검색어 없으면 통과)
+      const matchText =
+        !q ||
+        (p.title ?? '').toLowerCase().includes(q) ||
+        (p.content ?? '').toLowerCase().includes(q);
+
+      // 2) 태그 조건 (전체면 통과)
+      const matchTag =
+        selectedTag === '전체' ||
+        (p.tag ?? []).includes(selectedTag);
+
+      return matchText && matchTag;
+    });
+  }, [posts, search, isSearching, selectedTag]);
 
   // [수정 1] 로직 제어용 '진짜' 잠금장치 (Ref는 리렌더링을 유발하지 않음)
   const isFetching = useRef(false); 
@@ -155,10 +190,22 @@ export default function AllPostsPage() {
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
       <HeaderWithBack title="전체 게시글" backTF={true} 
         buttonCustomName='게시글 작성' buttonCustomPath='/posts/write' buttonCustomicon={1} />
+      <div style={{marginBottom:12}}>
+        <PostSearchAutocomplete
+          value={search}
+          onChange={setSearch}
+          onEnter={applySearch}
+          selectedTag={selectedTag}
+          onTagChange={(t) => {
+            setSelectedTag(t);
+            setIsSearching(t !== '전체' || search.trim().length > 0);
+          }}
+        />
+      </div>
       <div style={{ height: '10px' }}></div>
 
       <div style={{ paddingTop: '0px' }}>
-        <PostList posts={posts} profile={profile} onPostDeleted={handlePostDeleted} />
+        <PostList posts={filteredPosts} profile={profile} onPostDeleted={handlePostDeleted} />
         
         {/* 로딩 중이거나 데이터가 더 있을 때 감지용 div 표시 */}
         {hasMore && (

@@ -17,6 +17,7 @@ interface Post {
   title: string;
   content: string;
   image_urls: string[];
+  tag?:string[];
 }
 
 // Comment 인터페이스 (PostPage와 동일하게 정의)
@@ -171,10 +172,27 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             marginBottom: '8px',
           }}>
-          <h3 style={{ fontSize: '18px', margin: '5px 0 5px 8px', color: '#222' }}>{post.title}</h3>
+            {/*태그 출력*/}
+            <div style={{display:'flex', flexDirection: 'column', alignItems: 'flex-start', flex:1,}}>
+              {post.tag && post.tag.length >0 && (
+                <div style={{display:'flex',gap:6, flexWrap:'wrap', marginLeft:8, marginTop:2, marginBottom:2,}}>
+                  {post.tag.map((t)=> (
+                    <span key={t} style={{
+                      fontSize:12, 
+                      padding: '2px 2px', 
+                      borderRadius:999,
+                      color:'#414de4',
+                      fontWeight:700,
+                      lineHeight:1,
+                    }}>#{t}</span>
+                  ))}
+                </div>
+              )}
+              <h3 style={{ fontSize: '18px', margin: '5px 0 5px 8px', color: '#222' }}>{post.title}</h3>
+            </div>
             {profile?.id === post.user_id && ( // 사용자 id와 게시글 작성자 id가 같으면 게시글 삭제
           <button
             onClick={() => deletePost(post)} 
