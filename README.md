@@ -1,4 +1,4 @@
-# <img width="64" height="64" alt="Image" src="https://github.com/user-attachments/assets/21e03b94-3f37-4815-9375-3ba463f16acd" /> 피티스푼 (PTspoon)
+# <img width="64" height="64" alt="Image" src="./image/logo_bgx.png" /> 피티스푼 (PTspoon)
 > **평택대학교 학생들을 위한 맛집 추천 및 로컬 커뮤니티 서비스**
 
 **피티스푼**은 학교 주변의 숨은 맛집을 찾고, 학우들과 실시간으로 소통할 수 있는 웹 플랫폼입니다.  
