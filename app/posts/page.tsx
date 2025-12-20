@@ -190,7 +190,18 @@ export default function AllPostsPage() {
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
       <HeaderWithBack title="전체 게시글" backTF={true} 
         buttonCustomName='게시글 작성' buttonCustomPath='/posts/write' buttonCustomicon={1} />
-      <div style={{marginBottom:12}}>
+      <div 
+        style={{
+          position:'fixed',
+          top:60,
+          left:'50%',
+          transform:'translateX(-50%)',
+          width:540,
+          maxWidth:'95%',
+          zIndex:50,
+          paddingTop:8,
+          paddingBottom:8,
+        }}>
         <PostSearchAutocomplete
           value={search}
           onChange={setSearch}
@@ -202,7 +213,7 @@ export default function AllPostsPage() {
           }}
         />
       </div>
-      <div style={{ height: '10px' }}></div>
+      <div style={{ height: 80 }}></div>
 
       <div style={{ paddingTop: '0px' }}>
         <PostList posts={filteredPosts} profile={profile} onPostDeleted={handlePostDeleted} />

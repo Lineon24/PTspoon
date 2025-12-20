@@ -10,6 +10,7 @@ import HeaderWithBack from '@/components/HeaderWithBack';
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import { SendHorizontal } from 'lucide-react';
 import { FilterTag } from '@/components/filter-tag';
+import PostShareButton from '@/components/PostShareButton';
 
 // 인터페이스 정의 (기존과 동일)
 interface Post {
@@ -336,13 +337,18 @@ return (
           }}>{post.title}
           </div>
       </div>
+      <div style={{display : 'flex', gap: 10, alignItems:'center'}}>
+        <PostShareButton
+          postId={post.id}
+          postTitle={post.title}
+        />
       {profile?.id === post.user_id && (
         <button
           onClick={deletePost}
           style={{
             border:'none',
             background: 'transparent',
-            fontSize: '45px',
+            fontSize: '32px',
             color: '#999',
             cursor: 'pointer',
             marginLeft: '10px',
@@ -350,6 +356,7 @@ return (
           title="게시글 삭제"
           >x</button>
       )}
+      </div>
     </div>
     <div>
       <p style={{ fontSize: '15px', color: '#888', margin: '0 0 10px 7px' }}>
