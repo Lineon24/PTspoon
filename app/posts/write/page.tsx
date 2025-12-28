@@ -16,6 +16,7 @@ interface Post {
   title: string;
   content: string;
   image_urls: string[];
+  tag?:string[];
 }
 
 interface Profile {
@@ -33,6 +34,21 @@ export default function WritePostPage() {
   const [newPostContent, setNewPostContent] = useState('');
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  //선택 가능한 태그 목록
+  const TAG_OPTIONS = ["자유","행사","음식"] as const;
+  //태그를 여러개 담게 하기
+  const [tags, setTags]= useState<string[]>([]);
+
+  //확장: 태그 토글 함수, 이미 선택된 태그면 제거, 선택 안된 태그면 추가
+  const toggleTag= (value: string) => {
+    setTags((prev)=> {
+      //이미 있으면 제거(선택 해제)
+      if (prev.includes(value)) return prev.filter((t)=> t!==value);
+
+      //없으면 선택
+      return [...prev, value];
+    });
+  }
 
   // 1. 사용자 로그인 및 프로필 불러오기 (동일)
   useEffect(() => {
@@ -133,6 +149,7 @@ export default function WritePostPage() {
       title: newPostTitle,
       content: newPostContent,
       image_urls: uploadedUrls,
+      tag:tags,
     },
   ])
   .select();
@@ -216,6 +233,33 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
 
       {/* 게시글 작성 폼 */}
       <form onSubmit={handleSubmitPost} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '30px', padding: '20px', background: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
+        <div style={{
+          display: "flex",
+          gap: 8,
+          flexWrap:"wrap",
+          marginBottom:6,
+        }}>
+          {TAG_OPTIONS.map((t)=> {
+            const selected=tags.includes(t); //현재 태그가 선택됐는지 여부
+
+            return(
+              <button 
+              key={t}
+              type="button"
+              onClick={()=> toggleTag(t)}
+              style={{
+                padding:"6px 12px",
+                borderRadius:20,
+                fontSize:13,
+                border:selected? "1px solid #414de4" : "1px solid #ddd",
+                background:selected? "#414de4": "#fff",
+                color:selected ? "#fff" : "#333",
+                cursor : "pointer",
+                fontWeight: 600,
+              }}>#{t}</button>
+            )
+          })}
+        </div>
         <input
           type="text" placeholder="게시글 제목을 입력하세요" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)}
           maxLength={40} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: 16 }}

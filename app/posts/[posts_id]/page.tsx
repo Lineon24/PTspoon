@@ -9,6 +9,8 @@ import { useRouter, useParams } from 'next/navigation';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import { SendHorizontal } from 'lucide-react';
+import { FilterTag } from '@/components/filter-tag';
+import PostShareButton from '@/components/PostShareButton';
 
 // 인터페이스 정의 (기존과 동일)
 interface Post {
@@ -19,6 +21,7 @@ interface Post {
   title: string;
   content: string;
   image_urls: string[];
+  tag?:string[];
 }
 
 interface Comment {
@@ -288,17 +291,73 @@ return (
     
   }}>
     <HeaderWithBack title={'게시글'} backTF={true} />
-
-    {/* --- 게시글 제목 --- */}
-    <div style={{ display: 'flex', maxWidth:'530px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-      <div style={{ fontSize: '25px', fontWeight: 'bold', margin: '20px 0 5px 8px', color: '#222' }}>{post.title}</div>
+    {/*게시글 제목 + 태그*/}
+    <div style={{
+      display: 'flex',
+      maxWidth:'530px',
+      justifyContent:'space-between',
+      alignItems: 'flex-start',
+      marginBottom: '8px',
+    }}>
+      <div style={{
+        display:'flex',
+        flexDirection: 'column',
+        alignItems:'flex-start',
+        flex:1,
+      }}>
+        {post.tag && post.tag.length>0 && (
+          <div style={{
+            display:'flex',
+            gap:6,
+            flexWrap:'wrap',
+            marginLeft:8,
+            marginTop:14,
+            marginBottom:2,
+          }}>
+            {post.tag.map((t)=>(
+              <span
+                key={t}
+                style={{
+                  fontSize:12,
+                  padding:'2px 2px',
+                  borderRadius: 999,
+                  color: '#414de4',
+                  fontWeight: 700,
+                  lineHeight:1,
+                }}
+              >#{t}</span>
+            ))}
+          </div>
+        )}
+        <div style={{
+          fontSize:'25px', 
+          fontWeight: 'bold', 
+          margin: post.tag && post.tag.length>0 ? '2px 0 5px 8px': '20px 0 5px 8px',
+          color:'#222',
+          }}>{post.title}
+          </div>
+      </div>
+      <div style={{display : 'flex', gap: 10, alignItems:'center'}}>
+        <PostShareButton
+          postId={post.id}
+          postTitle={post.title}
+        />
       {profile?.id === post.user_id && (
-        <button onClick={deletePost} style={{ border: 'none', background: 'transparent', fontSize: '45px', color: '#999', cursor: 'pointer', marginLeft: '10px' }} title="게시글 삭제">
-          ×
-        </button>
+        <button
+          onClick={deletePost}
+          style={{
+            border:'none',
+            background: 'transparent',
+            fontSize: '32px',
+            color: '#999',
+            cursor: 'pointer',
+            marginLeft: '10px',
+          }}
+          title="게시글 삭제"
+          >x</button>
       )}
+      </div>
     </div>
-
     <div>
       <p style={{ fontSize: '15px', color: '#888', margin: '0 0 10px 7px' }}>
         작성자: <span style={{ fontWeight: 'bold', color: '#555' }}>{post.username}</span> | {new Date(post.created_at).toLocaleString()}
