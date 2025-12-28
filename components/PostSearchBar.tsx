@@ -146,7 +146,7 @@ export function PostSearchAutocomplete({
       {/* input (오른쪽 버튼 공간 확보: pr 크게) */}
       <Input
         placeholder="찾고 싶은 게시글을 검색해 보세요"
-        className="pl-10 pr-24 h-12 rounded-full shadow-lg border-transparent"
+        className="pl-10 pr-16 h-12 rounded-full shadow-lg border-transparent"
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
         autoComplete="off"
