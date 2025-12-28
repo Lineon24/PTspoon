@@ -35,7 +35,7 @@ export default function WritePostPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   //선택 가능한 태그 목록
-  const TAG_OPTIONS = ["자유","음식"] as const;
+  const TAG_OPTIONS = ["자유","음식","행사"] as const;
   //태그를 여러개 담게 하기
   const [tags, setTags]= useState<string[]>([]);
 
