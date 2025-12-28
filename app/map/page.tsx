@@ -66,6 +66,8 @@ export default function MapPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(true)
   const [inputValue, setInputValue] = useState("")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [ptuActive, setPtuActive] = useState(false);
+  const [myActive, setMyActive] = useState(false);
   const router = useRouter()
 
   // -----------------------
@@ -91,6 +93,18 @@ export default function MapPage() {
     return R*c;
   }
   const formatDistance=(d:number)=>d<1000?`${Math.round(d)} m`:`${(d/1000).toFixed(1)} km`;
+
+  const handlePtuClick = () => {
+  setPtuActive(true);
+  setTimeout(() => setPtuActive(false), 600); // 0.6초 뒤 파동 제거
+  moveToPresetPosition();
+};
+
+const handleMyClick = () => {
+  setMyActive(true);
+  setTimeout(() => setMyActive(false), 600);
+  moveToMyPosition();
+};
 
   // 그룹 기준 거리 업데이트
   const updateDistancesByGroup=(userLat:number,userLng:number)=>{
@@ -415,7 +429,8 @@ export default function MapPage() {
   // -----------------------
   // 버튼: 내 위치로 이동
   // -----------------------
-  const moveToMyPosition=()=>{if(mapRef.current) {if(currentLocationMarker.current){mapRef.current.panTo(currentLocationMarker.current.getPosition())}else navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude; const lng=pos.coords.longitude; const currentPos=new window.kakao.maps.LatLng(lat,lng); mapRef.current.panTo(currentPos); updateDistancesByGroup(lat,lng); watchUserPosition()})}}
+  const moveToMyPosition=()=>{if(mapRef.current) {if(currentLocationMarker.current){mapRef.current.panTo(currentLocationMarker.current.getPosition())}
+    else navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude; const lng=pos.coords.longitude; const currentPos=new window.kakao.maps.LatLng(lat,lng); mapRef.current.panTo(currentPos); updateDistancesByGroup(lat,lng); watchUserPosition()})}}
 
   // -----------------------
   // ✅ 필터 검색
@@ -525,14 +540,47 @@ export default function MapPage() {
       <div id="map" ref={mapContainerRef} className="absolute inset-0"/>
 
       {/* 지도 우측 하단 버튼 (평택대, 내 위치) */}
-      <div className="fixed bottom-[120px] z-10 flex flex-col items-end w-full max-w-[540px] mx-auto p-3 gap-3" style={{pointerEvents:'none'}}>
-        <button onClick={moveToPresetPosition} className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]" style={{pointerEvents:'auto'}}>
-          <img src="/image/ptu_logo.png" alt="평택대" className="w-8 h-8"/>
-        </button>
-        <button onClick={moveToMyPosition} className="z-30 h-13 w-13 rounded-full bg-white shadow-lg flex justify-center items-center text-[#3268f8]" style={{pointerEvents:'auto'}}>
-          <LocateFixed size={32}/>
-        </button>
-      </div>
+<div className="fixed bottom-[120px] z-10 flex flex-col items-end w-full max-w-[540px] mx-auto p-4 gap-4 pointer-events-none">
+  
+  {/* 1. 평택대 버튼 */}
+  <div className="relative">
+    {/* 클릭 시 터지는 파동 효과 */}
+    {ptuActive && (
+      <span className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-75"></span>
+    )}
+    <button 
+      onClick={handlePtuClick} 
+      className="relative z-30 h-13 w-13 rounded-full bg-white flex justify-center items-center active:scale-90 transition-all 
+                 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2),0_8px_10px_-6px_rgba(0,0,0,0.1)] 
+                 border border-gray-50" 
+      style={{ pointerEvents: 'auto' }}
+    >
+      <img 
+        src="/image/ptu_logo.png" 
+        alt="평택대" 
+        className="w-9 h-9 object-contain drop-shadow-md" /* 로고에도 미세한 그림자 */
+      />
+    </button>
+  </div>
+
+  {/* 2. 내 위치 버튼 */}
+  <div className="relative">
+    {/* 클릭 시 터지는 파동 효과 */}
+    {myActive && (
+      <span className="absolute inset-0 rounded-full bg-[#3268f8] animate-ping opacity-75"></span>
+    )}
+    <button 
+      onClick={handleMyClick} 
+      className="relative z-30 h-13 w-13 rounded-full bg-white flex justify-center items-center text-[#3268f8] active:scale-90 transition-all 
+                 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2),0_8px_10px_-6px_rgba(0,0,0,0.1)] 
+                 border border-gray-50" 
+      style={{ pointerEvents: 'auto' }}
+    >
+      <LocateFixed size={34} className="drop-shadow-md" />
+    </button>
+  </div>
+
+</div>
 
       {/* 하단 시트 (맛집 목록) */}
       <div ref={sheetRef} className={cn("fixed bottom-7.5 left-0 right-0 max-w-[540px] mx-auto bg-white rounded-t-2xl shadow transition-transform duration-300 z-20", isSheetOpen?"translate-y-0":"translate-y-[calc(100%-80px)]")}>
