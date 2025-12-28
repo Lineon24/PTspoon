@@ -72,7 +72,7 @@ export default function HeaderWithBack({
       maxWidth: 540,
       margin: '0 auto',
       zIndex: 10,
-      height: '44px', // 헤더 높이를 고정하여 늘어남 방지
+      height: '48px', // 헤더 높이를 고정하여 늘어남 방지
       boxSizing: 'border-box'
     }}>
       {backTF && (
@@ -143,8 +143,8 @@ export default function HeaderWithBack({
               border: 'none',
               borderRadius: 9,
               fontWeight: 600,
-              fontSize: 13,
-              padding: '5px 12px',
+              fontSize: 14,
+              padding: '7px 13px',
               cursor: 'pointer',
               alignItems: 'center',
               gap: '4px',
@@ -161,7 +161,7 @@ export default function HeaderWithBack({
         ) : (
           user ? (
             <>
-              <span style={{ fontWeight: 600, color: '#414de4', fontSize: 13, whiteSpace: 'nowrap' }}>
+              <span style={{ fontWeight: 600, color: '#414de4', fontSize: 14, whiteSpace: 'nowrap' }}>
                 {profile ? `${profile.nickname} 님` : '사용자'}
               </span>
               <button
@@ -169,8 +169,8 @@ export default function HeaderWithBack({
                   background: '#eef2fa',
                   border: 'none',
                   borderRadius: 9,
-                  fontSize: 11,
-                  padding: '4px 10px',
+                  fontSize: 13,
+                  padding: '4px 12px',
                   color: '#3878ff',
                   cursor: 'pointer',
                 }}
@@ -187,8 +187,8 @@ export default function HeaderWithBack({
                 border: 'none',
                 borderRadius: 9,
                 fontWeight: 600,
-                fontSize: 11,
-                padding: '4px 10px',
+                fontSize: 14,
+                padding: '4px 12px',
                 cursor: 'pointer'
               }}
               onClick={() => router.push('/login')}

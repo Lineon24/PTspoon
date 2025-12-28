@@ -188,7 +188,7 @@ export default function AllPostsPage() {
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
-      <HeaderWithBack title="전체 게시글" backTF={true} 
+      <HeaderWithBack title="전체 게시글" backTF={false} 
         buttonCustomName='게시글 작성' buttonCustomPath='/posts/write' buttonCustomicon={1} />
       <div 
         style={{

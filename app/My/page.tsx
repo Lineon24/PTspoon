@@ -19,6 +19,7 @@ interface Post {
   title: string;
   content: string;
   image_urls: string[];
+  tag?: string[];
 }
 
 interface Comment {
@@ -137,7 +138,7 @@ export default function ProfilePage() {
     // 2. 게시글 가져오기
     const { data: postsData } = await supabase
       .from("posts")
-      .select("id, title, content, created_at, image_urls")
+      .select('*')
       .eq("user_id", currentUserId)
       .order("created_at", { ascending: false });
 
@@ -149,6 +150,7 @@ export default function ProfilePage() {
       image_urls: Array.isArray(p.image_urls) ? p.image_urls : JSON.parse(p.image_urls ?? "[]"),
       user_id: currentUserId,
       username: currentNickname, 
+      tag: p.tag
     }));
     setMyPosts(postsWithDetails);
 
@@ -544,10 +546,14 @@ const handleWithdrawal = async () => {
   };
 
   return (
-    <div className="w-full max-w-[540px] mx-auto flex flex-col h-screen">
-      <HeaderWithBack title={`내 정보`} backTF={true} />
+<div className="w-full max-w-[540px] mx-auto bg-white flex flex-col h-screen">
+      {/* 1. 헤더 (최상단 고정) */}
+      <HeaderWithBack title={`내 정보`} backTF={false} />
       
-      <div className="flex-none">
+      {/* 2. 스크롤 가능 영역 (헤더 제외한 나머지 전체) */}
+      <div className="flex-1 overflow-y-auto scroll-smooth">
+        
+        {/* 배너 섹션 */}
         <section className="bg-blue-100 p-3 text-center">
           <div className="flex justify-center gap-4">
             {Array.from({ length: 3 }).map((_, idx) => (
@@ -563,7 +569,8 @@ const handleWithdrawal = async () => {
           </div>
         </section>
 
-        <section className="p-5 flex justify-between items-center">
+        {/* 유저 정보 섹션 */}
+        <section className="p-5 flex justify-between items-center bg-white">
           <h2 className="font-bold text-2xl text-gray-800">{nickname}</h2>
           <button 
             onClick={handleWithdrawal}
@@ -573,7 +580,9 @@ const handleWithdrawal = async () => {
           </button>
         </section>
 
-        <nav className="flex border-b text-sm bg-white z-10 sticky top-0">
+        {/* 3. 탭 네비게이션 (스크롤 시 상단 고정!) */}
+        {/* HeaderWithBack의 높이가 보통 48px~56px이므로 top-0으로 설정하면 헤더 아래에 붙습니다. */}
+        <nav className="flex border-b text-sm bg-white z-20 sticky top-0 shadow-sm">
           {[
             { key: "homeReview", label: "홈" },
             { key: "posts", label: "게시글" },
@@ -581,22 +590,23 @@ const handleWithdrawal = async () => {
           ].map((tab) => (
             <button
               key={tab.key}
-              className={`flex-1 py-3 text-center font-medium border-b ${
+              className={`flex-1 py-4 text-center font-medium border-b-2 transition-all duration-200 ${
                 activeTab === tab.key
-                  ? "border-b-2 border-blue-500 text-blue-500 font-bold"
-                  : "border-gray-500 text-gray-500"
-              } transition-colors duration-200`}
+                  ? "border-blue-500 text-blue-500 font-bold"
+                  : "border-transparent text-gray-400"
+              }`}
               onClick={() => setActiveTab(tab.key as any)}
             >
               {tab.label}
             </button>
           ))}
         </nav>
-      </div>
 
-      <main className="p-3 flex-1 overflow-y-auto">
+        {/* 탭 콘텐츠 영역 */}
+        <div className="p-3 bg-gray-50 min-h-full">
           {tabContents[activeTab]}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

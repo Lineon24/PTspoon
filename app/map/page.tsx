@@ -517,7 +517,7 @@ const handleMyClick = () => {
   return <>
     {/* Kakao Maps SDK 스크립트 */}
     <Script src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer,drawing`} onLoad={handleMapLoad} strategy="afterInteractive"/>
-    <HeaderWithBack title="주변 맛집 찾기" backTF={true}/>
+    <HeaderWithBack title="주변 맛집 찾기" backTF={false}/>
 
     {/* 검색창 + 필터 버튼 */}
     <div className="fixed top-[45px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between p-2">
