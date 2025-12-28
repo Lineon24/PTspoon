@@ -233,6 +233,43 @@ export default function ProfilePage() {
     fetchProfileData();
   }, [fetchProfileData]);
 
+  
+const handleWithdrawal = async () => {
+  // 1차 확인: 단순 의사 묻기
+  const firstConfirm = window.confirm("정말로 피티스푼을 탈퇴하시겠습니까?");
+  if (!firstConfirm) return;
+
+  // 2차 확인: 데이터 삭제 경고 및 최종 의사 확인
+  const secondConfirm = window.confirm(
+    "⚠️ 마지막 확인입니다.\n\n탈퇴 시 작성하신 게시글, 댓글, 채팅방 데이터가 모두 삭제되며 절대 복구할 수 없습니다.\n정말로 모든 데이터를 삭제하고 탈퇴하시겠습니까?"
+  );
+  if (!secondConfirm) return;
+
+  // 두 번의 확인을 모두 통과했을 때만 아래 로직 실행
+  try {
+    // 1. Supabase RPC 호출 (DB 유저 삭제)
+    const { error: rpcError } = await supabase.rpc('delete_user');
+    
+    if (rpcError) {
+      console.error("RPC Error:", rpcError);
+      alert("탈퇴 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      return;
+    }
+
+    // 2. 클라이언트 세션 파기 (JWT 에러 방지용)
+    await supabase.auth.signOut();
+
+    alert("탈퇴가 완료되었습니다. 그동안 이용해주셔서 감사합니다.");
+    
+    // 3. 메인 페이지로 이동 및 새로고침
+    window.location.href = "/"; 
+    
+  } catch (err) {
+    console.error("Withdrawal Error:", err);
+    alert("서버와 통신 중 알 수 없는 오류가 발생했습니다.");
+  }
+};
+
   const handlePostDeleted = (deletedPostId: string) => {
     setMyPosts((prevPosts) => prevPosts.filter((post) => post.id !== deletedPostId));
   };
@@ -526,10 +563,14 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="p-4">
-          <div className="text-left">
-            <h2 className="font-bold text-lg">{nickname}</h2>
-          </div>
+        <section className="p-5 flex justify-between items-center">
+          <h2 className="font-bold text-2xl text-gray-800">{nickname}</h2>
+          <button 
+            onClick={handleWithdrawal}
+            className="text-[11px] text-gray-400 border border-gray-200 px-2 py-1 rounded hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
+          >
+            계정 탈퇴
+          </button>
         </section>
 
         <nav className="flex border-b text-sm bg-white z-10 sticky top-0">
