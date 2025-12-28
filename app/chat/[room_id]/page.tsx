@@ -221,6 +221,36 @@ useEffect(() => {
   );
   if (!profile) return null;
 
+  // 하이퍼 링크 처리 부분
+  const renderMessageContent = (content: string) => {
+  // URL 감지 정규식 (http/https로 시작하는 링크)
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  
+  // 정규식을 기준으로 텍스트 분할
+  const parts = content.split(urlRegex);
+
+  return parts.map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"             // 새 창에서 열기
+          rel="noopener noreferrer"   // 보안 설정
+          style={{
+            color: '#3171e3',         // 링크 색상 (브랜드 컬러 추천)
+            textDecoration: 'underline',
+            wordBreak: 'break-all',   // 긴 URL이 말풍선을 뚫고 나가는 것 방지
+          }}
+        >
+          {part}
+        </a>
+      );
+    }
+    // 일반 텍스트일 경우
+    return part;
+  });
+};
   return (
     // ⭐ 1. main 태그는 Flexbox 컨테이너 역할을 합니다.
     <main
@@ -265,8 +295,20 @@ useEffect(() => {
               {msg.username}
             </span>
             <div style={{ padding: '8px 13px', borderRadius: 13, background: msg.user_id === profile.id ? '#e6f0ff' : '#fff', fontWeight: 500, color: '#1d1d1f', maxWidth: '86%', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-              {msg.msg_image && (<img src={msg.msg_image} alt="msg-img" style={{ marginTop: 8, marginBottom: 10, maxWidth: '100%', borderRadius: 8, display: 'block' }}/>)}
-              {msg.content && (msg.content.startsWith('#') ? <RestaurantMessage tag={msg.content.slice(1)} /> : <span>{msg.content}</span>)}
+              {msg.msg_image && (
+              <img src={msg.msg_image} alt="msg-img" style={{ marginTop: 8, marginBottom: 10, maxWidth: '100%', borderRadius: 8, display: 'block' }}/>
+              )}
+
+              {msg.content && (
+                msg.content.startsWith('#') ? (
+                  <RestaurantMessage tag={msg.content.slice(1)} />
+                    ) : (
+                    // renderMessageContent 함수를 통해 텍스트 출력
+                  <span style={{ whiteSpace: 'pre-wrap' }}>
+                    {renderMessageContent(msg.content)}
+                  </span>
+                    )
+                )}
             </div>
           </div>
         )}
