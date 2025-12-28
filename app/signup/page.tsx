@@ -9,6 +9,7 @@ import HeaderWithBack from '@/components/HeaderWithBack';
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -46,6 +47,11 @@ const handleSignup = async (e: React.FormEvent) => {
     .from('profiles')
     .select('id')
     .eq('email', email);
+
+  if (password !== confirmPassword) {
+    setError('비밀번호가 일치하지 않습니다.');
+    return;
+  }
 
   if (profileError) {
     setError('서버 오류로 회원가입을 진행할 수 없습니다.');
@@ -116,6 +122,7 @@ const handleSignup = async (e: React.FormEvent) => {
           type="text"
           placeholder="닉네임"
           value={nickname}
+          maxLength={12}
           onChange={e => setNickname(e.target.value)}
           style={inputStyle}
           required
@@ -124,6 +131,7 @@ const handleSignup = async (e: React.FormEvent) => {
           type="email"
           placeholder="이메일"
           value={email}
+          maxLength={255}
           onChange={e => setEmail(e.target.value)}
           style={inputStyle}
           required
@@ -134,6 +142,16 @@ const handleSignup = async (e: React.FormEvent) => {
           value={password}
           onChange={e => setPassword(e.target.value)}
           style={inputStyle}
+          maxLength={20}
+          required
+        />
+        <input
+          type="password"
+          placeholder="비밀번호 확인"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          style={inputStyle}
+          maxLength={20}
           required
         />
         <button type="submit" style={buttonStyle}>회원가입</button>

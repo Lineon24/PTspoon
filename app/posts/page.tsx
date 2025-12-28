@@ -25,7 +25,7 @@ interface Profile {
 
 const POSTS_PER_PAGE = 10;
 
-type TagOption= '전체' | '음식' | '행사' | '자유';
+type TagOption = "전체" | "행사" | "음식" | "자유";
 
 export default function AllPostsPage() {
   const [search, setSearch]= useState('');
@@ -196,7 +196,7 @@ export default function AllPostsPage() {
           top:60,
           left:'50%',
           transform:'translateX(-50%)',
-          width:540,
+          width:520,
           maxWidth:'95%',
           zIndex:50,
           paddingTop:8,

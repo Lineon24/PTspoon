@@ -86,6 +86,7 @@ export default function LoginPage() {
           value={email}
           onChange={e => setEmail(e.target.value)}
           style={inputStyle}
+          maxLength={255}
           required
         />
         <input
@@ -94,6 +95,7 @@ export default function LoginPage() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           style={inputStyle}
+          maxLength={20}
           required
         />
         <button type="submit" style={buttonStyle}>로그인</button>
