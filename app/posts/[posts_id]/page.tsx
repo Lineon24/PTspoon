@@ -9,7 +9,6 @@ import { useRouter, useParams } from 'next/navigation';
 import HeaderWithBack from '@/components/HeaderWithBack';
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import { SendHorizontal } from 'lucide-react';
-import { FilterTag } from '@/components/filter-tag';
 import PostShareButton from '@/components/PostShareButton';
 
 // 인터페이스 정의 (기존과 동일)

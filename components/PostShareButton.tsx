@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-//공유 아이콘
 import { Share2 } from 'lucide-react';
 
-//UI 컴포넌트
+// UI 컴포넌트
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -14,197 +13,196 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-// 채팅방 목록 필터 모드
-// -mine : 내가 참여한 방
-// -all : 전체 방
+
+// 채팅방 기본 이미지 (ChatRoomListPage와 동일하게 설정)
+const DEFAULT_ROOM_IMAGE_URL = '/image/logo_bg.jpg';
+
 type ViewMode = 'all' | 'mine';
 
-//채팅방 타입
-
-interface ChatRoom{
-    id: string;
-    room_name:string;
-    created_at:string;
-    creator_id:string;
-    room_image?:string;
-    room_description?:string;
+interface ChatRoom {
+  id: string;
+  room_name: string;
+  created_at: string;
+  creator_id: string;
+  room_image?: string;
+  room_description?: string;
 }
 
-//PostShareButton 컴포넌트
-
-interface PostShareButtonProps{
-    postId:string; //공유할 게시글 ID
-    postTitle?:string; //게시글 제목 
-    postUrl?:string; //게시글 URL
+interface PostShareButtonProps {
+  postId: string;
+  postTitle?: string;
+  postUrl?: string;
 }
 
-export default function PostShareButton({postId, postTitle, postUrl}:PostShareButtonProps){
-    const [open , setOpen]= useState(false) //시트 열림/닫힘
-    const [viewMode,setViewMode]=useState<ViewMode>('mine'); //탭 상태
-    const [rooms, setRooms]=useState<ChatRoom[]>([]); //전체 채팅방 목록
-    const [myRoomIds,setMyRoomIds]=useState<string[]>([]); //내가 참여한 방 ID
-    const [loadingRooms, setLoadingRooms]= useState(false); //채팅방 로딩 상태
-    const [sendingRoomId, setSendingRoomId]= useState<string | null> (null) //전송 중 방
+export default function PostShareButton({ postId, postTitle, postUrl }: PostShareButtonProps) {
+  const [open, setOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('mine');
+  const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const [myRoomIds, setMyRoomIds] = useState<string[]>([]);
+  const [loadingRooms, setLoadingRooms] = useState(false);
+  const [sendingRoomId, setSendingRoomId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-    //postUrl이 전달되면 그대로 사용, 없으면 현재 origin 기준으로 /post/{id} 생성
-    const finalPostUrl= useMemo(()=>{
-        if (postUrl) return postUrl;
-        if (typeof window==='undefined') return `/posts/${postId}`;
-        return `${window.location.origin}/posts/${postId}`;
-    },[postId,postUrl]);
+  const finalPostUrl = useMemo(() => {
+    if (postUrl) return postUrl;
+    if (typeof window === 'undefined') return `/posts/${postId}`;
+    return `${window.location.origin}/posts/${postId}`;
+  }, [postId, postUrl]);
 
-    /*============================
-     * Sheet 열릴 때 채팅방 불러오기
-     *============================*/
+  /*============================
+   * Sheet 열릴 때 데이터 로드
+   *============================*/
+  useEffect(() => {
+    if (!open) return;
 
-    useEffect(()=>{
-        if (!open) return; //Sheet가 닫혀 있으면 실행 안함
+    const fetchData = async () => {
+      setLoadingRooms(true);
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) setCurrentUserId(userData.user.id);
 
-        const loadRooms = async () => {
-            setLoadingRooms(true);
+        const { data: roomsData } = await supabase
+          .from('chat_rooms')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-            try{
-                //현재 로그인 유저 가져오기
-                const {data : userData, error:userError}= await supabase.auth.getUser();
-                if (userError || !userData?.user) return;
+        setRooms((roomsData as ChatRoom[]) || []);
 
-                //전체 채팅방 조회
-                const {data:roomsData, error:roomsError}= await supabase
-                .from('chat_rooms')
-                .select('*')
-                .order('created_at', { ascending:false});
+        if (userData?.user) {
+          const { data: myMsgs } = await supabase
+            .from('messages')
+            .select('room_id')
+            .eq('user_id', userData.user.id);
 
-                if (!roomsError && roomsData){
-                    setRooms(roomsData as ChatRoom[]);
-                }
-                else{
-                    setRooms([]);
-                }
-                // 내가 메시지를 보낸 적 있는 방 조회
-                const {data:myMessages} = await supabase
-                .from('messages')
-                .select('room_id')
-                .eq('user_id',userData.user.id);
-
-                //중복 제거
-                const uniqueRoomIds = Array.from(
-                    new Set((myMessages || []).map((m:any)=> m.room_id))
-                );
-                setMyRoomIds(uniqueRoomIds);
-            }
-            finally{
-                setLoadingRooms(false);
-            }
-        };
-        loadRooms();
-    },[open]);
-    /*============================
-     * 탭에 따른 필터링(mine/all)
-     *============================*/
-    const visiableRooms = useMemo(()=>{
-        //전체 보기
-        if (viewMode==='all') return rooms;
-        //참여한 방만 보기
-        return rooms.filter((room)=> myRoomIds.includes(room.id));
-    },[rooms,myRoomIds,viewMode]);
-    /*============================
-     * 특정 채팅방에 게시글 공유
-     *============================*/
-    const handleShareToRoom= async (roomId:string)=>{
-        //이미 전송 중이면 중복 방지
-        if (sendingRoomId) return;
-
-        setSendingRoomId(roomId);
-
-        try{
-            //로그인 체크
-            const {data:userData}=await supabase.auth.getUser();
-            if (!userData?.user){
-                alert('로그인이 필요합니다.');
-                return;
-            }
-            //채팅에 남길 메시지 포맷
-            const message= `게시글을 공유했습니다!\n` + `${postTitle ? `제목: ${postTitle}\n`: ''}` + `${finalPostUrl}`;
-
-            //messages 테이블에 메시지 insert
-            const {error} = await supabase.from('messages').insert({
-                room_id : roomId,
-                user_id : userData.user.id,
-                content: message,
-            });
-            if (error) {
-                console.error(error);
-                alert("공유 중 오류가 발생했습니다. 관리자에게 신고 바랍니다.");
-                return;
-            }
-            alert('게시글을 공유했습니다!');
-            setOpen(false); //Sheet 닫기
+          const ids = Array.from(new Set((myMsgs || []).map((msg: any) => msg.room_id)));
+          setMyRoomIds(ids);
         }
-        finally{
-            setSendingRoomId(null);
-        }
+      } finally {
+        setLoadingRooms(false);
+      }
     };
-    //UI
-    return(
-        <Sheet open={open} onOpenChange={setOpen}>
-            {/*공유 아이콘 버튼*/}
-            <SheetTrigger asChild>
-                <Button variant={"ghost"} size={"icon"} aria-label='게시글 공유' className='h-11 w-11 rounded-full'>
-                    <Share2 className='h-11 w-11'/>
-                </Button>
-            </SheetTrigger>
-            {/*바텀/사이드 시트*/}
-            <SheetContent className='w-full sm:max-w-[540px]'>
-                <SheetHeader>
-                    <SheetTitle>채팅방에 공유하기</SheetTitle>
-                </SheetHeader>
-            {/*탭 버튼*/}
-            <div className='mt-4 flex gap-2'>
-                <Button 
-                variant={viewMode ==='mine'? 'default' : 'secondary'}
-                onClick={()=>setViewMode('mine')}
-                >
-                    참여한 방
-                </Button>
-                <Button 
-                variant={viewMode ==='all'? 'default' : 'secondary'}
-                onClick={()=>setViewMode('all')}>
-                    전체 채팅방
-                </Button>
-            </div>
-            {/*채팅방 리스트*/}
-            <div className='mt-4 space-y-2'>
-                {loadingRooms && (
-                    <div className='text-sm text-gray-500'>채팅방 불러오는 중</div>
-                )}
-                {!loadingRooms && visiableRooms.length===0 && (
-                    <div className='text-sm text-gray-500'>표시할 채팅방이 없습니다.</div>
-                )}
-            {visiableRooms.map((room) => (
-                <button
-                key={room.id}
-                onClick={() => handleShareToRoom(room.id)}
-                className="w-full rounded-lg border p-3 hover:bg-gray-50
-                             flex items-center justify-between text-left"
-                >
-                <div className="min-w-0">
-                    <div className="font-semibold truncate">
-                    {room.room_name}
-                    </div>
-                    {room.room_description && (
-                    <div className="text-xs text-gray-500 truncate">
-                        {room.room_description}
-                    </div>
-                    )}
-                </div>
+    fetchData();
+  }, [open]);
 
-                <div className="text-xs text-gray-500">
-                    {sendingRoomId === room.id ? '전송중...' : '공유'}
+  const visibleRooms = useMemo(() => {
+    if (viewMode === 'all') return rooms;
+    return rooms.filter((room) => myRoomIds.includes(room.id));
+  }, [rooms, myRoomIds, viewMode]);
+
+  const handleShareToRoom = async (roomId: string) => {
+    if (sendingRoomId) return;
+    setSendingRoomId(roomId);
+
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+      const message = `게시글을 공유했습니다!\n${postTitle ? `제목: ${postTitle}\n` : ''}${finalPostUrl}`;
+
+      const { error } = await supabase.from('messages').insert({
+        room_id: roomId,
+        user_id: userData.user.id,
+        content: message,
+      });
+
+      if (error) throw error;
+      alert('게시글을 공유했습니다!');
+      setOpen(false);
+    } catch (err) {
+      alert("공유 중 오류가 발생했습니다.");
+    } finally {
+      setSendingRoomId(null);
+    }
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      {/* 1. 트리거 버튼: 요청하신 블루 호버 효과와 mt-1 적용 */}
+      <SheetTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          aria-label='게시글 공유' 
+          className='h-12 w-12 mt-1 rounded-full hover:text-blue-600 hover:bg-blue-50 transition-colors'
+        >
+          <Share2 className='h-9 w-9'/>
+        </Button>
+      </SheetTrigger>
+
+      {/* 2. 시트 내부: ChatRoomListPage의 배경색(#f6faff) 적용 */}
+      <SheetContent className='w-full sm:max-w-[540px] bg-[#f6faff] border-l-0 overflow-y-auto'>
+        <SheetHeader>
+          <SheetTitle className="text-center font-bold text-lg">채팅방에 공유하기</SheetTitle>
+        </SheetHeader>
+
+        {/* 3. 탭 버튼 디자인: 둥근 알약 형태(#3478ff)로 통일 */}
+        <div className='mt-6 flex justify-center gap-2'>
+          <button
+            onClick={() => setViewMode('mine')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+              viewMode === 'mine' ? 'bg-[#3478ff] text-white shadow-sm' : 'bg-[#eee] text-[#333]'
+            }`}
+          >
+            참여한 방
+          </button>
+          <button
+            onClick={() => setViewMode('all')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+              viewMode === 'all' ? 'bg-[#3478ff] text-white shadow-sm' : 'bg-[#eee] text-[#333]'
+            }`}
+          >
+            전체 채팅방
+          </button>
+        </div>
+
+        {/* 4. 채팅방 리스트: 카드 디자인(보더, 둥근 모서리, 배경색 로직) 적용 */}
+        <div className='mt-6 space-y-2.5 pb-10'>
+          {loadingRooms && (
+            <div className='text-center py-10 text-sm text-gray-500'>목록을 불러오는 중...</div>
+          )}
+          
+          {!loadingRooms && visibleRooms.length === 0 && (
+            <div className='text-center py-10 text-sm text-gray-500'>표시할 채팅방이 없습니다.</div>
+          )}
+
+          {visibleRooms.map((room) => (
+            <button
+              key={room.id}
+              onClick={() => handleShareToRoom(room.id)}
+              disabled={!!sendingRoomId}
+              className={`relative w-full p-3 border border-[#ddd] rounded-[10px] flex items-center gap-3 text-left transition-colors group ${
+                currentUserId === room.creator_id ? 'bg-[#eafff8]' : 'bg-white'
+              } hover:bg-[#f0f0f0]`}
+            >
+              {/* 채팅방 썸네일 (44x44, 8px 라운드) */}
+              <img
+                src={room.room_image || DEFAULT_ROOM_IMAGE_URL}
+                alt="room"
+                className="w-[44px] h-[44px] rounded-[8px] object-cover border border-[#ddd] flex-shrink-0"
+              />
+
+              {/* 텍스트 정보 */}
+              <div className="flex-grow min-w-0 pr-12">
+                <div className="font-bold text-[15px] text-[#333] truncate">
+                  {room.room_name}
                 </div>
-                </button>
-            ))}
-            </div>
-            </SheetContent>
-        </Sheet>
-    )
+                {room.room_description && (
+                  <div className="text-[12px] text-[#777] mt-0.5 truncate leading-tight">
+                    {room.room_description}
+                  </div>
+                )}
+              </div>
+
+              {/* 오른쪽 하단 상태 표시 (클릭 유도 문구) */}
+              <div className="absolute right-3 bottom-2 text-[11px] text-[#999] group-hover:text-blue-500 transition-colors">
+                {sendingRoomId === room.id ? '전송중...' : '공유하기'}
+              </div>
+            </button>
+          ))}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
 }
