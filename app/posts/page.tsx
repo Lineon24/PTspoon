@@ -6,6 +6,7 @@ import HeaderWithBack from '@/components/HeaderWithBack';
 import PostList from '@/components/PostList';
 import { useInView } from 'react-intersection-observer'; 
 import { PostSearchAutocomplete } from '@/components/PostSearchBar';
+import { cn } from "@/lib/utils"
 
 interface Post {
   id: string;
@@ -190,29 +191,36 @@ export default function AllPostsPage() {
     <div style={{ maxWidth: 540, margin: '0 auto', padding: '20px', fontFamily: 'Pretendard, sans-serif', minHeight: '100vh', background: '#f8f9fa' }}>
       <HeaderWithBack title="전체 게시글" backTF={false} 
         buttonCustomName='게시글 작성' buttonCustomPath='/posts/write' buttonCustomicon={1} />
-      <div 
-        style={{
-          position:'fixed',
-          top:60,
-          left:'50%',
-          transform:'translateX(-50%)',
-          width:520,
-          maxWidth:'95%',
-          zIndex:50,
-          paddingTop:8,
-          paddingBottom:8,
-        }}>
-        <PostSearchAutocomplete
-          value={search}
-          onChange={setSearch}
-          onEnter={applySearch}
-          selectedTag={selectedTag}
-          onTagChange={(t) => {
-            setSelectedTag(t);
-            setIsSearching(t !== '전체' || search.trim().length > 0);
-          }}
-        />
-      </div>
+<div 
+  className={cn(
+    "fixed top-[56px] left-1/2 -translate-x-1/2 z-50 w-[520px] max-w-[95%]",
+    "bg-transparent pointer-events-none p-1"
+  )}
+>
+  {/* 🔍 입체감을 살린 메인 컨테이너 */}
+  <div className={cn(
+    "pointer-events-auto transition-all duration-300 ease-out",
+    "bg-white rounded-2xl",
+    // 1. 입체감: 더 깊고 풍부한 다중 그림자 적용 (Floating 효과)
+    "shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15),0_10px_20px_-5px_rgba(0,0,0,0.05)]", 
+    "focus-within:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.25)]", 
+    // 2. 애니메이션: 포커스 시 살짝 더 커짐
+    "focus-within:scale-[1.02]",
+    // 3. 메인 바 테두리 제거 (잔상 방지)
+    "!border-none !ring-0 !ring-offset-0 outline-none"
+  )}>
+    <PostSearchAutocomplete
+      value={search}
+      onChange={setSearch}
+      onEnter={applySearch}
+      selectedTag={selectedTag}
+      onTagChange={(t) => {
+        setSelectedTag(t);
+        setIsSearching(t !== '전체' || search.trim().length > 0);
+      }}
+    />
+  </div>
+</div>
       <div style={{ height: 80 }}></div>
 
       <div style={{ paddingTop: '0px' }}>
