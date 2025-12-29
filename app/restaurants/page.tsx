@@ -207,7 +207,7 @@ function RestaurantsPageContent() {
         >
           <SlidersHorizontal 
             className={cn(
-              "h-5 w-5 text-gray-700 transition-transform duration-300",
+              "h-5 w-5 text-gray-700 transition-transform duration-400",
               isSheetOpen ? "rotate-90 scale-110" : "rotate-0 scale-100"
             )} 
           />

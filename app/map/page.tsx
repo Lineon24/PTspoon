@@ -382,7 +382,7 @@ useEffect(() => {
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
               <button className="h-13 w-13 rounded-full bg-white flex items-center justify-center shadow-lg active:scale-90 transition-all">
-                <SlidersHorizontal className={cn("h-5 w-5 text-gray-700", isFilterOpen && "rotate-90")} />
+                <SlidersHorizontal className={cn("h-5 w-5 text-gray-700 transition-transform duration-400", isFilterOpen && "rotate-90")} />
               </button>
             </SheetTrigger>
             <SheetContent className="w-full sm:max-w-[540px] rounded-t-[24px]">

@@ -336,7 +336,7 @@ return (
           }}>{post.title}
           </div>
       </div>
-      <div style={{display : 'flex', gap: 10, alignItems:'center'}}>
+      <div style={{display : 'flex', gap: 8, alignItems:'center'}}>
         <PostShareButton
           postId={post.id}
           postTitle={post.title}
@@ -350,7 +350,8 @@ return (
             fontSize: '32px',
             color: '#999',
             cursor: 'pointer',
-            marginLeft: '10px',
+            marginLeft: '8px',
+            marginRight: '18px'
           }}
           title="게시글 삭제"
           >x</button>
