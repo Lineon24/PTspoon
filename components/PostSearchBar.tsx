@@ -134,19 +134,19 @@ export function PostSearchAutocomplete({
       <button
         type="button"
         onClick={toggleTagMenu}
-        className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-sm text-gray-600"
+        // right-3 유지, flex-shrink-0 추가하여 찌그러짐 방지
+        className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-sm text-gray-600 max-w-[100px]"
       >
-        {/* 선택된 태그 표시 (전체면 '태그') */}
-        <span className="select-none">
+        <span className="select-none truncate">
           {selectedTag === "전체" ? "태그" : `#${selectedTag}`}
         </span>
-        <ChevronDown className={`h-4 w-4 transition-transform ${tagOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${tagOpen ? "rotate-180" : ""}`} />
       </button>
 
       {/* input (오른쪽 버튼 공간 확보: pr 크게) */}
       <Input
         placeholder="찾고 싶은 게시글을 검색해 보세요"
-        className="pl-10 pr-16 h-12 rounded-full shadow-lg border-transparent"
+        className="pl-10 pr-25 h-12 rounded-full shadow-lg border-transparent"
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
         autoComplete="off"
