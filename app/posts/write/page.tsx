@@ -22,6 +22,8 @@ interface Post {
 interface Profile {
   id: string;
   nickname: string;
+  restaurant_name?: string; // 식당 이름 추가
+  is_owner?: boolean;       // 주인 여부 추가
 }
 
 export default function WritePostPage() {
@@ -35,7 +37,7 @@ export default function WritePostPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   //선택 가능한 태그 목록
-  const TAG_OPTIONS = ["자유","음식","행사"] as const;
+  const TAG_OPTIONS = ["자유","음식","행사","혼밥","홍보"] as const;
   //태그를 여러개 담게 하기
   const [tags, setTags]= useState<string[]>([]);
 
@@ -63,7 +65,7 @@ export default function WritePostPage() {
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('nickname')
+        .select('nickname, restaurant_name, is_owner')
         .eq('id', userData.user.id)
         .single();
 
@@ -126,6 +128,15 @@ export default function WritePostPage() {
     return;
     }
     setIsSubmitting(true);
+    // 홍보 (식당 태그)  코드
+    let finalTags = [...tags]; // 사용자가 선택한 태그들 (예: ["피티스푼", "음식"]) 
+
+  // 만약 내 식당 이름 태그를 선택했다면, 검색용 키워드 'promotion'을 몰래 추가
+  if (profile?.restaurant_name && tags.includes(profile.restaurant_name)) {
+    if (!finalTags.includes('promotion')) {
+      finalTags.push('promotion');
+    }
+  }
   //  이미지 업로드
     let uploadedUrls: string[] = []; // 여러 장 받기에 배열로
       if (selectedFiles.length > 0) {
@@ -149,7 +160,7 @@ export default function WritePostPage() {
       title: newPostTitle,
       content: newPostContent,
       image_urls: uploadedUrls,
-      tag:tags,
+      tag: finalTags,
     },
   ])
   .select();
@@ -239,26 +250,37 @@ const handleImageUpload = async (file: File, profile: Profile | null, index: num
           flexWrap:"wrap",
           marginBottom:6,
         }}>
-          {TAG_OPTIONS.map((t)=> {
-            const selected=tags.includes(t); //현재 태그가 선택됐는지 여부
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+            {TAG_OPTIONS.map((t) => {
+              const selected = tags.includes(t);
+              return (
+                <button key={t} type="button" onClick={() => toggleTag(t)}
+                 style={{
+                    padding: "6px 12px", borderRadius: 20, fontSize: 13,
+                    border: selected ? "1px solid #414de4" : "1px solid #ddd",
+                    background: selected ? "#414de4" : "#fff",
+                    color: selected ? "#fff" : "#333",
+                    fontWeight: 600, cursor: "pointer"
+                  }}>#{t}</button>
+              );
+            })}
 
-            return(
-              <button 
-              key={t}
-              type="button"
-              onClick={()=> toggleTag(t)}
-              style={{
-                padding:"6px 12px",
-                borderRadius:20,
-                fontSize:13,
-                border:selected? "1px solid #414de4" : "1px solid #ddd",
-                background:selected? "#414de4": "#fff",
-                color:selected ? "#fff" : "#333",
-                cursor : "pointer",
-                fontWeight: 600,
-              }}>#{t}</button>
-            )
-          })}
+            {/* 식당 주인일 경우 본인 식당 이름 태그 추가 표시 */}
+            {profile?.restaurant_name && (
+              <button
+                type="button"
+                onClick={() => toggleTag(profile.restaurant_name!)}
+                style={{
+                  padding: "6px 12px", borderRadius: 20, fontSize: 13,
+                  border: tags.includes(profile.restaurant_name) ? "1px solid #ff4d4f" : "1px solid #ddd",
+                  background: tags.includes(profile.restaurant_name) ? "#ff4d4f" : "#fff",
+                  color: tags.includes(profile.restaurant_name) ? "#fff" : "#333",
+                  fontWeight: 800, cursor: "pointer"
+                }}>
+                #{profile.restaurant_name} (내 식당)
+              </button>
+            )}
+          </div>
         </div>
         <input
           type="text" placeholder="게시글 제목을 입력하세요" value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)}

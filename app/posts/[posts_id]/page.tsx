@@ -304,30 +304,37 @@ return (
         alignItems:'flex-start',
         flex:1,
       }}>
-        {post.tag && post.tag.length>0 && (
-          <div style={{
-            display:'flex',
-            gap:6,
-            flexWrap:'wrap',
-            marginLeft:8,
-            marginTop:14,
-            marginBottom:2,
-          }}>
-            {post.tag.map((t)=>(
-              <span
-                key={t}
-                style={{
-                  fontSize:12,
-                  padding:'2px 2px',
-                  borderRadius: 999,
-                  color: '#414de4',
-                  fontWeight: 700,
-                  lineHeight:1,
-                }}
-              >#{t}</span>
-            ))}
-          </div>
-        )}
+        {post.tag && post.tag.length > 0 && (
+  <div style={{
+    display: 'flex',
+    gap: 6,
+    flexWrap: 'wrap',
+    marginLeft: 8,
+    marginTop: 14,
+    marginBottom: 2,
+  }}>
+    {post.tag.map((t) => {
+      // 시스템용 키워드인 'promotion'은 화면에 렌더링하지 않고 건너뜁니다.
+      if (t === 'promotion') return null;
+
+      return (
+        <span
+          key={t}
+          style={{
+            fontSize: 12,
+            padding: '2px 2px',
+            borderRadius: 999,
+            color: '#414de4',
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          #{t}
+        </span>
+            );
+          })}
+        </div>
+      )}
         <div style={{
           fontSize:'25px', 
           fontWeight: 'bold', 

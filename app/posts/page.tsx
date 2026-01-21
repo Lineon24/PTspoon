@@ -26,7 +26,7 @@ interface Profile {
 
 const POSTS_PER_PAGE = 10;
 
-type TagOption = "전체" | "행사" | "음식" | "자유";
+type TagOption = "전체" | "식당소식" | "행사" | "음식" | "자유" | "혼밥" | "홍보";
 
 export default function AllPostsPage() {
   const [search, setSearch]= useState('');
@@ -46,25 +46,33 @@ export default function AllPostsPage() {
   },[search, selectedTag]);
 
   const filteredPosts = useMemo(() => {
-    if (!isSearching) return posts;
+  const q = search.trim().toLowerCase();
 
-    const q = search.trim().toLowerCase();
+  if (!isSearching) return posts;
 
-    return posts.filter((p) => {
-      // 1) 텍스트 조건 (검색어 없으면 통과)
-      const matchText =
-        !q ||
-        (p.title ?? '').toLowerCase().includes(q) ||
-        (p.content ?? '').toLowerCase().includes(q);
+  return posts.filter((p) => {
+    // 1. 텍스트 검색 조건 (기존과 동일)
+    const matchText =
+      !q ||
+      (p.title ?? '').toLowerCase().includes(q) ||
+      (p.content ?? '').toLowerCase().includes(q);
 
-      // 2) 태그 조건 (전체면 통과)
-      const matchTag =
-        selectedTag === '전체' ||
-        (p.tag ?? []).includes(selectedTag);
+    // 2. 태그 조건 (수정된 부분)
+    let matchTag = false;
+    const postTags = p.tag ?? [];
 
-      return matchText && matchTag;
-    });
-  }, [posts, search, isSearching, selectedTag]);
+    if (selectedTag === '전체') {
+      matchTag = true;
+    } else if (selectedTag === '식당소식') {
+      // 시스템 태그(promotion)
+      matchTag = postTags.includes('promotion') 
+    } else {
+      matchTag = postTags.includes(selectedTag);
+    }
+
+    return matchText && matchTag;
+  });
+}, [posts, search, isSearching, selectedTag]);
 
   // [수정 1] 로직 제어용 '진짜' 잠금장치 (Ref는 리렌더링을 유발하지 않음)
   const isFetching = useRef(false); 

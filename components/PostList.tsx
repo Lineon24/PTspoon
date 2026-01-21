@@ -34,6 +34,7 @@ interface Comment {
 interface Profile {
   id: string;
   nickname: string;
+  restaurant_name?: string;
 }
 
 interface PostListProps {
@@ -177,18 +178,27 @@ export default function PostList({ posts, profile, onPostDeleted }: PostListProp
           }}>
             {/*태그 출력*/}
             <div style={{display:'flex', flexDirection: 'column', alignItems: 'flex-start', flex:1,}}>
-              {post.tag && post.tag.length >0 && (
-                <div style={{display:'flex',gap:6, flexWrap:'wrap', marginLeft:8, marginTop:2, marginBottom:2,}}>
-                  {post.tag.map((t)=> (
-                    <span key={t} style={{
-                      fontSize:12, 
-                      padding: '2px 2px', 
-                      borderRadius:999,
-                      color:'#414de4',
-                      fontWeight:700,
-                      lineHeight:1,
-                    }}>#{t}</span>
-                  ))}
+              {post.tag && post.tag.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginLeft: 8, marginTop: 2, marginBottom: 2 }}>
+                  {post.tag.map((t) => {
+                    // 1. 시스템용 영문 키워드 'promotion'만 화면에서 숨깁니다.
+                    if (t === 'promotion') return null;
+                    return (
+                      <span
+                        key={t}
+                        style={{
+                          fontSize: 12,
+                          padding: '2px 2px',
+                          borderRadius: 999,
+                          color: '#414de4', 
+                          fontWeight: 700,  
+                          lineHeight: 1,
+                        }}
+                      >
+                        #{t}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
               <h3 style={{ fontSize: '18px', margin: '5px 0 5px 8px', color: '#222' }}>{post.title}</h3>

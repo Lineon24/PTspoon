@@ -41,7 +41,7 @@ const RestaurantListItem = ({ restaurant }: { restaurant: Restaurant }) => (
       <p className="text-gray-400">{restaurant.phone || "연락처 정보 없음"}</p>
     </div>
     <div className="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-md text-xs ml-auto">
-      {restaurant.distanceText || "--"}
+      {restaurant.distanceText || "거리 계산 중"}
     </div>
   </div>
 )

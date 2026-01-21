@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown } from "lucide-react";
 
-type TagOption = "전체" | "행사" | "음식" | "자유";
+type TagOption = "전체" | "식당소식" |"행사" | "음식" | "자유" | "혼밥" | "홍보" | "식당소식";
 
 interface PostSearchAutocompleteProps {
   value: string;
@@ -17,7 +17,7 @@ interface PostSearchAutocompleteProps {
   onTagChange: (tag: TagOption) => void;
 }
 
-const TAG_OPTIONS: TagOption[] = ["전체", "행사", "음식", "자유"];
+const TAG_OPTIONS: TagOption[] = ["전체", "식당소식", "행사", "음식", "자유", "혼밥", "홍보"];
 
 export function PostSearchAutocomplete({
   value,
