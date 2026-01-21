@@ -137,7 +137,7 @@ export function PostSearchAutocomplete({
         onClick={() => setTagOpen(!tagOpen)}
         // 💡 !를 붙여서 클릭 시 발생하는 모든 테두리와 배경 변화를 강제로 끕니다.
         className={cn(
-          "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-gray-600 z-20",
+          "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-sm text-gray-600 z-20",
           "!outline-none !ring-0 !ring-offset-0 !border-none !bg-transparent", 
           "focus:!ring-0 focus:!outline-none active:!bg-transparent active:!scale-100"
         )}
