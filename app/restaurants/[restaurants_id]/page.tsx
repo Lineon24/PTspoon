@@ -201,7 +201,7 @@ useEffect(() => {
         {contentType === "review" ? (
           <RestaurantReviewList profile={profile} restaurant_id={restaurantId} />
         ) : contentType === "notice" ? (
-          <div className="px-0"> {/* PostList 내부에서 여백을 가지므로 px-0 권장 */}
+          <div className="px-2"> {/* PostList 내부에서 여백을 가지므로 px-0 권장 */}
             {noticePosts.length > 0 ? (
               <PostList 
                 posts={noticePosts} 
