@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type TagOption = "전체" | "식당소식" |"행사" | "음식" | "자유" | "혼밥" | "홍보" | "식당소식";
 
@@ -146,11 +147,15 @@ export function PostSearchAutocomplete({
       {/* input (오른쪽 버튼 공간 확보: pr 크게) */}
       <Input
         placeholder="찾고 싶은 게시글을 검색해 보세요"
-        className="pl-10 pr-25 h-12 rounded-full shadow-lg border-transparent"
+        className={cn(
+          "pl-10 h-12 rounded-full shadow-lg border-transparent outline-none focus-visible:ring-0",
+          // 💡 식당소식일 때는 pr을 키워 글자가 약간 가려지게, 나머지는 넉넉하게 설정
+          selectedTag === "식당소식" ? "pr-25" : "pr-16" 
+        )}
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
         autoComplete="off"
-        onFocus={() => setIsClosedByClick(false)} // 포커스만 와도 다시 검색 가능
+        onFocus={() => setIsClosedByClick(false)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
