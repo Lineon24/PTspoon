@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 type TagOption = "전체" | "식당소식" |"행사" | "음식" | "자유" | "혼밥" | "홍보" | "식당소식";
 
@@ -134,14 +134,18 @@ export function PostSearchAutocomplete({
       {/* 오른쪽 태그 버튼(텍스트 + ▼) */}
       <button
         type="button"
-        onClick={toggleTagMenu}
-        // right-3 유지, flex-shrink-0 추가하여 찌그러짐 방지
-        className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-sm text-gray-600 max-w-[100px]"
+        onClick={() => setTagOpen(!tagOpen)}
+        // 💡 !를 붙여서 클릭 시 발생하는 모든 테두리와 배경 변화를 강제로 끕니다.
+        className={cn(
+          "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-gray-600 z-20",
+          "!outline-none !ring-0 !ring-offset-0 !border-none !bg-transparent", 
+          "focus:!ring-0 focus:!outline-none active:!bg-transparent active:!scale-100"
+        )}
       >
-        <span className="select-none truncate">
+        <span className="select-none truncate max-w-[70px]">
           {selectedTag === "전체" ? "태그" : `#${selectedTag}`}
         </span>
-        <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${tagOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 transition-transform", tagOpen && "rotate-180")} />
       </button>
 
       {/* input (오른쪽 버튼 공간 확보: pr 크게) */}
@@ -155,7 +159,7 @@ export function PostSearchAutocomplete({
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
         autoComplete="off"
-        onFocus={() => setIsClosedByClick(false)}
+        onFocus={() => setIsClosedByClick(false)} // 포커스만 와도 다시 검색 가능
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();

@@ -365,11 +365,23 @@ useEffect(() => {
       <HeaderWithBack title="주변 맛집 찾기" backTF={false} />
 
       {/* 검색 및 필터 UI */}
-      <div className="fixed top-[56px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between px-4 bg-transparent pointer-events-none">
-        <div className="flex-1 mr-4 pointer-events-auto group transition-all duration-300 focus-within:scale-[1.02]">
+      <div className="fixed top-[56px] left-0 right-0 z-30 max-w-[540px] mx-auto flex items-center justify-between px-3 bg-transparent pointer-events-none">
+        {/* 1. 확대 애니메이션 (1.05배) */}
+        <div className="flex-1 mr-3 pointer-events-auto group transition-all duration-300 focus-within:scale-[1.04]">
           <div className={cn(
-            "relative bg-white rounded-2xl transition-all duration-300 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]",
-            "border-none ring-0 outline-none [&_input]:border-none [&_input]:ring-0"
+            "relative bg-white rounded-full transition-all duration-300 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]",
+            // 💡 클릭 시 검은색 테두리 (ring-4)
+            "ring-0 focus-within:ring-3 focus-within:ring-black",
+            // 💡 포커스 시 더 깊은 그림자
+            "focus-within:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.25)]",
+            // 💡 레이어 우선순위 및 기본 테두리 제거
+            "z-40 focus-within:z-50 outline-none border-none",
+            
+            // 🔥 [핵심 추가] 내부의 모든 자식 요소(! 기호로 강제)가 
+            // 클릭 시 별도의 테두리를 그리지 못하도록 차단하여 "안쪽 칠해짐" 방지
+            "[&_*]:!ring-0 [&_*]:!outline-none [&_*]:!ring-offset-0",
+            "[&_input]:!border-none [&_input]:!bg-white",
+            "[&_button]:!bg-transparent"
           )}>
             <SearchAutocomplete
               value={inputValue}
@@ -377,7 +389,7 @@ useEffect(() => {
               onEnter={() => handleFilterSearch({ selectedFoodTypes: [], selectedTasteTypes: [], tasteSearchLogic: "OR" })}
             />
           </div>
-        </div>
+          </div>
         <div className="pointer-events-auto">
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
