@@ -155,7 +155,7 @@
 ### 3️⃣ 지도 기능
 | 지도 페이지(실시간 위치, 필터링 기능) | 
 | :---: | 
-| ![지도 페이지](https://github.com/Lineon24/PTspoon/blob/main/image/%EC%A7%80%EB%8F%84%EA%B8%B0%EB%8A%A5.gif) | 
+| ![지도 페이지](https://github.com/Lineon24/restaurant_finder/blob/main/image/%EC%A7%80%EB%8F%84%EA%B8%B0%EB%8A%A5.gif) | 
 | 실시간 나의 위치로 주변 식당 정보와 필터링 기능을 사용할 수 있습니다.<br/>왼쪽 아래의 버튼으로 평택대와 내 위치로 이동 가능합니다. | 
 
 
@@ -164,7 +164,7 @@
 ### 4️⃣ 소통 (게시글)
 | 전체 게시글(실시간) | 
 | :---: |
-| ![게시글 페이지](https://github.com/Lineon24/PTspoon/blob/main/image/%EA%B2%8C%EC%8B%9C%ED%8C%90%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![게시글 페이지](https://github.com/Lineon24/restaurant_finder/blob/main/image/%EA%B2%8C%EC%8B%9C%ED%8C%90%20%EA%B8%B0%EB%8A%A5.gif) | 
 | 게시글 페이지에서 게시글을 작성하거나 실시간으로 업로드되는 글을 볼 수 있습니다. | 
 
 | 게시글 상세 | 
@@ -190,29 +190,29 @@
 ### 5️⃣ 소통 (공유)
 | 태그 기능 | 
 | :---: |
-| ![태그 기능](https://github.com/Lineon24/PTspoon/blob/main/%ED%83%9C%EA%B7%B8%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![태그 기능](https://github.com/Lineon24/restaurant_finder/blob/main/%ED%83%9C%EA%B7%B8%20%EA%B8%B0%EB%8A%A5.gif) | 
 | 게시글에 태그를 넣어 다른 사람들에게 필요한 정보를 주거나 얻을 수 있습니다. | 
 
 | 게시글 공유 | 
 | :---: |
-| ![게시글 공유](https://github.com/Lineon24/PTspoon/blob/main/%EA%B2%8C%EC%8B%9C%EA%B8%80%20%EA%B3%B5%EC%9C%A0%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![게시글 공유](https://github.com/Lineon24/restaurant_finder/blob/main/%EA%B2%8C%EC%8B%9C%EA%B8%80%20%EA%B3%B5%EC%9C%A0%20%EA%B8%B0%EB%8A%A5.gif)| 
 | 채팅방으로 게시글을 공유하여 정보를 보내거나 받을 수 있습니다. | 
 
 | 식당 공유 | 
 | :---: |
-| ![식당 공유](https://github.com/Lineon24/PTspoon/blob/main/%EC%8B%9D%EB%8B%B9%20%EA%B3%B5%EC%9C%A0%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![식당 공유](https://github.com/Lineon24/restaurant_finder/blob/main/%EC%8B%9D%EB%8B%B9%20%EA%B3%B5%EC%9C%A0%20%EA%B8%B0%EB%8A%A5.gif) | 
 | 괜찮은 식당의 정보를 채팅방에 전송을 할 수 있습니다. | 
 
 | 사장님의 공유 | 
 | :---: |
-| ![사장님의 공유](https://github.com/Lineon24/PTspoon/blob/main/image/%EC%82%AC%EC%9E%A5%EB%8B%98%20%ED%83%9C%EA%B7%B8%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![사장님의 공유](https://github.com/Lineon24/restaurant_finder/blob/main/image/%EC%82%AC%EC%9E%A5%EB%8B%98%20%ED%83%9C%EA%B7%B8%20%EA%B8%B0%EB%8A%A5.gif) | 
 | 가게의 사장님이 자신의 식당 태그를 누르고 작성을 하면 자동으로 식당 공지사항으로 올라갑니다. | 
 <br/>
 
 ### 6️⃣ 소통 (AI 피투)
 | AI 피투 채팅방 |
 | :---: | 
-| ![AI페이지](https://github.com/Lineon24/PTspoon/blob/main/image/AI%20%EC%B1%97%EB%B4%87%20%EA%B8%B0%EB%8A%A5.gif) | 
+| ![AI페이지](https://github.com/Lineon24/restaurant_finder/blob/main/image/AI%20%EC%B1%97%EB%B4%87%20%EA%B8%B0%EB%8A%A5.gif) | 
 | 무엇을 먹을지 고민될 땐<br/>AI 챗봇 '피투'에게 물어보세요! | 
 
 <br/>
