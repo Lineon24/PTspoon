@@ -187,7 +187,7 @@
 
 <br/>
 
-### 5️⃣ 소통 (공유)
+### 6️⃣ 소통 (공유)
 | 태그 기능 | 
 | :---: |
 | ![태그 기능](https://github.com/Lineon24/restaurant_finder/blob/main/%ED%83%9C%EA%B7%B8%20%EA%B8%B0%EB%8A%A5.gif) | 
@@ -209,7 +209,7 @@
 | 가게의 사장님이 자신의 식당 태그를 누르고 작성을 하면 자동으로 식당 공지사항으로 올라갑니다. | 
 <br/>
 
-### 6️⃣ 소통 (AI 피투)
+### 7️⃣ 소통 (AI 피투)
 | AI 피투 채팅방 |
 | :---: | 
 | ![AI페이지](https://github.com/Lineon24/restaurant_finder/blob/main/image/AI%20%EC%B1%97%EB%B4%87%20%EA%B8%B0%EB%8A%A5.gif) | 
@@ -217,7 +217,7 @@
 
 <br/>
 
-### 7️⃣ 내 정보
+### 8️⃣ 내 정보
 | 내 정보 |
 | :---: | 
 | ![마페이지](https://github.com/user-attachments/assets/cee53767-4ac7-4889-9aa3-7a3b87dc389f) | 
