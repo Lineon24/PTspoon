@@ -19,6 +19,15 @@
 
 <br/>
 
+## 🗄️ Database Design (ERD)
+
+| Supabase 데이터베이스 설계 |
+| :---: |
+| [![피티스푼 Supabase 데이터베이스 ERD](docs/images/ptspoon-supabase-erd.png)](docs/images/ptspoon-supabase-erd.png) |
+| 식당·메뉴·리뷰, 사용자 프로필, 게시글·댓글, 채팅방·메시지의 테이블 구조와 외래 키 관계입니다.<br/>이미지를 클릭하면 원본 크기로 확인할 수 있습니다. |
+
+<br/>
+
 ## 👥 Developers (개발팀)
 
 <table width="100%">
