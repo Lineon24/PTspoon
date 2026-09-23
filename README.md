@@ -54,7 +54,8 @@
         <span style="font-size: 13px; text-align: left;">
           🏗️ <b>System Architecture</b><br/>
           Next.js 전역 레이아웃 및 구조 설계<br/>
-          DB 설계 (ERD) & 인증 (OAuth)<br/>
+          Supabase 데이터베이스 설계 (ERD)<br/>
+          OAuth 인증 흐름 설계<br/>
           상단바, 네비게이션바 컴포넌트 제작<br/>
           <br/>
           🤖 <b>AI & FULL Stack</b><br/>
