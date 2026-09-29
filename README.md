@@ -54,8 +54,9 @@
         <b>이준희</b><br/>
         <span style="font-size: 12px;">팀장 / AI·풀스택 개발</span><br/><br/>
         <span style="font-size: 13px;">
-          프로젝트 총괄·시스템 아키텍처·DB 설계<br/>
-          DB 기반 2단계 AI 추천·요청 제한<br/>
+          프로젝트 총괄·시스템 아키텍처 설계<br/>
+          Supabase 데이터베이스 ERD 설계<br/>
+          AI 맛집 추천 챗봇·DB 기반 2단계 추천·요청 제한<br/>
           식당 수집·AI 태깅·DB 적재 자동화<br/>
           게시글·태그·점주 공지·채팅 공유<br/>
           인증·마이페이지·회원 탈퇴<br/>
