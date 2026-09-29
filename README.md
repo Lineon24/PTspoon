@@ -103,7 +103,8 @@
           <br/>
           🎨 <b>Design System</b><br/>
           UI 컴포넌트 라이브러리 구축<br/>
-          리뷰 작성 프로세스 UX
+          식당 상세 페이지 구현<br/>
+          리뷰 작성 페이지 및 작성 흐름 구현
         </span>
       </td>
       <td align="center">
