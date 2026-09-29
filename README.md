@@ -26,9 +26,9 @@
 <table width="100%">
   <thead>
     <tr>
-      <th width="33%" align="center">👑 프로젝트 총괄 / 인공지능·풀스택 개발</th>
-      <th width="34%" align="center">🧩 메인 개발자 / 코어 로직</th>
-      <th width="33%" align="center">💻 서브 개발자 / 브랜딩·품질 검증</th>
+      <th align="center" nowrap>👑&nbsp;프로젝트&nbsp;총괄&nbsp;/&nbsp;인공지능·풀스택&nbsp;개발</th>
+      <th align="center" nowrap>🧩&nbsp;메인&nbsp;개발자&nbsp;/&nbsp;코어&nbsp;로직</th>
+      <th align="center" nowrap>💻&nbsp;서브&nbsp;개발자&nbsp;/&nbsp;브랜딩·품질&nbsp;검증</th>
     </tr>
   </thead>
   <tbody>
@@ -51,8 +51,7 @@
     </tr>
     <tr>
       <td align="center">
-        <b>이준희</b><br/>
-        <span style="font-size: 12px;">팀장 / 인공지능·풀스택 개발</span><br/><br/>
+        <b>이준희</b><br/><br/>
         <span style="font-size: 13px;">
           프로젝트 총괄·시스템 아키텍처 설계<br/>
           Supabase 데이터베이스 ERD 설계<br/>
@@ -65,8 +64,7 @@
         </span>
       </td>
       <td align="center">
-        <b>서승진</b><br/>
-        <span style="font-size: 12px;">메인 개발자 / 핵심 로직 구현</span><br/><br/>
+        <b>서승진</b><br/><br/>
         <span style="font-size: 13px;">
           음식 카테고리·맛 특징 필터링·AND/OR 로직<br/>
           초기 지도·현재 위치·거리 계산 구현<br/>
@@ -77,8 +75,7 @@
         </span>
       </td>
       <td align="center">
-        <b>김윤정</b><br/>
-        <span style="font-size: 12px;">서브 개발자 / 브랜딩·품질 검증</span><br/><br/>
+        <b>김윤정</b><br/><br/>
         <span style="font-size: 13px;">
           실시간 채팅 구현·개선<br/>
           채팅방 생성·설정·삭제<br/>
