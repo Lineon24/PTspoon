@@ -28,7 +28,7 @@
     <tr>
       <th width="33%" align="center">👑 PM · AI & Full Stack</th>
       <th width="34%" align="center">🧩 Core Logic & Map</th>
-      <th width="33%" align="center">💬 Chat · Branding & Research</th>
+      <th width="33%" align="center">💻 Sub Developer · Branding & QA</th>
     </tr>
   </thead>
   <tbody>
@@ -115,11 +115,11 @@
       </td>
       <td align="center">
         <b>김윤정</b><br/>
-        <span style="font-size: 12px;">채팅 기능 개발 / 브랜딩·사용자 조사</span><br/><br/>
+        <span style="font-size: 12px;">서브 개발자 / 브랜딩·QA</span><br/><br/>
         <span style="font-size: 13px; text-align: left;">
           💬 <b>Chat System</b><br/>
           채팅방 목록/생성 페이지 구현<br/>
-          실시간 채팅 기능 구현<br/>
+          실시간 채팅 기능 구현·개선<br/>
           카카오톡 스타일 메시지 UI<br/>
           채팅 이미지 첨부·미리보기·전송<br/>
           채팅방 이미지·설명 등록<br/>
@@ -130,6 +130,7 @@
           <br/>
           🔎 <b>User Research & QA</b><br/>
           베타 테스터 모집 및 운영<br/>
+          엣지 케이스 테스트 수행<br/>
           사용자 피드백 수집 및 개선<br/>
           점주 인터뷰 및 홍보 요구 조사<br/>
         </span>
