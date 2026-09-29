@@ -86,15 +86,20 @@
       </td>
       <td align="center">
         <b>서승진</b><br/>
-        <span style="font-size: 12px;">메인 개발자</span><br/><br/>
+        <span style="font-size: 12px;">메인 개발자 / 음식 필터링·초기 지도 전체 구현</span><br/><br/>
         <span style="font-size: 13px; text-align: left;">
           🧩 <b>Core Logic</b><br/>
-          복합 필터링 알고리즘 (AND/OR)<br/>
-          Cross-Page 상태 관리<br/>
+          음식 카테고리·맛 특징 기반 식당 필터링<br/>
+          여러 필터 조건을 조합하는 AND/OR 로직 구현<br/>
+          AND: 선택한 맛 특징을 모두 만족하는 식당 조회<br/>
+          OR: 선택한 맛 특징 중 하나 이상 포함하는 식당 조회<br/>
+          페이지 간 검색·필터 상태 관리<br/>
           <br/>
           🗺️ <b>Map Service</b><br/>
-          Geolocation & 마커 클러스터링<br/>
-          지도 인터랙션 & 바텀시트<br/>
+          초기 지도 기능 전체 개발<br/>
+          현재 위치 조회 및 지도 이동 기능<br/>
+          식당 마커 표시·클러스터링<br/>
+          지도 인터랙션 및 식당 정보 바텀시트<br/>
           <br/>
           🎨 <b>Design System</b><br/>
           UI 컴포넌트 라이브러리 구축<br/>
@@ -138,6 +143,8 @@
     </tr>
   </tbody>
 </table>
+
+서승진은 초기 서비스의 음식 필터링과 지도 기능 전체를 담당했습니다. 현재 위치 조회·지도 이동과 식당 탐색은 초기 구현에 포함되며, 후속 고도화에서 추가한 현재 위치 기준 식당 거리 계산·표시는 이준희가 구현했습니다.
 
 </br>
 
