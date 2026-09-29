@@ -86,7 +86,7 @@
       </td>
       <td align="center">
         <b>서승진</b><br/>
-        <span style="font-size: 12px;">메인 개발자 / 음식 필터링·초기 지도 전체 구현</span><br/><br/>
+        <span style="font-size: 12px;">메인 개발자 / 핵심 로직 구현</span><br/><br/>
         <span style="font-size: 13px; text-align: left;">
           🧩 <b>Core Logic</b><br/>
           음식 카테고리·맛 특징 기반 식당 필터링<br/>
