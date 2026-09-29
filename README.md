@@ -26,9 +26,9 @@
 <table width="100%">
   <thead>
     <tr>
-      <th width="33%" align="center">👑 PM & Full Stack</th>
-      <th width="34%" align="center">🎨 Main Developer</th>
-      <th width="33%" align="center">🧪 QA & Branding & Developer</th>
+      <th width="33%" align="center">👑 PM · AI & Full Stack</th>
+      <th width="34%" align="center">🧩 Core Logic & Map</th>
+      <th width="33%" align="center">💬 Chat · Branding & Research</th>
     </tr>
   </thead>
   <tbody>
@@ -52,7 +52,7 @@
     <tr>
       <td align="center">
         <b>이준희</b><br/>
-        <span style="font-size: 12px;">팀장 / 시스템 아키텍처</span><br/><br/>
+        <span style="font-size: 12px;">팀장 / AI·풀스택 개발</span><br/><br/>
         <span style="font-size: 13px; text-align: left;">
           🏗️ <b>System Architecture</b><br/>
           Next.js 전역 레이아웃 및 구조 설계<br/>
@@ -60,7 +60,7 @@
           OAuth 인증 흐름 설계<br/>
           상단바, 네비게이션바 컴포넌트 제작<br/>
           <br/>
-          🤖 <b>AI & FULL Stack</b><br/>
+          🤖 <b>AI & Full Stack</b><br/>
           OpenAI 기반 맛집 추천 챗봇<br/>
           사용자 조건 분석 → DB 후보 조회 → 답변 생성의 2단계 AI 추천 구조<br/>
           Upstash Redis 기반 AI 요청 횟수 제한 및 TTL 차단 로직 구현<br/>
@@ -115,7 +115,7 @@
       </td>
       <td align="center">
         <b>김윤정</b><br/>
-        <span style="font-size: 12px;">프론트엔드 / QA 담당</span><br/><br/>
+        <span style="font-size: 12px;">채팅 기능 개발 / 브랜딩·사용자 조사</span><br/><br/>
         <span style="font-size: 13px; text-align: left;">
           💬 <b>Chat System</b><br/>
           채팅방 목록/생성 페이지 구현<br/>
@@ -128,7 +128,7 @@
           ✨ <b>Branding</b><br/>
           자체 캐릭터(피투) 및 로고 디자인<br/>
           <br/>
-          🐞 <b>QA & Testing</b><br/>
+          🔎 <b>User Research & QA</b><br/>
           베타 테스터 모집 및 운영<br/>
           사용자 피드백 수집 및 개선<br/>
           점주 인터뷰 및 홍보 요구 조사<br/>
