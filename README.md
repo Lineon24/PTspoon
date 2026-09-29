@@ -27,7 +27,7 @@
   <thead>
     <tr>
       <th width="33%" align="center">👑 PM · AI & Full Stack</th>
-      <th width="34%" align="center">🧩 Core Logic & Map</th>
+      <th width="34%" align="center">🧩 메인 개발자 / 코어 로직</th>
       <th width="33%" align="center">💻 Sub Developer · Branding & QA</th>
     </tr>
   </thead>
