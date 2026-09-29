@@ -26,9 +26,9 @@
 <table width="100%">
   <thead>
     <tr>
-      <th width="33%" align="center">👑 PM · AI & Full Stack</th>
+      <th width="33%" align="center">👑 프로젝트 총괄 / 인공지능·풀스택 개발</th>
       <th width="34%" align="center">🧩 메인 개발자 / 코어 로직</th>
-      <th width="33%" align="center">💻 Sub Developer · Branding & QA</th>
+      <th width="33%" align="center">💻 서브 개발자 / 브랜딩·품질 검증</th>
     </tr>
   </thead>
   <tbody>
@@ -52,7 +52,7 @@
     <tr>
       <td align="center">
         <b>이준희</b><br/>
-        <span style="font-size: 12px;">팀장 / AI·풀스택 개발</span><br/><br/>
+        <span style="font-size: 12px;">팀장 / 인공지능·풀스택 개발</span><br/><br/>
         <span style="font-size: 13px;">
           프로젝트 총괄·시스템 아키텍처 설계<br/>
           Supabase 데이터베이스 ERD 설계<br/>
@@ -78,14 +78,14 @@
       </td>
       <td align="center">
         <b>김윤정</b><br/>
-        <span style="font-size: 12px;">서브 개발자 / 브랜딩·QA</span><br/><br/>
+        <span style="font-size: 12px;">서브 개발자 / 브랜딩·품질 검증</span><br/><br/>
         <span style="font-size: 13px;">
           실시간 채팅 구현·개선<br/>
           채팅방 생성·설정·삭제<br/>
           채팅 이미지 첨부·미리보기·전송<br/>
           피투 캐릭터·서비스 로고 디자인<br/>
           ERD 설계 지원·지속적인 디자인 피드백<br/>
-          베타 테스트·QA·엣지 케이스 테스트<br/>
+          베타 테스트·품질 검증·예외 상황 테스트<br/>
           사용자 피드백 수집·점주 인터뷰
         </span>
       </td>
@@ -114,7 +114,7 @@
 
 ## 팀원별 상세 담당
 
-### 이준희 — 팀장 / AI·풀스택 개발
+### 이준희 — 팀장 / 인공지능·풀스택 개발
 
 #### 시스템 설계
 
@@ -123,7 +123,7 @@
 - OAuth 인증 흐름 설계
 - 상단바, 네비게이션바 컴포넌트 제작
 
-#### AI·데이터 및 서비스 개발
+#### 인공지능·데이터 및 서비스 개발
 
 - OpenAI 기반 맛집 추천 챗봇
 - 사용자 조건 분석 → DB 후보 조회 → 답변 생성의 2단계 AI 추천 구조
@@ -177,7 +177,7 @@
 - 리뷰 작성 페이지 및 작성 흐름 구현
 - 리뷰의 메뉴·맛 특징 선택 및 저장
 
-### 김윤정 — 서브 개발자 / 브랜딩·QA
+### 김윤정 — 서브 개발자 / 브랜딩·품질 검증
 
 #### 채팅 기능
 
@@ -198,7 +198,7 @@
 - 사이트 디자인에 대한 지속적인 검토와 개선 의견 제안
 - 주변 사용자의 디자인 피드백 수집·전달
 
-#### 사용자 조사·QA
+#### 사용자 조사·품질 검증
 
 - 베타 테스터 모집 및 운영
 - 엣지 케이스 테스트 수행
